@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <title>Demo</title>
+  </head>
+  <body>
+
+    <div class="container w-60 h-100" id="main-container">
+        <!-- Buttons Group -->
+        <div class="row h-100 align-items-center" id="buttons">
+            <div class="col"></div>
+            <div class="col-5" id="action-buttons">
+                <p class="h1 text-center mb-5">Demo</p>
+                <div>
+                    <button class="btn btn-primary btn-block mb-3 mt-3" id="show-login" type="button">
+                        <span class="font-weight-bold" id="show-login">
+                            登 录
+                        </span>
+                    </button>
+                    <button class="btn btn-primary btn-block mb-3 mt-3" id="show-register" type="button">
+                        <span class="font-weight-bold" id="show-register">
+                            注 册
+                        </scan>
+                    </button>
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>
+
+        <!-- Login/Register Form -->
+        <!-- TODO: check form's intergity -->
+        <!-- TODO: more smooth effect when showing and hiding -->
+        <div class="row h-100 align-items-center d-none" id="form">
+            <div class="col"></div>
+            <div class="col-8">
+                <p class="h1 text-center mb-5">Demo</p>
+                <div id="form">
+                    <form>
+                        <div class="container">
+                            <div class="form-group row">
+                                <label for="exampleInputEmail1">Email address</label>
+                                <input type="email" class="form-control" id="email" placeholder="Enter email">
+                            </div>
+                            <div class="form-group row">
+                                <label for="exampleInputPassword1">Password</label>
+                                <input type="password" class="form-control" id="password" placeholder="Password">
+                                <small class="form-text text-muted" id="action-result"></small>
+                            </div>
+                            <div class="row justify-content-center" id="form-buttons">
+                                <div class="col"></div>
+                                <div class="col-3">
+                                    <button id="return" class="btn btn-primary">返回</button>
+                                </div>
+                                <div class="col-3">
+                                    <button id="submit" type="button" class="btn btn-primary"></button>
+                                    <button id="loading" class="btn btn-primary d-none" type="button" disabled>
+                                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                                        <span class="sr-only">Loading...</span>
+                                    </button>
+                                </div>
+                                <div class="col"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>
+
+    </div>
+
+    <script>
+        delete module.exports
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>
