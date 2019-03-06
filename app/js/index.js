@@ -37,6 +37,9 @@ function submit(type) {
     var success = (data) => {
         $("button#loading").addClass("d-none")
         $("button#submit").removeClass("d-none").text("Success")
+        if (type == "login") {
+            ipcRenderer.send("load-page", "editor")
+        }
     }
 
     $("button#submit").addClass("d-none")

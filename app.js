@@ -41,3 +41,15 @@ ipcMain.on("alert", (event, arg) => {
     console.log(arg)
     event.returnValue = 'pong'
 })
+
+ipcMain.on("load-page", (event, arg) => {
+    console.log("load page:", arg)
+    if (arg == "editor") {
+        window.loadURL(url.format({
+            pathname: path.join(__dirname, "app/editor.html"),
+            protocol: "file:",
+            slashes: true
+        }))
+    }
+
+})
