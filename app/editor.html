@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./css/styles.css">
+
+        <title>Editor</title>
+    </head>
+
+    <body>
+
+        <div class="container w-100 h-100">
+
+            <!-- toolbar -->
+            <div class="row h-25 w-100 align-items-center justify-content-center no-gutters">
+                <div class="col-sm-7 col-md-6 col-lg-4 text-center">
+                    <div class="btn-group" role="group" aria-label="basic group">
+                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/bold.png" /></button>
+                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/italic.png" /></button>
+                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/underline.png" /></button>
+                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/left-align.png" /></button>
+                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/align-center.png" /></button>
+                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/right-align.png" /></button>
+                        <div class="btn-group" role="group" aria-label="basic group">
+                            <button id="paragraph" type="button" class="btn btn-light btn-sm dropdown-toggle font-weight-bolder" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Paragraph
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#">Heading 1</a>
+                                <a class="dropdown-item" href="#">Headint 2</a>
+                            </div>
+                        </div>
+                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/symbol.png" /></button>
+                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/profits.png" /></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- text area -->
+            <div class="row h-75 w-100 align-items-start justify-content-center no-gutters">
+                <div class="col text-center h-100">
+                    <div class="editor" contenteditable>
+                        <h1>Simple Html editor</h1>
+                        <p>Good to start</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <script>
+            delete module.exports
+        </script>
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    </body>
+
+</html>
