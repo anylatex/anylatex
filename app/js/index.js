@@ -3,7 +3,7 @@ const remote = require('electron').remote
 
 function showLoginForm() {
     // hide buttons
-    $("div#action-buttons").fadeOut()
+    $("div#buttons").fadeOut()
     // show form
     $("button#submit").text("登录")
     $("button#submit").val("login")
