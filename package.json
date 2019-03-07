@@ -6,7 +6,9 @@
   "dependencies": {
     "electron": "^4.0.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^5.15.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron app.js"

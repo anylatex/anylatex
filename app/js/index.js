@@ -44,7 +44,7 @@ function submit(type) {
 
     $("button#submit").addClass("d-none")
     $("button#loading").removeClass("d-none")
-    var url = remote.getGlobal("api_base")
+    var url = remote.getGlobal("apiBase")
     var data = { email: $("input#email").val(), password: $("input#password").val() }
 
     if (type === "login") {
