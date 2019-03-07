@@ -33,7 +33,8 @@ app.once('ready', () => {
 })
 
 
-global.api_base = "http://latex.0x7cc.com:8080"
+global.apiBase = "http://latex.0x7cc.com:8080"
+global.currentCompilingTask = ""
 
 const { ipcMain } = require("electron")
 
@@ -52,4 +53,23 @@ ipcMain.on("load-page", (event, arg) => {
         }))
     }
 
+})
+
+// add a compile task
+ipcMain.on("add-task", (event, arg) => {
+    console.log("add task:", arg)
+    global.currentCompilingTask = arg
+    event.returnValue = "done"
+})
+
+// pop up a page
+ipcMain.on("pop-page", (event, arg) => {
+    if (arg == "pdfviewer") {
+        let child = new BrowserWindow({parent: window, modal: true, show: true});
+        child.loadURL(url.format({
+            pathname: path.join(__dirname, "app/pdfviewer.html"),
+            protocol: "file:",
+            slashes: true
+        }))
+    }
 })

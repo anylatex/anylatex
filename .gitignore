@@ -1,5 +1,7 @@
 # vscode
 *.code-workspace
+# es-lint
+*.eslintrc.json
 
 # Logs
 logs
