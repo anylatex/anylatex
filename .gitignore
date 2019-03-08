@@ -2,6 +2,8 @@
 *.code-workspace
 # es-lint
 *.eslintrc.json
+# config
+config.json
 
 # Logs
 logs
