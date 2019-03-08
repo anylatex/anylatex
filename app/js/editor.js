@@ -6,46 +6,14 @@ toolbar.addEventListener("click", toolbarHandler)
 
 function toolbarHandler(event) {
     var target = event.target
-    var command = ""
-    var value = ""
-    ipcRenderer.sendSync("alert", "click: "+target.id)
-    switch(target.id) {
-        case "b-bold":
-            command = "bold"
-            break
-        case "b-italic":
-            command = "italic"
-            break
-        case "b-underline":
-            command = "underline"
-            break
-        case "b-leftalign":
-            command = "justifyLeft"
-            break
-        case "b-centeralign":
-            command = "justifyCenter"
-            break
-        case "b-rightalign":
-            command = "justifyRight"
-            break
-        case "b-h1":
-            command = "formatBlock"
-            value = "H1"
-            break
-        case "b-h2":
-            command = "formatBlock"
-            value = "H2"
-            break
-        case "b-h3":
-            command = "formatBlock"
-            value = "H3"
-            break
-        case "b-compile":
-            compile()
-            return
-    }
+    var command = target.getAttribute("command")
+    var value = target.getAttribute("value")
+    ipcRenderer.sendSync("alert", "click: "+command)
     document.execCommand(command, false, value)
 }
+
+let compileButton = document.getElementById("compile")
+compileButton.addEventListener("click", compile)
 
 function compile() {
 

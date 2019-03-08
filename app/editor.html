@@ -14,26 +14,33 @@
 
             <!-- toolbar -->
             <div class="row mt-5 mb-4 align-items-center justify-content-center no-gutters">
-                <div class="col-sm-7 col-md-6 col-lg-4 text-center">
-                    <div id="toolbar" class="btn-group" role="group" aria-label="basic group">
-                        <button id="b-bold" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/bold.png" /></button>
-                        <button id="b-italic" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/italic.png" /></button>
-                        <button id="b-underline" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/underline.png" /></button>
-                        <button id="b-leftalign" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/left-align.png" /></button>
-                        <button id="b-centeralign" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/align-center.png" /></button>
-                        <button id="b-rightalign" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/right-align.png" /></button>
-                        <div class="btn-group" role="group" aria-label="basic group">
-                            <button id="b-paragraph" type="button" class="btn btn-light btn-sm dropdown-toggle font-weight-bolder" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Paragraph
-                            </button>
-                            <div class="dropdown-menu">
-                                <a id="b-h1" class="dropdown-item" href="#">Heading 1</a>
-                                <a id="b-h2" class="dropdown-item" href="#">Heading 2</a>
-                                <a id="b-h3" class="dropdown-item" href="#">Heading 3</a>
+                <div class="col-sm-9 col-md-8 col-lg-5 text-center">
+                    <div id="btn-toolbar h-100" class="btn-group" role="toolbar">
+                        <div id="toolbar" class="btn-group mr-2 h-100" role="group">
+                            <button command="bold" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/bold.png" /></button>
+                            <button command="italic" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/italic.png" /></button>
+                            <button command="underline" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/underline.png" /></button>
+                            <button command="justifyLeft" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/left-align.png" /></button>
+                            <button command="justifyCenter" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/align-center.png" /></button>
+                            <button command="justifyRight" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/right-align.png" /></button>
+                            <button command="justifyFull" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/justify.png" /></button>
+                            <button command="insertUnorderedList" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/list.png" /></button>
+                            <button command="insertOrderedList" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/list-1.png" /></button>
+                            <div class="btn-group" role="group" aria-label="basic group">
+                                <button command="b-paragraph" value="" type="button" class="btn btn-light btn-sm dropdown-toggle font-weight-bolder" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Paragraph
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a command="formatBlock" value="H1" class="dropdown-item" href="#">Heading 1</a>
+                                    <a command="formatBlock" value="H2" class="dropdown-item" href="#">Heading 2</a>
+                                    <a command="formatBlock" value="H3" class="dropdown-item" href="#">Heading 3</a>
+                                </div>
                             </div>
+                            <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/symbol.png" /></button>
                         </div>
-                        <button class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/symbol.png" /></button>
-                        <button id="b-compile" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/profits.png" /></button>
+                        <div class="btn-group h-100" role="group">
+                            <button id="compile" class="btn btn-light btn-sm" type="button"><img class="img-fluid" src="assets/editor/profits.png" /></button>
+                        </div>
                     </div>
                 </div>
                 <div class="col d-none text-muted" id="debug-info"></div>
