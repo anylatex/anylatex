@@ -21,7 +21,7 @@ app.once('ready', () => {
 
   // Load a URL in the window to the local index.html path
   window.loadURL(url.format({
-    pathname: path.join(__dirname, 'app/index.html'),
+    pathname: path.join(__dirname, 'app/editor.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -33,7 +33,9 @@ app.once('ready', () => {
 })
 
 
-global.apiBase = "http://latex.0x7cc.com:8080"
+const config = require("./config.json")
+console.log("api: " + config.api)
+global.apiBase = config.api
 global.currentCompilingTask = ""
 
 const { ipcMain } = require("electron")
@@ -52,7 +54,6 @@ ipcMain.on("load-page", (event, arg) => {
             slashes: true
         }))
     }
-
 })
 
 // add a compile task
