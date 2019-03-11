@@ -1,30 +1,50 @@
 const { ipcRenderer } = require('electron')
 const remote = require('electron').remote
 
-var apiBase = remote.getGlobal("apiBase")
-var currentTask = remote.getGlobal("currentCompilingTask")
-var pdfUrl = apiBase + '/compile/result/' + currentTask
-var statusUrl = apiBase + '/compile/status/' + currentTask
-var finishUrl = apiBase + '/compile/delete/' + currentTask
+var baseRequest = remote.getGlobal('baseRequest')
+var currentTaskId = remote.getGlobal("currentCompilingTask")
 
 // get compiling status
 var isContinue = true
+var pdfData = ""
 while (isContinue) {
     $.ajax({
-        url: statusUrl,
+        url: 'http://latex.0x7cc.com:8080/tasks/'+currentTaskId,
         type: "get",
         success: (data) => {
-            ipcRenderer.send("alert", data)
-            isContinue = false
+            ipcRenderer.send('alert', 'received raw data')
+            if (data['status'] == 'finished') {
+                isContinue = false
+                pdfData = data['pdf_b64']
+                ipcRenderer.send('alert', 'downloaded pdf content')
+            }
         },
         async: false
     })
 }
 
+// delete the task
+baseRequest.delete(
+    '/tasks/' + currentTaskId,
+    (error, response, jsonBody) => {
+        if (error) {
+            ipcRenderer.send(
+                'alert',
+                'error when deleting the task ' +
+                currentTaskId + ' error: ' + jsonBody
+            )
+        } else {
+            ipcRenderer.send('alert', 'delete task successfully')
+        }
+    }
+)
+
+pdfData = atob(pdfData)
+
 // render pdf
 var pdfjsLib = window['pdfjs-dist/build/pdf'];
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.worker.js';
-var loadingTask = pdfjsLib.getDocument(pdfUrl);
+var loadingTask = pdfjsLib.getDocument({data: pdfData});
 loadingTask.promise.then(function (pdf) {
     // Fetch the first page
     var pageNumber = 1;
@@ -50,17 +70,6 @@ loadingTask.promise.then(function (pdf) {
         renderTask.promise.then(function () {
         });
     });
-    $.ajax({
-        url: finishUrl,
-        type: "get",
-        error: (jqXHR, textStatus, errorThrown) => {
-            ipcRenderer.send("alert", jqXHR.status + ": " + jqXHR.statusText)
-        },
-        success: (data) => {
-            ipcRenderer.send("alert", "delete pdf successfully")
-        },
-        async: false
-    })
 }, function (reason) {
     // pdf loading error
     ipcRenderer.send("alert", "pdf render error:" + reason)
