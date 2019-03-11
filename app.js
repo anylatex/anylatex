@@ -1,6 +1,8 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const url = require('url')
+const request = require('request');
+const config = require("./config.json")
 
 let window = null
 
@@ -32,10 +34,40 @@ app.once('ready', () => {
   })
 })
 
+// setup base request with api base setted and json option enabled
+console.log("api: " + config.apiBase)
+const baseRequest = request.defaults({
+    'baseUrl': config.apiBase,
+    'json': true
+})
+global.baseRequest = baseRequest
 
-const config = require("./config.json")
-console.log("api: " + config.api)
-global.apiBase = config.api
+// get user id, request if not exist
+console.log("user id: " + config.userId)
+if (config.userId == undefined) {
+    baseRequest.post('/users', function(error, response, jsonBody) {
+        if (error) {
+            console.log(error)
+            global.userId = ""
+        } else {
+            console.log('user id:', jsonBody['user_id'])
+            config.userId = jsonBody['user_id']
+            global.userId = config.userId
+            const fs = require('fs')
+            fs.writeFile('./config.json', JSON.stringify(config), err => {
+                if (err) {
+                    console.log('save config file error:', err)
+                } else {
+                    console.log('user id has saved into config.')
+                }
+            })
+        }
+    })
+} else {
+    // read from file
+    global.userId = config.userId
+}
+
 global.currentCompilingTask = ""
 
 const { ipcMain } = require("electron")

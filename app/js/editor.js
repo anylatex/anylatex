@@ -1,5 +1,7 @@
 const { ipcRenderer } = require('electron')
 const remote = require('electron').remote
+const path = require('path')
+const { Converter } = require(path.resolve('app/js/converter.js'))
 
 let toolbar = document.getElementById("toolbar")
 toolbar.addEventListener("click", toolbarHandler)
@@ -16,27 +18,29 @@ let compileButton = document.getElementById("compile")
 compileButton.addEventListener("click", compile)
 
 function compile() {
+    var html = document.getElementById("editor").innerHTML
+    var converter = new Converter(html)
+    var latex = converter.convert()
+    ipcRenderer.send("alert", "latex: "+latex)
 
-    var error = (jqXHR, textStatus, errorThrown) => {
-        var debugDiv = $("div#debug-ingo")
-        debugDiv.text(jqXHR.status + ": " + jqXHR.statusText)
-        debugDiv.removeClass("d-none")
+    // send the compiling task
+    var baseRequest = remote.getGlobal('baseRequest')
+    var body = {
+        'user_id': remote.getGlobal('userId'),
+        'latex': latex
     }
-
-    var success = (data) => {
-        ipcRenderer.sendSync("add-task", "temp")
-        ipcRenderer.send("pop-page", "pdfviewer")
-    }
-
-    html = document.getElementById("editor").innerHTML
-    html = "<html><head></head><body>" + html + "</body></html>"
-    url = remote.getGlobal("apiBase") + "/compile/start"
-
-    $.ajax({
-        url: url,
-        type: "post",
-        data: {html: html, task: "temp"},
-        error: error,
-        success: success
-    })
+    baseRequest.post(
+        '/tasks',
+        {'body': body},
+        (error, response, jsonBody) => {
+            if (error) {
+                var debugDiv = $("div#debug-info")
+                debugDiv.text(error + ': ' + jsonBody)
+                debugDiv.removeClass("d-none")
+            } else {
+                ipcRenderer.sendSync("add-task", jsonBody['task_id'])
+                ipcRenderer.send("pop-page", "pdfviewer")
+            }
+        }
+    )
 }
