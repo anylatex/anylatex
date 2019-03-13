@@ -5,7 +5,7 @@ class Converter {
     // TODO: supported document classes' list
     // TODO: get document's structure from server
 
-    constructor(html, documentClass = "article") {
+    constructor(html, documentClass = "ctexart") {
         this.html = html
         this.documentClass = documentClass
         this.translatedLatex = `\\documentclass{${this.documentClass}}\n\\begin{document}\n%s\n\\end{document}`
