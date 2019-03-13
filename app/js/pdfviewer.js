@@ -44,7 +44,9 @@ pdfData = atob(pdfData)
 // render pdf
 var pdfjsLib = window['pdfjs-dist/build/pdf'];
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.worker.js';
-var loadingTask = pdfjsLib.getDocument({data: pdfData});
+const cMapUrl= 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/cmaps/'
+const cMapPacked= true
+var loadingTask = pdfjsLib.getDocument({data: pdfData, cMapUrl: cMapUrl, cMapPacked: cMapPacked});
 loadingTask.promise.then(function (pdf) {
     // Fetch the first page
     var pageNumber = 1;
