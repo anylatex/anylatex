@@ -175,7 +175,8 @@ function generateOutline() {
     }
 
     let treeElement = document.getElementById('tree')
-    treeElement.innerHTML = ''
+    $('#tree li').remove();
+    // treeElement.innerHTML = ''
     for (let i = 0; i < rootHeaders.length; i++) {
         let hashId = rootHeaders[i]
         let childrenList = getChildrenList[hashId]
@@ -198,9 +199,13 @@ function treeHandler(event) {
         target.parentElement.querySelector(".nested").classList.toggle("active");
         target.classList.toggle("caret-down");
     } else if (target.tagName == 'A') {
-        var targetId = target.getAttribute('link')
-        var selectedElement = document.querySelector("[id='" + targetId + "']")
-        selectedElement.scrollIntoView(true, {behavior: "smooth"})
+        if (target.getAttribute('id') == "refresh-link") {
+            generateOutline()
+        } else {
+            var targetId = target.getAttribute('link')
+            var selectedElement = document.querySelector("[id='" + targetId + "']")
+            selectedElement.scrollIntoView(true, {behavior: "smooth"})
+        }
     }
 }
 
