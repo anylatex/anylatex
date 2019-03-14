@@ -2,13 +2,11 @@ const util = require('util')
 
 class Converter {
 
-    // TODO: supported document classes' list
-    // TODO: get document's structure from server
-
     constructor(html, documentClass = "ctexart") {
         this.html = html
         this.documentClass = documentClass
-        this.translatedLatex = `\\documentclass{${this.documentClass}}\n\\begin{document}\n%s\n\\end{document}`
+        // this.translatedLatex = `\\documentclass{${this.documentClass}}\n\\begin{document}\n%s\n\\end{document}`
+        this.translatedLatex = '%s'
     }
 
     convert() {

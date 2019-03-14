@@ -66,6 +66,10 @@ if (config.userId == undefined) {
     global.userId = config.userId
 }
 
+// variable storing templates
+// TODO: store locally
+global.templateArgs = {}
+
 global.currentCompilingTask = ""
 
 const { ipcMain } = require("electron")
