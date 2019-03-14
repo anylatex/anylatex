@@ -4,6 +4,57 @@ const path = require('path')
 const { Converter } = require(path.resolve('app/js/converter.js'))
 const crypto = require('crypto')
 
+/* Get Available Templates */
+let baseRequest = remote.getGlobal('baseRequest')
+// Templates Arguments
+let templateArgs = remote.getGlobal('templateArgs')
+baseRequest.get(
+    '/templates',
+    (error, response, jsonBody) => {
+        var responseCode = ''
+        if (response) {
+            responseCode = response.statusCode.toString()
+        }
+        if (error || !responseCode.startsWith('2')) {
+            var debugDiv = document.getElementById('debug-info')
+            debugDiv.innerText = error + ': ' + responseCode + '\n' + jsonBody
+            debugDiv.classList.remove('d-none')
+        } else {
+            parseTemplates(jsonBody)
+        }
+    }
+)
+
+function parseTemplates(jsonBody) {
+    ipcRenderer.send('alert', Object.keys(jsonBody))
+    let templateNames = Object.keys(jsonBody)
+    let dropdownElement = document.getElementById('templates-dropdown')
+    var defaultTemplateName = ''
+    for (let i = 0; i < templateNames.length; i++) {
+        let templateName = templateNames[i]
+        if (templateName == 'default') {
+            defaultTemplateName = jsonBody.default
+            document.getElementById('current-template').value = defaultTemplateName
+            continue
+        }
+        let dropdownItem = document.createElement('a')
+        dropdownItem.className = 'dropdown-item'
+        dropdownItem.setAttribute('href', '#')
+        dropdownItem.setAttribute('id', templateName)
+        dropdownItem.innerText = templateName
+        dropdownElement.appendChild(dropdownItem)
+        let { args } = jsonBody[templateName]
+        if (!args) {
+            // has no arguments
+            continue
+        } else {
+            templateArgs[templateName] = args
+        }
+    }
+    document.getElementById('dropdown-button').innerText = `Templates(${defaultTemplateName})`
+}
+
+
 /* Toolbar handler */
 
 // Basic buttons' handler
@@ -14,6 +65,9 @@ function toolbarHandler(event) {
     var target = event.target
     var command = target.getAttribute("command")
     var value = target.getAttribute("value")
+    if (!command) {
+        return
+    }
     ipcRenderer.sendSync("alert", "click: "+command)
     document.execCommand(command, false, value)
     // If inserted an heading, call outline generator
@@ -22,29 +76,108 @@ function toolbarHandler(event) {
     }
 }
 
+// Template buttons' handler
+let templateDropdown = document.getElementById('templates-dropdown')
+templateDropdown.addEventListener('click', templateDropdownHandler)
+
+function templateDropdownHandler(event) {
+    var target = event.target
+    var templateName = target.getAttribute('id')
+    var oldSelectedTemplateName = document.getElementById('current-template').value
+    if (templateName == oldSelectedTemplateName) {
+        // select the same as old
+        return
+    }
+    ipcRenderer.send('alert', 'set template:'+templateName)
+    document.getElementById('current-template').value = templateName
+    document.getElementById('dropdown-button').innerText = `Templates(${templateName})` 
+
+    let templateArgsDivId = 'template-args'
+    let editor = document.getElementById('editor')
+    let argsDiv = document.getElementById(templateArgsDivId)
+    if (argsDiv) {
+        // remove
+        argsDiv.remove()
+    }
+
+    let currentTemplateArgs = templateArgs[templateName]
+    if (!currentTemplateArgs) {
+        // no args
+        return
+    }
+    let argNames = Object.keys(currentTemplateArgs)
+    let argDiv = document.createElement('div')
+    argDiv.setAttribute('id', templateArgsDivId)
+    for (let i = 0; i < argNames.length; i++) {
+        let argName = argNames[i]
+        let { help } = currentTemplateArgs[argName]
+        let input = document.createElement('input')
+        input.setAttribute('id', argName)
+        input.setAttribute('placeholder', help)
+        input.setAttribute('type', 'text')
+        input.setAttribute('value', '')
+        argDiv.appendChild(input)
+    }
+    let originInEditor = editor.innerHTML
+    editor.innerHTML = argDiv.outerHTML + originInEditor
+}
+
+
 // Compile button's handler
 let compileButton = document.getElementById("compile")
 compileButton.addEventListener("click", compile)
 
 function compile() {
-    var html = document.getElementById("editor").innerHTML
+    ipcRenderer.send('alert', 'click: compile')
+    // convert args if exist
+    var templateName = document.getElementById('current-template').value
+    var argDiv = document.getElementById('template-args')
+    let args = {}
+    if (argDiv) {
+        let currentTemplateArgs = templateArgs[templateName]
+        let argNames = Object.keys(currentTemplateArgs)
+        for (let i = 0; i < argNames.length; i++) {
+            let argName = argNames[i]
+            let { help } = currentTemplateArgs[argName]
+            let argElement = document.getElementById(argName)
+            var argValue = argElement.value
+            if (!argValue) {
+                argValue = help
+            }
+            args[argName] = argValue
+        }
+        argDiv.remove()
+    }
+    var editor = document.getElementById('editor')
+    var html = editor.innerHTML
+    // readd argDiv
+    if (argDiv) {
+        editor.insertBefore(argDiv, editor.firstChild) 
+    }
     var converter = new Converter(html)
     var latex = converter.convert()
-    ipcRenderer.send("alert", "latex: "+latex)
+    ipcRenderer.send('alert', "args:"+args)
+    ipcRenderer.send("alert", "body: "+latex)
 
     // send the compiling task
-    var baseRequest = remote.getGlobal('baseRequest')
     var body = {
         'user_id': remote.getGlobal('userId'),
-        'latex': latex
+        'body': latex,
+        'args': JSON.stringify(args),
+        'template': templateName
     }
+    ipcRenderer.send('alert', 'post task data:'+ body)
     baseRequest.post(
         '/tasks',
         {'body': body},
         (error, response, jsonBody) => {
-            if (error) {
+            var responseCode = ''
+            if (response) {
+                responseCode = response.statusCode.toString()
+            }
+            if (error || !responseCode.startsWith('2')) {
                 var debugDiv = document.getElementById('debug-info')
-                debugDiv.innerText = error + ': ' + jsonBody
+                debugDiv.innerText = error + ': ' + responseCode + '\n' + jsonBody
                 debugDiv.classList.remove('d-none')
             } else {
                 ipcRenderer.sendSync("add-task", jsonBody['task_id'])
