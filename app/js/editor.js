@@ -59,14 +59,15 @@ function parseTemplates(jsonBody) {
 
 // current format relating status
 let controllingCommands = [
-    'bold', 'italic', 'underline'
+    'bold', 'italic', 'underline',
+    'justifyFull', 'justifyLeft', 'justifyRight', 'justifyCenter'
 ]
 let commandEffectsCancelKeys = {
-    bold: ['Enter', ' '],
-    italic: ['Enter', ' '],
-    underline: ['Enter', ' '],
+    bold: ['Enter'],
+    italic: ['Enter'],
+    underline: ['Enter'],
 }
-var currentActiveCommands = []
+let justifies = ['justifyFull', 'justifyCenter', 'justifyLeft', 'justifyRight']
 var justifyStatus = 'justifyLeft'
 var lastPressedKey = ''
 
@@ -83,22 +84,26 @@ function toolbarHandler(event) {
     }
     ipcRenderer.sendSync("alert", "click: "+command)
     if (controllingCommands.indexOf(command) >= 0) {
-        // record command if it is a command needed manual control
-        let index = currentActiveCommands.indexOf(command)
-        if (index >= 0) {
+        if (document.queryCommandState(command)) {
             // cancel command
             let button = document.querySelector(`[command="${command}"]`)
             button.classList.remove('active')
-            currentActiveCommands.pop(index)
         } else {
             // new command
             let button = document.querySelector(`[command="${command}"]`)
             button.classList.add('active')
-            currentActiveCommands.push(command)
         }
     }
     if (command.startsWith('justify')) {
         justifyStatus = command
+        for (let i = 0; i < justifies.length; i++) {
+            let justifyCommand = justifies[i]
+            if (justifyCommand == command) {
+                continue
+            }
+            let button = document.querySelector(`[command="${justifyCommand}"]`)
+            button.classList.remove('active')
+        }
     }
     document.execCommand(command, false, value)
     // If inserted an heading, call outline generator
@@ -108,9 +113,10 @@ function toolbarHandler(event) {
 }
 
 let editor = document.getElementById('editor')
-editor.addEventListener('keydown', editorHandler)
+editor.addEventListener('keydown', editorKeyHandler)
+document.addEventListener('selectionchange', editorSelectionHandler)
 
-function editorHandler(event) {
+function editorKeyHandler(event) {
     var key = event.key
     // monitor justify status
     if (justifyStatus != 'justifyLeft') {
@@ -124,17 +130,17 @@ function editorHandler(event) {
         }
     }
     // monitor stop keys
-    var newActiveCommands = []
-    for(let i = 0; i < currentActiveCommands.length; i++) {
-        let command = currentActiveCommands[i]
+    for(let i = 0; i < controllingCommands.length; i++) {
+        let command = controllingCommands[i]
         let stopKeys = commandEffectsCancelKeys[command]
-        if (stopKeys.indexOf(key) >= 0) {
+        if (!stopKeys) {
+            continue
+        }
+        if (stopKeys.indexOf(key) >= 0 && document.queryCommandState(command)) {
             // cancel command
             document.execCommand(command)
             let button = document.querySelector(`[command="${command}"]`)
             button.classList.remove('active')
-        } else {
-            newActiveCommands.push(command)
         }
     }
     // extra manual controls for shortcut
@@ -155,29 +161,59 @@ function editorHandler(event) {
     }
     // bold, italic and underline's shorcuts
     if (shortcutCommand != '') {
-        let index = newActiveCommands.indexOf(shortcutCommand)
         let button = document.querySelector(`[command="${shortcutCommand}"]`)
-        if (index >= 0) {
+        if (document.queryCommandState(shortcutCommand)) {
             // cancel command
             button.classList.remove('active')
-            newActiveCommands.pop(index)
         } else {
             // new command
             button.classList.add('active') 
-            newActiveCommands.push(shortcutCommand)
         }
     }
-    // backspace after ctrl+a will clear all formats
-    if (key == 'Backspace' && lastPressedKey == 'ctrl+a') {
-        for (let i = 0; i < newActiveCommands.length; i++) {
-            let command = newActiveCommands[i]
-            let button = document.querySelector(`[command="${command}"]`)
-            button.classList.remove('active')
-        }
-        newActiveCommands = []
-    }
-    currentActiveCommands = newActiveCommands
     lastPressedKey = key
+}
+
+function editorSelectionHandler() {
+    for(let i = 0; i < controllingCommands.length; i++) {
+        let command = controllingCommands[i]
+        let button = document.querySelector(`[command="${command}"]`)
+        if (document.queryCommandState(command)) {
+            // active
+            if (!button.classList.contains('active')) {
+                button.classList.add('active')
+            }
+            // keep buttons of justifying single selected
+            if (command.startsWith('justify')) {
+                for (let i = 0; i < justifies.length; i++) {
+                    let justifyCommand = justifies[i]
+                    if (justifyCommand == command) {
+                        continue
+                    }
+                    let button = document.querySelector(`[command="${justifyCommand}"]`)
+                    button.classList.remove('active')
+                }
+                justifyStatus = command
+            }
+        } else {
+            // not active
+            if (button.classList.contains('active')) {
+                button.classList.remove('active')
+            }
+        }
+    }
+    var isJustifySet = false
+    for (let i = 0; i < justifies.length; i++) {
+        let button = document.querySelector(`[command="${justifies[i]}"]`)
+        if (button.classList.contains('active')) {
+            isJustifySet = true
+            break
+        }
+    }
+    if (!isJustifySet && lastPressedKey != 'ctrl+a') {
+        // set to justifyLeft
+        document.execCommand('justifyLeft', false, '')
+        document.querySelector(`[command="justifyLeft"]`).classList.add('active')
+    }
 }
 
 
