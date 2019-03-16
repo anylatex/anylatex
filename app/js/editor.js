@@ -55,7 +55,20 @@ function parseTemplates(jsonBody) {
 }
 
 
-/* Toolbar handler */
+/* Toolbar and Editor's handlers */
+
+// current format relating status
+let controllingCommands = [
+    'bold', 'italic', 'underline'
+]
+let commandEffectsCancelKeys = {
+    bold: ['Enter', ' '],
+    italic: ['Enter', ' '],
+    underline: ['Enter', ' '],
+}
+var currentActiveCommands = []
+var justifyStatus = 'justifyLeft'
+var lastPressedKey = ''
 
 // Basic buttons' handler
 let toolbar = document.getElementById("toolbar")
@@ -69,12 +82,104 @@ function toolbarHandler(event) {
         return
     }
     ipcRenderer.sendSync("alert", "click: "+command)
+    if (controllingCommands.indexOf(command) >= 0) {
+        // record command if it is a command needed manual control
+        let index = currentActiveCommands.indexOf(command)
+        if (index >= 0) {
+            // cancel command
+            let button = document.querySelector(`[command="${command}"]`)
+            button.classList.remove('active')
+            currentActiveCommands.pop(index)
+        } else {
+            // new command
+            let button = document.querySelector(`[command="${command}"]`)
+            button.classList.add('active')
+            currentActiveCommands.push(command)
+        }
+    }
+    if (command.startsWith('justify')) {
+        justifyStatus = command
+    }
     document.execCommand(command, false, value)
     // If inserted an heading, call outline generator
     if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].indexOf(value) >= 0) {
         generateOutline()
     }
 }
+
+let editor = document.getElementById('editor')
+editor.addEventListener('keydown', editorHandler)
+
+function editorHandler(event) {
+    var key = event.key
+    // monitor justify status
+    if (justifyStatus != 'justifyLeft') {
+        if (key == 'Backspace' && lastPressedKey == 'Enter') {
+            // cancel justify status
+            justifyStatus = 'justifyLeft'
+            document.execCommand('justifyLeft')
+            event.preventDefault()
+            lastPressedKey = key
+            return
+        }
+    }
+    // monitor stop keys
+    var newActiveCommands = []
+    for(let i = 0; i < currentActiveCommands.length; i++) {
+        let command = currentActiveCommands[i]
+        let stopKeys = commandEffectsCancelKeys[command]
+        if (stopKeys.indexOf(key) >= 0) {
+            // cancel command
+            document.execCommand(command)
+            let button = document.querySelector(`[command="${command}"]`)
+            button.classList.remove('active')
+        } else {
+            newActiveCommands.push(command)
+        }
+    }
+    // extra manual controls for shortcut
+    var shortcutCommand = ''
+    if (event.ctrlKey) {
+        key = 'ctrl+' + key
+        switch(key) {
+            case 'ctrl+b':
+                shortcutCommand = 'bold'      
+                break
+            case 'ctrl+i':
+                shortcutCommand = 'italic'
+                break
+            case 'ctrl+u':
+                shortcutCommand = 'underline'
+                break
+        }
+    }
+    // bold, italic and underline's shorcuts
+    if (shortcutCommand != '') {
+        let index = newActiveCommands.indexOf(shortcutCommand)
+        let button = document.querySelector(`[command="${shortcutCommand}"]`)
+        if (index >= 0) {
+            // cancel command
+            button.classList.remove('active')
+            newActiveCommands.pop(index)
+        } else {
+            // new command
+            button.classList.add('active') 
+            newActiveCommands.push(shortcutCommand)
+        }
+    }
+    // backspace after ctrl+a will clear all formats
+    if (key == 'Backspace' && lastPressedKey == 'ctrl+a') {
+        for (let i = 0; i < newActiveCommands.length; i++) {
+            let command = newActiveCommands[i]
+            let button = document.querySelector(`[command="${command}"]`)
+            button.classList.remove('active')
+        }
+        newActiveCommands = []
+    }
+    currentActiveCommands = newActiveCommands
+    lastPressedKey = key
+}
+
 
 // Template buttons' handler
 let templateDropdown = document.getElementById('templates-dropdown')
