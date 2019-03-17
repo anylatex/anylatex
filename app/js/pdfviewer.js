@@ -42,37 +42,39 @@ baseRequest.delete(
 pdfData = atob(pdfData)
 
 // render pdf
-var pdfjsLib = window['pdfjs-dist/build/pdf'];
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.worker.js';
+var pdfjsLib = window['pdfjs-dist/build/pdf']
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.worker.js'
 const cMapUrl= 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/cmaps/'
 const cMapPacked= true
-var loadingTask = pdfjsLib.getDocument({data: pdfData, cMapUrl: cMapUrl, cMapPacked: cMapPacked});
+var loadingTask = pdfjsLib.getDocument({data: pdfData, cMapUrl: cMapUrl, cMapPacked: cMapPacked})
 loadingTask.promise.then(function (pdf) {
     // Fetch the first page
-    var pageNumber = 1;
-    pdf.getPage(pageNumber).then(function (page) {
-        // adjust size
-        var scale = 5;
-        var viewport = page.getViewport(scale);
-        var canvas = document.getElementById('the-canvas');
-        var wrapper = document.getElementById("wrapper");
-        var context = canvas.getContext('2d');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        wrapper.style.width = Math.floor(viewport.width / scale) + 'pt';
-        wrapper.style.height = Math.floor(viewport.height / scale) + 'pt';
-        // render pdf into canvas context
-        var renderContext = {
-            canvasContext: context,
-            viewport: viewport
-        };
-        var renderTask = page.render(renderContext);
-        renderTask.promise.then(function () {
-        });
-    });
+    for (let pageNumber = 1; pageNumber < pdf.numPages+1; pageNumber++) {
+        pdf.getPage(pageNumber).then(function (page) {
+            // adjust size
+            var scale = 5
+            var viewport = page.getViewport(scale)
+            var canvasContainer = document.getElementById('wrapper')
+            var canvas = document.createElement('canvas')
+            var context = canvas.getContext('2d')
+            canvas.width = viewport.width
+            canvas.height = viewport.height
+            canvas.style.width = "100%"
+            canvas.style.height = "100%"
+            canvasContainer.style.width = Math.floor(viewport.width / scale) + 'pt'
+            canvasContainer.style.height = Math.floor(viewport.height / scale) + 'pt'
+            canvasContainer.appendChild(canvas)
+            // render pdf into canvas context
+            var renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            }
+            var renderTask = page.render(renderContext)
+            renderTask.promise.then(function () {
+            })
+        })
+    }
 }, function (reason) {
     // pdf loading error
     ipcRenderer.send("alert", "pdf render error:" + reason)
-});
+})
