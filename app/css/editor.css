@@ -10,6 +10,7 @@
   border: 1.5px solid grey;
 }
 
+/*
 #tree {
   padding: 1rem;
   font-size: 1.1rem;
@@ -17,6 +18,7 @@
   border: 0.3px solid black;
   overflow-y: auto;
 }
+*/
 
 a.anchor-link {
   color: #000000;
@@ -43,6 +45,7 @@ ul, #tree{
 .caret::before {
   content: "\FF0B";
   display: inline-block;
+  margin-right: 0.3rem;
 }
 
 /* Change icon to minus sign */
