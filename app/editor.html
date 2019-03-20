@@ -89,9 +89,12 @@
 
     <div class="row align-items-center justify-content-center w-100 h-100">
       <!-- tree view -->
-      <div class="col-sm-3 col-md-3 col-lg-3 h-100 mt-5">
-        <ul id="tree" class="rounded ml-4 mt-5">
-          <a id="refresh-link" class="mb-5" href="#" style="font-weight: bold; color: black; font-size: 0.9rem">刷新</a>
+      <div class="col-sm-3 col-md-3 col-lg-3 h-100 mt-5 pl-4">
+        <ul id="tree" class="rounded">
+          <div class="mb-2">
+            <span class="font-weight-bold">目录</span>
+            <a id="refresh-link" class="ml-1 mb-5" href="#" style="color: black; font-size: 0.8rem">刷新</a>
+          </div>
         </ul>
       </div>
       <!-- Editor -->
@@ -100,10 +103,11 @@
         <div class="row mt-2 mb-2 d-none text-muted" id="debug-info"></div>
         <!-- text area -->
         <div class="row mt-4 align-items-center justify-content-center no-gutters" style="height: 90%">
-          <div class="col-11 h-100">
+          <div class="col-9 h-100">
             <div id="editor" class="editor h-100" contenteditable>
             </div>
           </div>
+          <div class="col-1"></div>
         </div>
       </div>
     </div>
