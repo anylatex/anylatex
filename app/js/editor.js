@@ -43,12 +43,10 @@ function parseTemplates(jsonBody) {
         dropdownItem.setAttribute('id', templateName)
         dropdownItem.innerText = templateName
         dropdownElement.appendChild(dropdownItem)
-        let { args } = jsonBody[templateName]
-        if (!args) {
-            // has no arguments
-            continue
-        } else {
-            templateArgs[templateName] = args
+        let { args, part_args: partArgs } = jsonBody[templateName]
+        templateArgs[templateName] = {
+            args: args,
+            partArgs: partArgs
         }
     }
     document.getElementById('dropdown-button').innerText = `Templates(${defaultTemplateName})`
@@ -233,22 +231,26 @@ function templateDropdownHandler(event) {
     document.getElementById('current-template').value = templateName
     document.getElementById('dropdown-button').innerText = `Templates(${templateName})` 
 
-    let templateArgsDivId = 'template-args'
-    let editor = document.getElementById('editor')
+    let templateArgsDivId = 'arguments-modal-body'
     let argsDiv = document.getElementById(templateArgsDivId)
     if (argsDiv) {
         // remove
-        argsDiv.remove()
+        argsDiv.innerHTML = ''
     }
 
-    let currentTemplateArgs = templateArgs[templateName]
+    let currentTemplateArgs = templateArgs[templateName]['args']
+    let templateModalButton = document.getElementById('arguments-modal-button')
     if (!currentTemplateArgs) {
         // no args
+        if (templateModalButton.classList.contains('disabled') < 0 ) {
+            templateModalButton.classList.add('disabled')
+        }
         return
     }
+    if (templateModalButton.classList.contains('disabled') >= 0) {
+        templateModalButton.classList.remove('disabled')
+    }
     let argNames = Object.keys(currentTemplateArgs)
-    let argDiv = document.createElement('div')
-    argDiv.setAttribute('id', templateArgsDivId)
     for (let i = 0; i < argNames.length; i++) {
         let argName = argNames[i]
         let { help } = currentTemplateArgs[argName]
@@ -257,10 +259,8 @@ function templateDropdownHandler(event) {
         input.setAttribute('placeholder', help)
         input.setAttribute('type', 'text')
         input.setAttribute('value', '')
-        argDiv.appendChild(input)
+        argsDiv.appendChild(input)
     }
-    let originInEditor = editor.innerHTML
-    editor.innerHTML = argDiv.outerHTML + originInEditor
 }
 
 
@@ -272,10 +272,10 @@ function compile() {
     ipcRenderer.send('alert', 'click: compile')
     // convert args if exist
     var templateName = document.getElementById('current-template').value
-    var argDiv = document.getElementById('template-args')
+    var argsDiv = document.getElementById('arguments-modal-body')
     let args = {}
-    if (argDiv) {
-        let currentTemplateArgs = templateArgs[templateName]
+    if (argsDiv.innerHTML != '') {
+        let currentTemplateArgs = templateArgs[templateName]['args']
         let argNames = Object.keys(currentTemplateArgs)
         for (let i = 0; i < argNames.length; i++) {
             let argName = argNames[i]
@@ -287,14 +287,20 @@ function compile() {
             }
             args[argName] = argValue
         }
-        argDiv.remove()
     }
+    let partArgs = {}
+    // no support for part args now, use default value from the server
+    let currentTemplatePartArgs = templateArgs[templateName]['partArgs']
+    ipcRenderer.send('alert', currentTemplatePartArgs)
+    let partArgNames = Object.keys(currentTemplatePartArgs)
+    for (let i = 0; i < partArgNames.length; i++) {
+        let argName = partArgNames[i]
+        let { help } = currentTemplatePartArgs[argName]
+        partArgs[argName] = help
+    }
+    // get editor's content
     var editor = document.getElementById('editor')
     var html = editor.innerHTML
-    // readd argDiv
-    if (argDiv) {
-        editor.insertBefore(argDiv, editor.firstChild) 
-    }
     var converter = new Converter(html)
     var latex = converter.convert()
     ipcRenderer.send('alert', "args:"+args)
@@ -305,6 +311,7 @@ function compile() {
         'user_id': remote.getGlobal('userId'),
         'body': latex,
         'args': JSON.stringify(args),
+        'part_args': JSON.stringify(partArgs),
         'template': templateName
     }
     ipcRenderer.send('alert', 'post task data:'+ body)
