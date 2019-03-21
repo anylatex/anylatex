@@ -2,15 +2,13 @@ const util = require('util')
 
 class Converter {
 
-    constructor(html, documentClass = "ctexart") {
-        this.html = html
-        this.documentClass = documentClass
-        // this.translatedLatex = `\\documentclass{${this.documentClass}}\n\\begin{document}\n%s\n\\end{document}`
+    constructor() {
         this.translatedLatex = '%s'
     }
 
-    convert() {
-        let convertedElements = this._convert_elements(this.html)
+    convert(html) {
+        this.translatedLatex = '%s'
+        let convertedElements = this._convert_elements(html)
         this.translatedLatex = util.format(this.translatedLatex, convertedElements)
         return this.translatedLatex
     }
@@ -60,6 +58,14 @@ class Converter {
                     parsedInnerLatex = `\n${this._convert_elements(element.innerHTML)}\n`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     // latex += this._convert_elements(element.innerHTML) + '\n'
+                    break
+                case 'P':
+                    parsedInnerLatex = `\n${this._convert_elements(element.innerHTML)}\n`
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'SPAN':
+                    parsedInnerLatex = `${this._convert_elements(element.innerHTML)}`
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'B':
                     parsedInnerLatex = `\\textbf{${this._convert_elements(element.innerHTML)}}`

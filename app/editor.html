@@ -11,7 +11,7 @@
 
 <body>
 
-  <nav class="navbar fixed-top navbar-light bg-light w-100">
+  <nav id="navbar" class="navbar fixed-top navbar-light bg-light w-100">
     <!-- toolbar -->
     <div class="row align-items-center justify-content-center no-gutters w-100 h-75">
       <div class="col-sm-12 col-md-11 col-lg-9 col-xl-8">
@@ -67,15 +67,11 @@
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="arguments-modal-title"></h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
                 </div>
                 <div class="modal-body" id="arguments-modal-body">
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Save changes</button>
+                  <button id="modal-dismiss-button" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
               </div>
             </div>
@@ -89,11 +85,19 @@
 
     <div class="row align-items-center justify-content-center w-100 h-100">
       <!-- tree view -->
-      <div class="col-sm-3 col-md-3 col-lg-3 h-100 mt-5 pl-4">
-        <ul id="tree" class="rounded">
-          <div class="mb-2">
+      <div class="col-sm-3 col-md-3 col-lg-3 h-100 mt-5 pl-2">
+        <ul id="tree" class="rounded text-left">
+          <div>
             <span class="font-weight-bold">目录</span>
             <a id="refresh-link" class="ml-1 mb-5" href="#" style="color: black; font-size: 0.8rem">刷新</a>
+          </div>
+          <div class="w-75">
+            <hr class="mt-2 mb-2">
+          </div>
+          <div id="part-arguments" class="d-none">
+          </div>
+          <div class="w-75">
+            <hr class="mt-2 mb-2">
           </div>
         </ul>
       </div>
@@ -104,8 +108,14 @@
         <!-- text area -->
         <div class="row mt-4 align-items-center justify-content-center no-gutters" style="height: 90%">
           <div class="col-9 h-100">
-            <div id="editor" class="editor h-100" contenteditable>
+            <div id="part-args-editor" class="row h-25 mt-4 align-items-center justify-content-center no-gutters d-none">
+              <div class="col h-100">
+                <div id="part-args-name" class="font-weight-bold mb-4"></div>
+                <div id="part-editor" class="editor h-100 w-100" contenteditable></div>
+                <button class="btn btn-primary mt-2" id="part-args-confirm">Confirm</button>
+              </div>
             </div>
+            <div id="editor" class="editor h-100" contenteditable></div>
           </div>
           <div class="col-3"></div>
         </div>

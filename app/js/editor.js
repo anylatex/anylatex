@@ -218,6 +218,18 @@ function editorSelectionHandler() {
 // Template buttons' handler
 let templateDropdown = document.getElementById('templates-dropdown')
 templateDropdown.addEventListener('click', templateDropdownHandler)
+let templatePartArgs = document.getElementById('part-arguments')
+templatePartArgs.addEventListener('click', templatePartArgsHandler)
+let templatePartArgConfirmButton = document.getElementById('part-args-confirm')
+templatePartArgConfirmButton.addEventListener('click', confirmPartArg)
+let modalOpenButton = document.getElementById('arguments-modal-button')
+let modalCloseButton = document.getElementById('modal-dismiss-button')
+modalOpenButton.addEventListener('click', () => {
+    document.getElementById('navbar').classList.remove('fixed-top')
+})
+modalCloseButton.addEventListener('click', (event) => {
+    document.getElementById('navbar').classList.add('fixed-top')
+})
 
 function templateDropdownHandler(event) {
     var target = event.target
@@ -238,8 +250,13 @@ function templateDropdownHandler(event) {
         argsDiv.innerHTML = ''
     }
 
+    // basic arguments
     let currentTemplateArgs = templateArgs[templateName]['args']
     let templateModalButton = document.getElementById('arguments-modal-button')
+    // part arguments
+    let currentTemplatePartArgs = templateArgs[templateName]['partArgs']
+    let partArgsDiv = document.getElementById('part-arguments')
+    partArgsDiv.innerHTML = ''
     if (!currentTemplateArgs) {
         // no args
         if (templateModalButton.classList.contains('disabled') < 0 ) {
@@ -254,15 +271,94 @@ function templateDropdownHandler(event) {
     for (let i = 0; i < argNames.length; i++) {
         let argName = argNames[i]
         let { help } = currentTemplateArgs[argName]
+
+        let inputDiv = document.createElement('div')
+        inputDiv.classList.add('input-group')
+        inputDiv.classList.add('mb-3')
+        let inputPrepend = document.createElement('div')
+        inputPrepend.classList.add('input-group-prepend')
+        let prependSpan = document.createElement('span')
+        prependSpan.classList.add('input-group-text')
+        prependSpan.setAttribute('id', argName+'prepend')
+        prependSpan.innerText = help
+        inputPrepend.appendChild(prependSpan)
         let input = document.createElement('input')
-        input.setAttribute('id', argName)
-        input.setAttribute('placeholder', help)
         input.setAttribute('type', 'text')
-        input.setAttribute('value', '')
-        argsDiv.appendChild(input)
+        input.classList.add('form-control')
+        input.setAttribute('aria-describedby', argName+'prepend')
+        input.setAttribute('id', argName)
+
+        inputDiv.appendChild(inputPrepend)
+        inputDiv.appendChild(input)
+        argsDiv.appendChild(inputDiv)
+
+        //let input = document.createElement('input')
+        //input.setAttribute('id', argName)
+        //input.setAttribute('placeholder', help)
+        //input.setAttribute('type', 'text')
+        //input.setAttribute('value', '')
+        //argsDiv.appendChild(input)
+    }
+
+    if (!currentTemplatePartArgs) {
+        // no part args
+        if (!partArgsDiv.classList.contains('d-none')) {
+            partArgsDiv.classList.add('d-none')
+        }
+        return
+    } else {
+        // remove d-none
+        if (partArgsDiv.classList.contains('d-none')) {
+            partArgsDiv.classList.remove('d-none')
+        }
+    }
+    let partArgNames = Object.keys(currentTemplatePartArgs)
+    for (let i = 0; i < partArgNames.length; i++) {
+        let argName = partArgNames[i]
+        let { help } = currentTemplatePartArgs[argName]
+        let argLink = document.createElement('a')
+        argLink.innerText = argName
+        argLink.classList.add('anchor-link')
+        argLink.setAttribute('help', help)
+        partArgsDiv.appendChild(argLink)
+        partArgsDiv.appendChild(document.createElement('br'))
     }
 }
 
+// template part arguments' handler
+function templatePartArgsHandler(event) {
+    if (event.target.tagName != 'A') {
+        return
+    }
+    let partArgsEditorDiv = document.getElementById('part-args-editor')
+    let partArgsEditor = document.getElementById('part-editor')
+    let documentEditor = document.getElementById('editor')
+    partArgsEditorDiv.classList.remove('d-none')
+    documentEditor.classList.add('d-none')
+    document.getElementById('part-args-name').innerText = event.target.innerText
+    if (document.getElementById(event.target.innerText + '-' + 'value')) {
+        // input element exists, restore inner html
+        partArgsEditor.innerHTML = document.getElementById(event.target.innerText + '-' + 'value').value
+    } else {
+        let input = document.createElement('input')
+        input.setAttribute('type', 'hidden')
+        input.setAttribute('name', event.target.innerText)
+        input.setAttribute('id', event.target.innerText + '-' + 'value')
+        partArgsEditorDiv.appendChild(input)
+        partArgsEditor.innerHTML = ''
+    }
+}
+
+function confirmPartArg() {
+    let argName = document.getElementById('part-args-name').innerText
+    let partArgsEditorDiv = document.getElementById('part-args-editor')
+    let documentEditor = document.getElementById('editor')
+    let argValue = document.getElementById('part-editor').innerHTML
+    // store value
+    document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
+    partArgsEditorDiv.classList.add('d-none')
+    documentEditor.classList.remove('d-none')
+}
 
 // Compile button's handler
 let compileButton = document.getElementById("compile")
@@ -289,22 +385,25 @@ function compile() {
         }
     }
     let partArgs = {}
+    var converter = new Converter(html)
     // no support for part args now, use default value from the server
     let currentTemplatePartArgs = templateArgs[templateName]['partArgs']
-    ipcRenderer.send('alert', currentTemplatePartArgs)
     let partArgNames = Object.keys(currentTemplatePartArgs)
     for (let i = 0; i < partArgNames.length; i++) {
         let argName = partArgNames[i]
         let { help } = currentTemplatePartArgs[argName]
-        partArgs[argName] = help
+        let argInput = document.getElementById(argName + '-' + 'value')
+        if (argInput) {
+            partArgs[argName] = converter.convert(argInput.value)
+        } else {
+            partArgs[argName] = help
+        }
     }
     // get editor's content
     var editor = document.getElementById('editor')
     var html = editor.innerHTML
-    var converter = new Converter(html)
+
     var latex = converter.convert()
-    ipcRenderer.send('alert', "args:"+args)
-    ipcRenderer.send("alert", "body: "+latex)
 
     // send the compiling task
     var body = {
