@@ -291,13 +291,6 @@ function templateDropdownHandler(event) {
         inputDiv.appendChild(inputPrepend)
         inputDiv.appendChild(input)
         argsDiv.appendChild(inputDiv)
-
-        //let input = document.createElement('input')
-        //input.setAttribute('id', argName)
-        //input.setAttribute('placeholder', help)
-        //input.setAttribute('type', 'text')
-        //input.setAttribute('value', '')
-        //argsDiv.appendChild(input)
     }
 
     if (!currentTemplatePartArgs) {
@@ -319,6 +312,7 @@ function templateDropdownHandler(event) {
         let argLink = document.createElement('a')
         argLink.innerText = argName
         argLink.classList.add('anchor-link')
+        argLink.classList.add('arguments')
         argLink.setAttribute('help', help)
         partArgsDiv.appendChild(argLink)
         partArgsDiv.appendChild(document.createElement('br'))
@@ -386,7 +380,8 @@ function compile() {
     }
     let partArgs = {}
     var converter = new Converter(html)
-    // no support for part args now, use default value from the server
+
+    // conver part arguments if exist
     let currentTemplatePartArgs = templateArgs[templateName]['partArgs']
     let partArgNames = Object.keys(currentTemplatePartArgs)
     for (let i = 0; i < partArgNames.length; i++) {
@@ -578,7 +573,7 @@ function treeHandler(event) {
     if (target.tagName == 'SPAN') {
         target.parentElement.querySelector(".nested").classList.toggle("active");
         target.classList.toggle("caret-down");
-    } else if (target.tagName == 'A') {
+    } else if (target.tagName == 'A' && !target.classList.contains('arguments')) {
         if (target.getAttribute('id') == "refresh-link") {
             generateOutline()
         } else {
