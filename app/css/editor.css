@@ -20,6 +20,9 @@
   overflow-y: auto;
 }
 */
+#tree {
+  position: fixed;
+}
 
 a.anchor-link {
   color: #000000;

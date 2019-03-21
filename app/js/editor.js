@@ -313,6 +313,7 @@ function templateDropdownHandler(event) {
         argLink.innerText = argName
         argLink.classList.add('anchor-link')
         argLink.classList.add('arguments')
+        argLink.setAttribute('href', '#')
         argLink.setAttribute('help', help)
         partArgsDiv.appendChild(argLink)
         partArgsDiv.appendChild(document.createElement('br'))
@@ -364,7 +365,7 @@ function compile() {
     var templateName = document.getElementById('current-template').value
     var argsDiv = document.getElementById('arguments-modal-body')
     let args = {}
-    if (argsDiv.innerHTML != '') {
+    if (argsDiv.innerHTML.trim() != '') {
         let currentTemplateArgs = templateArgs[templateName]['args']
         let argNames = Object.keys(currentTemplateArgs)
         for (let i = 0; i < argNames.length; i++) {
@@ -378,27 +379,30 @@ function compile() {
             args[argName] = argValue
         }
     }
-    let partArgs = {}
+
     var converter = new Converter(html)
 
-    // conver part arguments if exist
+    // convert part arguments if exist
+    let partArgs = {}
     let currentTemplatePartArgs = templateArgs[templateName]['partArgs']
-    let partArgNames = Object.keys(currentTemplatePartArgs)
-    for (let i = 0; i < partArgNames.length; i++) {
-        let argName = partArgNames[i]
-        let { help } = currentTemplatePartArgs[argName]
-        let argInput = document.getElementById(argName + '-' + 'value')
-        if (argInput) {
-            partArgs[argName] = converter.convert(argInput.value)
-        } else {
-            partArgs[argName] = help
+    if (currentTemplatePartArgs) {
+        let partArgNames = Object.keys(currentTemplatePartArgs)
+        for (let i = 0; i < partArgNames.length; i++) {
+            let argName = partArgNames[i]
+            let { help } = currentTemplatePartArgs[argName]
+            let argInput = document.getElementById(argName + '-' + 'value')
+            if (argInput) {
+                partArgs[argName] = converter.convert(argInput.value)
+            } else {
+                partArgs[argName] = help
+            }
         }
     }
+
     // get editor's content
     var editor = document.getElementById('editor')
     var html = editor.innerHTML
-
-    var latex = converter.convert()
+    var latex = converter.convert(html)
 
     // send the compiling task
     var body = {
@@ -408,7 +412,7 @@ function compile() {
         'part_args': JSON.stringify(partArgs),
         'template': templateName
     }
-    ipcRenderer.send('alert', 'post task data:'+ body)
+    ipcRenderer.send('alert', 'post task data:'+ args + partArgs)
     baseRequest.post(
         '/tasks',
         {'body': body},
