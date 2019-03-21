@@ -100,7 +100,13 @@ ipcMain.on("add-task", (event, arg) => {
 // pop up a page
 ipcMain.on("pop-page", (event, arg) => {
     if (arg == "pdfviewer") {
-        let child = new BrowserWindow({parent: window, modal: true, show: true});
+        let child = new BrowserWindow({
+            parent: window,
+            width: 800,
+            height: 900,
+            modal: true,
+            show: true
+        });
         child.loadURL(url.format({
             pathname: path.join(__dirname, "app/pdfviewer.html"),
             protocol: "file:",
