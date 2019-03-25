@@ -2,8 +2,13 @@ const util = require('util')
 
 class Converter {
 
-    constructor() {
+    constructor(headings) {
         this.translatedLatex = '%s'
+        this.headings = {}
+        if (headings.length == 0) {
+            headings = ['section', 'subsection', 'subsubsection']
+        }
+        this.headings = headings
     }
 
     convert(html) {
@@ -19,6 +24,18 @@ class Converter {
 
     _into_one_line(str) {
         return str.split('\n').join('')
+    }
+
+    _convert_headings(headingValue, elementContent) {
+        let headingLatex = this.headings[headingValue]
+        var parsedInnerLatex = ''
+        if (!headingLatex) {
+            console.log('warn: unsupported heaing: h1')
+            parsedInnerLatex = `${elementContent}\n`
+        } else {
+            parsedInnerLatex = `\\${headingLatex}{${elementContent}}\n`
+        }
+        return parsedInnerLatex
     }
 
     _convert_elements(html) {
@@ -42,15 +59,27 @@ class Converter {
             switch (tagName) {
                 // Converting Heading
                 case 'H1':
-                    parsedInnerLatex = `\\section{${elementContent}}\n`
+                    parsedInnerLatex = this._convert_headings(0, elementContent)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'H2':
-                    parsedInnerLatex = `\\subsection{${element.textContent}}\n`
+                    parsedInnerLatex = this._convert_headings(1, elementContent)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'H3':
-                    parsedInnerLatex = `\\subsubsection{${element.textContent}}\n`
+                    parsedInnerLatex = this._convert_headings(2, elementContent)
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'H4':
+                    parsedInnerLatex = this._convert_headings(3, elementContent)
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'H5':
+                    parsedInnerLatex = this._convert_headings(4, elementContent)
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'H6':
+                    parsedInnerLatex = this._convert_headings(5, elementContent)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 // Converting others
