@@ -43,13 +43,17 @@ function parseTemplates(jsonBody) {
         dropdownItem.setAttribute('id', templateName)
         dropdownItem.innerText = templateName
         dropdownElement.appendChild(dropdownItem)
-        let { args, part_args: partArgs } = jsonBody[templateName]
+        let { headings, args, part_args: partArgs } = jsonBody[templateName]
         templateArgs[templateName] = {
+            headings: headings,
             args: args,
             partArgs: partArgs
         }
     }
     document.getElementById('dropdown-button').innerText = `Templates(${defaultTemplateName})`
+    // set headings and arguments
+    setTemplateHeadings(defaultTemplateName)
+    setTemplateArguments(defaultTemplateName)
 }
 
 
@@ -231,25 +235,36 @@ modalCloseButton.addEventListener('click', (event) => {
     document.getElementById('navbar').classList.add('fixed-top')
 })
 
-function templateDropdownHandler(event) {
-    var target = event.target
-    var templateName = target.getAttribute('id')
-    var oldSelectedTemplateName = document.getElementById('current-template').value
-    if (templateName == oldSelectedTemplateName) {
-        // select the same as old
-        return
+// set template's headings
+function setTemplateHeadings(templateName) {
+    let templateHeadings = templateArgs[templateName]['headings']
+    var headings = []
+    if (!templateHeadings) {
+        headings = ['section', 'subsection', 'subsubsection']
+    } else {
+        headings = templateHeadings
     }
-    ipcRenderer.send('alert', 'set template:'+templateName)
-    document.getElementById('current-template').value = templateName
-    document.getElementById('dropdown-button').innerText = `Templates(${templateName})` 
+    let headingsDropdown = document.getElementById('headings-dropdown')
+    headingsDropdown.innerHTML = ''
+    for (let i = 0; i < headings.length; i++) {
+        let newHeading = document.createElement('a')
+        newHeading.setAttribute('command', 'formatBlock')
+        newHeading.setAttribute('value', 'H'+(i+1).toString())
+        newHeading.classList.add('dropdown-item')
+        newHeading.setAttribute('href', '#')
+        newHeading.innerText = headings[i]
+        headingsDropdown.appendChild(newHeading)
+    }
+}
 
+// set template's arguments
+function setTemplateArguments(templateName){
     let templateArgsDivId = 'arguments-modal-body'
     let argsDiv = document.getElementById(templateArgsDivId)
     if (argsDiv) {
         // remove
         argsDiv.innerHTML = ''
     }
-
     // basic arguments
     let currentTemplateArgs = templateArgs[templateName]['args']
     let templateModalButton = document.getElementById('arguments-modal-button')
@@ -320,6 +335,25 @@ function templateDropdownHandler(event) {
     }
 }
 
+function templateDropdownHandler(event) {
+    var target = event.target
+    var templateName = target.getAttribute('id')
+    var oldSelectedTemplateName = document.getElementById('current-template').value
+    if (templateName == oldSelectedTemplateName) {
+        // select the same as old
+        return
+    }
+    ipcRenderer.send('alert', 'set template:'+templateName)
+    document.getElementById('current-template').value = templateName
+    document.getElementById('dropdown-button').innerText = `Templates(${templateName})` 
+
+    // headings
+    setTemplateHeadings(templateName)
+
+    // arguments
+    setTemplateArguments(templateName)
+}
+
 // template part arguments' handler
 function templatePartArgsHandler(event) {
     if (event.target.tagName != 'A') {
@@ -380,7 +414,8 @@ function compile() {
         }
     }
 
-    var converter = new Converter(html)
+    let headings = templateArgs[templateName]['headings']
+    var converter = new Converter(headings)
 
     // convert part arguments if exist
     let partArgs = {}
@@ -403,6 +438,11 @@ function compile() {
     var editor = document.getElementById('editor')
     var html = editor.innerHTML
     var latex = converter.convert(html)
+    if (!latex && Object.keys(args).length == 0 && Object.keys(partArgs).length == 0) {
+        alert("No contents. Please write something before compiling.")
+        return
+    }
+    ipcRenderer.send("alert", "latex:" + latex)
 
     // send the compiling task
     var body = {
