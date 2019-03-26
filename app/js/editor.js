@@ -56,6 +56,68 @@ function parseTemplates(jsonBody) {
     setTemplateArguments(defaultTemplateName)
 }
 
+/* Modal buttons' handlers */
+let modalOpenButtons = document.getElementsByClassName('modal-open-button')
+let modalCloseButtons = document.getElementsByClassName('modal-dismiss-button')
+Array.from(modalOpenButtons).forEach(function(element) {
+    element.addEventListener('click', () => {
+        document.getElementById('navbar').classList.remove('fixed-top')
+    })
+});
+Array.from(modalCloseButtons).forEach(function(element) {
+    element.addEventListener('click', () => {
+        document.getElementById('navbar').classList.add('fixed-top')
+    })
+});
+
+
+/* Reference Modal */
+
+// listener for changes in reference editor
+$('#reference-editor').on('input', () => {
+    let re = /@.*?\{(.*?),.*?\}\s}/gs
+    var bibtexText = document.getElementById('reference-editor').innerText
+    var extractedLabels = []
+    try {
+        var result = re.exec(bibtexText)
+        while (result) {
+            let label = result[1].trim()
+            if (extractedLabels.indexOf(label) < 0) {
+                extractedLabels.push(label)
+            }
+            result = re.exec(bibtexText)
+        }
+    } catch(err) {}
+    document.getElementById('extracted-labels').innerText = extractedLabels.join(', ')
+})
+
+// insert reference
+$('#reference-modal').on('hidden.bs.modal', () => {
+    let labelEl = document.getElementById('extracted-labels')
+    let labelText = labelEl.innerText
+    if (!labelText) {
+        alert('No labels extracted. No reference will be inserted.')
+        document.getElementById('reference-editor').innerHTML = ''
+        labelEl.innerHTML = ''
+        return
+    }
+    let bibtexText = document.getElementById('reference-editor').innerText
+
+    let reference = document.createElement('reference')
+    reference.classList.add('reference')
+    reference.setAttribute('reference', bibtexText)
+    reference.setAttribute('labels', labelText)
+    reference.setAttribute('contenteditable', 'false')
+    if (document.getElementById('reference-sup-check').checked) {
+        reference.innerHTML = '<sup>[*]</sup>'
+    } else {
+        reference.innerHTML = '[*]'
+    }
+    document.getElementById('editor').innerHTML += (reference.outerHTML)
+    // clear reference editor
+    document.getElementById('reference-editor').innerHTML = ''
+    labelEl.innerHTML = ''
+})
 
 /* Toolbar and Editor's handlers */
 
@@ -226,14 +288,7 @@ let templatePartArgs = document.getElementById('part-arguments')
 templatePartArgs.addEventListener('click', templatePartArgsHandler)
 let templatePartArgConfirmButton = document.getElementById('part-args-confirm')
 templatePartArgConfirmButton.addEventListener('click', confirmPartArg)
-let modalOpenButton = document.getElementById('arguments-modal-button')
-let modalCloseButton = document.getElementById('modal-dismiss-button')
-modalOpenButton.addEventListener('click', () => {
-    document.getElementById('navbar').classList.remove('fixed-top')
-})
-modalCloseButton.addEventListener('click', (event) => {
-    document.getElementById('navbar').classList.add('fixed-top')
-})
+
 
 // set template's headings
 function setTemplateHeadings(templateName) {
@@ -389,6 +444,9 @@ function confirmPartArg() {
     documentEditor.classList.remove('d-none')
 }
 
+
+/* Compile */
+
 // Compile button's handler
 let compileButton = document.getElementById("compile")
 compileButton.addEventListener("click", compile)
@@ -443,6 +501,14 @@ function compile() {
         return
     }
     ipcRenderer.send("alert", "latex:" + latex)
+
+    // get references
+    var references = ''
+    for (const refEl of document.getElementsByClassName('reference')) {
+        let referenceText = refEl.getAttribute('reference')
+        references += referenceText
+    }
+    args.references = references
 
     // send the compiling task
     var body = {
