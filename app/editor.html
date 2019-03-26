@@ -34,6 +34,9 @@
               src="assets/editor/list.png" /></button>
           <button command="insertOrderedList" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
               src="assets/editor/list-1.png" /></button>
+          <button class="btn btn-light btn-sm modal-open-button" type="button" data-toggle="modal"
+            data-target="#reference-modal" tab-index="-1" role="dialog" aria-labelledby="referenceModal"><img class="img-fluid"
+              src="assets/editor/reference.png" /></button>
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-light btn-sm dropdown-toggle font-weight-bolder" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
@@ -55,7 +58,7 @@
           </div>
           <button id="compile" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
               src="assets/editor/profits.png" /></button>
-          <button id="arguments-modal-button" class="btn btn-light btn-sm ml-2 font-weight-bold disabled" type="button"
+          <button id="arguments-modal-button" class="btn btn-light btn-sm ml-2 font-weight-bold disabled modal-open-button" type="button"
             data-toggle="modal" data-target="#arguments-modal">TemplateArguments</button>
           <!-- Arguments Modal -->
           <div class="modal fade" id="arguments-modal" tabindex="-1" role="dialog" aria-labelledby="argumentsModal"
@@ -68,7 +71,44 @@
                 <div class="modal-body" id="arguments-modal-body">
                 </div>
                 <div class="modal-footer">
-                  <button id="modal-dismiss-button" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Reference Inserting Modal -->
+          <div class="modal fade" id="reference-modal" tabindex="-1" role="dialog" aria-labelledby="referenceModal"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Choose</h5>
+                </div>
+                <div class="modal-body" id="scripts-modal-body">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radio1" id="reference-sup-check" checked>
+                    <label class="form-check-label" for="radio1">
+                      Texts<sup>[*]</sup>
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radio1" id="reference-normal-check">
+                    <label class="form-check-label" for="radio1">
+                      Texts[*]
+                    </label>
+                  </div>
+                  <div class="mt-4">
+                    <p class="font-weight-bold">Input reference with bibtex's style:</p>
+                    <div id="reference-editor" class="reference-editor" contenteditable='plaintext-only'></div>
+                    <p class="mt-3">
+                      <b>Extracted Labels:</b><br>
+                      <span id="extracted-labels"></span>
+                    </p>
+                    <input id="reference-value" type="hidden" />
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
                 </div>
               </div>
             </div>

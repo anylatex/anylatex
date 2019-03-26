@@ -30,6 +30,18 @@
   font-size: 1rem;
   font-weight: bold;
 }
+.editor .highlight {
+  background: #E1ECF4;
+  border: 1px dotted #39739d;
+}
+
+.reference-editor {
+  padding: 1rem;
+  font-size: 1rem;
+  border: 0.5px solid black;
+  overflow-y: auto;
+  min-height: 100%;
+}
 
 /*
 #tree {
