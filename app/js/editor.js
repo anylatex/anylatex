@@ -44,6 +44,9 @@ function parseTemplates(jsonBody) {
         dropdownItem.innerText = templateName
         dropdownElement.appendChild(dropdownItem)
         let { headings, args, part_args: partArgs } = jsonBody[templateName]
+        if (!headings) {
+            headings = ['section', 'subsection', 'subsubsection']
+        }
         templateArgs[templateName] = {
             headings: headings,
             args: args,
