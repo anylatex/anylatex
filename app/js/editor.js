@@ -111,6 +111,17 @@ $('#reference-modal').on('hidden.bs.modal', () => {
     reference.setAttribute('reference', bibtexText)
     reference.setAttribute('labels', labelText)
     reference.setAttribute('contenteditable', 'false')
+    // set up popover and enable it
+    reference.setAttribute('data-toggle', 'popover')
+    reference.setAttribute('title', labelText)
+    reference.setAttribute('data-content', bibtexText)
+    reference.setAttribute('data-trigger', 'hover')
+    reference.setAttribute('data-placement', 'top')
+    let id = '_' + Math.random().toString(36).substr(2, 9)
+    reference.setAttribute('id', id)
+    $(function () {
+        $('#'+id).popover()
+    })
     if (document.getElementById('reference-sup-check').checked) {
         reference.innerHTML = '<sup>[*]</sup>'
     } else {
