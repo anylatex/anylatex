@@ -526,7 +526,7 @@ function compile() {
 
     // send the compiling task
     var body = {
-        'user_id': remote.getGlobal('userId'),
+        'user_id': remote.getGlobal('userID'),
         'body': latex,
         'args': JSON.stringify(args),
         'part_args': JSON.stringify(partArgs),

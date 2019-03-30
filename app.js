@@ -2,9 +2,16 @@ const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const url = require('url')
 const request = require('request');
-const config = require("./config.json")
+const Store = require("./app/js/store")
 
 let window = null
+const store = new Store({
+    configName: 'anylatex-config',
+    defaults: {
+        apiBase: 'http://latex.0x7cc.com/api',
+        currentUserID: ''
+    }
+})
 
 // Wait until the app is ready
 app.once('ready', () => {
@@ -21,7 +28,7 @@ app.once('ready', () => {
 
   // Load a URL in the window to the local index.html path
   window.loadURL(url.format({
-    pathname: path.join(__dirname, 'app/editor.html'),
+    pathname: path.join(__dirname, 'app/documents.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -33,37 +40,33 @@ app.once('ready', () => {
 })
 
 // setup base request with api base setted and json option enabled
-console.log("api: " + config.apiBase)
+console.log("api: " + store.getConfig('apiBase'))
 const baseRequest = request.defaults({
-    'baseUrl': config.apiBase,
+    'baseUrl': store.getConfig('apiBase'),
     'json': true
 })
 global.baseRequest = baseRequest
 
 // get user id, request if not exist
-console.log("user id: " + config.userId)
-if (config.userId == undefined) {
+console.log("user id: " + store.getConfig('currentUserID'))
+if (!store.getConfig('currentUserID')) {
     baseRequest.post('/users', function(error, response, jsonBody) {
         if (error) {
             console.log(error)
-            global.userId = ""
+            global.userID = ""
         } else {
             console.log('user id:', jsonBody['user_id'])
-            config.userId = jsonBody['user_id']
-            global.userId = config.userId
-            const fs = require('fs')
-            fs.writeFile('./config.json', JSON.stringify(config), err => {
-                if (err) {
-                    console.log('save config file error:', err)
-                } else {
-                    console.log('user id has saved into config.')
-                }
-            })
+            if (!jsonBody['user_id']) {
+                console.log('WARN: no user id in response.')
+                return
+            }
+            store.createNewUser(jsonBody['user_id'])
+            global.userID = jsonBody['user_id']
         }
     })
 } else {
     // read from file
-    global.userId = config.userId
+    global.userID = store.getConfig('userID')
 }
 
 // variable storing templates
