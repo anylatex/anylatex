@@ -41,8 +41,8 @@ class Store {
         }
     }
 
-    getConfig(key) {
-        return this.config[key]
+    getConfig(key, defaultValue) {
+        return this.config[key] || defaultValue
     }
 
     setConfig(key, val) {
@@ -67,6 +67,18 @@ class Store {
         return documents
     }
 
+    getOneDocumentData(documentID) {
+        let documentDir = path.join(this.dataPath, documentID)
+        let documentStatFile = path.join(documentDir, 'stat.json')
+        let documentPath = path.join(documentDir, 'document.html')
+        var htmlContent = ''
+        if (fs.existsSync(documentPath)) {
+            htmlContent = fs.readFileSync(documentPath)
+        }
+        let stat = JSON.parse(fs.readFileSync(documentStatFile))
+        return { documentContent: htmlContent, stat: stat }
+    }
+
     createDocument(documentID, name) {
         let documentDir = path.join(this.dataPath, documentID)
         let documentStatFile = path.join(documentDir, 'stat.json')
@@ -76,7 +88,7 @@ class Store {
     }
 
     updateDocument(updateOptions) {
-        let { id, htmlContent, name } = updateOptions
+        let { id, htmlContent, name, templateName, args, partArguments } = updateOptions
         if (!id) {
             return
         }
@@ -86,12 +98,32 @@ class Store {
             let documentPath = path.join(documentDir, 'document.html')
             fs.writeFileSync(documentPath, htmlContent)
         }
+        let statPath = path.join(documentDir, 'stat.json')
+        let stat = JSON.parse(fs.readFileSync(statPath))
         if (name) {
-            let statPath = path.join(documentDir, 'stat.json')
-            let stat = JSON.parse(fs.readFileSync(statPath))
             stat['name'] = name
-            fs.writeFileSync(statPath, JSON.stringify(stat))
         }
+        if (templateName) {
+            stat['template'] = templateName
+        }
+        if (args) {
+            let argNames = Object.keys(args)
+            if (!stat['args']) {
+                stat['args'] = {}
+            }
+            for (const name of argNames) {
+                const value = args[name]
+                stat['args'][name] = value
+            }
+        }
+        if (partArguments) {
+            let { name, value } = partArguments
+            if (!stat['partArguments']) {
+                stat['partArguments'] = {}
+            }
+            stat['partArguments'][name] = value
+        }
+        fs.writeFileSync(statPath, JSON.stringify(stat))
         return true
     }
 }
