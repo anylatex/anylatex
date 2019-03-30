@@ -3,7 +3,6 @@ const remote = require('electron').remote
 const path = require('path')
 const { Converter } = require(path.resolve('app/js/converter.js'))
 const crypto = require('crypto')
-const fs = require('fs')
 const store = remote.getGlobal('store')
 
 /* Setup current document's name and id */
@@ -11,71 +10,63 @@ let documentID = remote.getGlobal('currentDocumentID')
 let documentName = remote.getGlobal('currentDocumentName')
 document.title = 'Editor - ' + documentName
 
-/* Load the document's content */
-let documentContentPath = path.join(store.dataPath, documentID, 'document.html')
-if (fs.existsSync(documentContentPath)) {
-    let content = fs.readFileSync(documentContentPath)
-    document.getElementById('editor').innerHTML = content
-    // enable popovers
-    $(function () {
-        $('[data-toggle="popover"]').popover()
-    })
-}
-
 /* Get Available Templates */
 let baseRequest = remote.getGlobal('baseRequest')
 // Templates Arguments
-let templateArgs = remote.getGlobal('templateArgs')
-baseRequest.get(
-    '/templates',
-    (error, response, jsonBody) => {
-        var responseCode = ''
-        if (response) {
-            responseCode = response.statusCode.toString()
-        }
-        if (error || !responseCode.startsWith('2')) {
-            var debugDiv = document.getElementById('debug-info')
-            debugDiv.innerText = error + ': ' + responseCode + '\n' + jsonBody
-            debugDiv.classList.remove('d-none')
-        } else {
-            parseTemplates(jsonBody)
-        }
-    }
-)
+let templateArgs = store.getConfig('templateArgs')
+let defaultTemplateName = store.getConfig('defaultTemplateName')
+setupTemplatesDropdown()
 
-function parseTemplates(jsonBody) {
-    ipcRenderer.send('alert', Object.keys(jsonBody))
-    let templateNames = Object.keys(jsonBody)
+function setupTemplatesDropdown() {
+    let templateNames = Object.keys(templateArgs)
     let dropdownElement = document.getElementById('templates-dropdown')
-    var defaultTemplateName = ''
     for (let i = 0; i < templateNames.length; i++) {
         let templateName = templateNames[i]
-        if (templateName == 'default') {
-            defaultTemplateName = jsonBody.default
-            document.getElementById('current-template').value = defaultTemplateName
-            continue
-        }
         let dropdownItem = document.createElement('a')
         dropdownItem.className = 'dropdown-item'
         dropdownItem.setAttribute('href', '#')
         dropdownItem.setAttribute('id', templateName)
         dropdownItem.innerText = templateName
         dropdownElement.appendChild(dropdownItem)
-        let { headings, args, part_args: partArgs } = jsonBody[templateName]
-        if (!headings) {
-            headings = ['section', 'subsection', 'subsubsection']
-        }
-        templateArgs[templateName] = {
-            headings: headings,
-            args: args,
-            partArgs: partArgs
+    }
+}
+
+/* Load the document's content */
+(function(){
+    let { documentContent, stat } = store.getOneDocumentData(documentID)
+    // recover document's content
+    if (documentContent) {
+        document.getElementById('editor').innerHTML = documentContent
+        // enable popovers
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    }
+    // recover template setting and arguments' content
+    let { template, args, partArguments } = stat
+    if (!template) {
+        template = defaultTemplateName
+    }
+    document.getElementById('current-template').value = template
+    document.getElementById('dropdown-button').innerText = `Templates(${template})`
+    setTemplateHeadings(template)
+    setTemplateArguments(template)
+    if (partArguments) {
+        for (const argName of Object.keys(partArguments)) {
+            const argValue = partArguments[argName]
+            document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
         }
     }
-    document.getElementById('dropdown-button').innerText = `Templates(${defaultTemplateName})`
-    // set headings and arguments
-    setTemplateHeadings(defaultTemplateName)
-    setTemplateArguments(defaultTemplateName)
-}
+    if (args) {
+        let argNames = Object.keys(args)
+        for (let i = 0; i < argNames.length; i++) {
+            const name = argNames[i]
+            const value = args[name]
+            let argElement = document.getElementById(name)
+            argElement.value = value
+        }
+    }
+})()
 
 /* Modal buttons' handlers */
 let modalOpenButtons = document.getElementsByClassName('modal-open-button')
@@ -181,7 +172,7 @@ function toolbarHandler(event) {
     ipcRenderer.sendSync("alert", "click: "+command)
     /* special commands */
     if (command == 'return') {
-        save()
+        save(true)
         ipcRenderer.send('load-page', 'documents')
         return
     }
@@ -216,12 +207,14 @@ function toolbarHandler(event) {
 
 let editor = document.getElementById('editor')
 var lastSaveTime = -1
+var lastPartSaveTime = -1
 editor.addEventListener('keydown', editorKeyHandler)
 $('#editor').on('blur keyup paste input', save)
+$('#part-editor').on('blur keyup paste input', savePart)
 document.addEventListener('selectionchange', editorSelectionHandler)
 
-function save() {
-    if (Date.now() - lastSaveTime < 2) {
+function save(force=false) {
+    if (Date.now() - lastSaveTime < 2 && !force) {
         return
     }
     const content = document.getElementById('editor').innerHTML
@@ -230,6 +223,21 @@ function save() {
         htmlContent: content
     })
     lastSaveTime = Date.now()
+}
+
+function savePart(force=false) {
+    if (Date.now() - lastPartSaveTime < 2 && !force) {
+        return
+    }
+    const content = document.getElementById('part-editor').innerHTML
+    store.updateDocument({
+        id: documentID,
+        partArguments: {
+            name: document.getElementById('part-args-name').innerText,
+            value: content
+        }
+    })
+    lastPartSaveTime = Date.now()
 }
 
 function editorKeyHandler(event) {
@@ -340,7 +348,29 @@ let templatePartArgs = document.getElementById('part-arguments')
 templatePartArgs.addEventListener('click', templatePartArgsHandler)
 let templatePartArgConfirmButton = document.getElementById('part-args-confirm')
 templatePartArgConfirmButton.addEventListener('click', confirmPartArg)
+let templateArgsConfirmButton = document.getElementById('arguments-confirm')
+templateArgsConfirmButton.addEventListener('click', saveArgs)
 
+function saveArgs() {
+    var templateName = document.getElementById('current-template').value
+    var argsDiv = document.getElementById('arguments-modal-body')
+    let args = {}
+    if (argsDiv.innerHTML.trim() != '') {
+        let currentTemplateArgs = templateArgs[templateName]['args']
+        let argNames = Object.keys(currentTemplateArgs)
+        for (let i = 0; i < argNames.length; i++) {
+            let argName = argNames[i]
+            let argElement = document.getElementById(argName)
+            var argValue = argElement.value
+            if (argValue) {
+                args[argName] = argValue
+            }
+        }
+    }
+    if (Object.keys(args).length > 0) {
+        store.updateDocument({ id: documentID, args: args })
+    }
+}
 
 // set template's headings
 function setTemplateHeadings(templateName) {
@@ -428,6 +458,7 @@ function setTemplateArguments(templateName){
         }
     }
     let partArgNames = Object.keys(currentTemplatePartArgs)
+    let partArgsEditorDiv = document.getElementById('part-args-editor')
     for (let i = 0; i < partArgNames.length; i++) {
         let argName = partArgNames[i]
         let { help } = currentTemplatePartArgs[argName]
@@ -439,6 +470,12 @@ function setTemplateArguments(templateName){
         argLink.setAttribute('help', help)
         partArgsDiv.appendChild(argLink)
         partArgsDiv.appendChild(document.createElement('br'))
+        let input = document.createElement('input')
+        input.setAttribute('type', 'hidden')
+        input.setAttribute('name', argName)
+        input.setAttribute('id', argName + '-' + 'value')
+        input.setAttribute('value', '')
+        partArgsEditorDiv.appendChild(input)
     }
 }
 
@@ -459,6 +496,9 @@ function templateDropdownHandler(event) {
 
     // arguments
     setTemplateArguments(templateName)
+
+    // update the document config
+    store.updateDocument({ id: documentID, templateName: templateName })
 }
 
 // template part arguments' handler
@@ -472,17 +512,7 @@ function templatePartArgsHandler(event) {
     partArgsEditorDiv.classList.remove('d-none')
     documentEditor.classList.add('d-none')
     document.getElementById('part-args-name').innerText = event.target.innerText
-    if (document.getElementById(event.target.innerText + '-' + 'value')) {
-        // input element exists, restore inner html
-        partArgsEditor.innerHTML = document.getElementById(event.target.innerText + '-' + 'value').value
-    } else {
-        let input = document.createElement('input')
-        input.setAttribute('type', 'hidden')
-        input.setAttribute('name', event.target.innerText)
-        input.setAttribute('id', event.target.innerText + '-' + 'value')
-        partArgsEditorDiv.appendChild(input)
-        partArgsEditor.innerHTML = ''
-    }
+    partArgsEditor.innerHTML = document.getElementById(event.target.innerText + '-' + 'value').value
 }
 
 function confirmPartArg() {
@@ -492,6 +522,7 @@ function confirmPartArg() {
     let argValue = document.getElementById('part-editor').innerHTML
     // store value
     document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
+    savePart(true)
     partArgsEditorDiv.classList.add('d-none')
     documentEditor.classList.remove('d-none')
 }

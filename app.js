@@ -71,8 +71,47 @@ if (!store.getConfig('currentUserID')) {
 }
 
 // variable storing templates
-// TODO: store locally
-global.templateArgs = {}
+global.templateArgs = store.getConfig('templateArgs', {})
+global.defaultTemplateName = store.getConfig('defaultTemplateName', '')
+baseRequest.get(
+    '/templates',
+    (error, response, jsonBody) => {
+        var responseCode = ''
+        if (response) {
+            responseCode = response.statusCode.toString()
+        }
+        if (error || !responseCode.startsWith('2')) {
+            console.log(error + ': ' + responseCode + '\n' + jsonBody)
+            console.log('WARN: templates not fetched')
+        } else {
+            parseTemplates(jsonBody)
+        }
+    }
+)
+
+// TODO: log updates if existed templates' arguments changed
+function parseTemplates(jsonBody) {
+    let templateNames = Object.keys(jsonBody)
+    for (let i = 0; i < templateNames.length; i++) {
+        let templateName = templateNames[i]
+        if (templateName == 'default') {
+            global.defaultTemplateName = jsonBody.default
+            continue
+        }
+        let { headings, args, part_args: partArgs } = jsonBody[templateName]
+        if (!headings) {
+            headings = ['section', 'subsection', 'subsubsection']
+        }
+        global.templateArgs[templateName] = {
+            headings: headings,
+            args: args,
+            partArgs: partArgs
+        }
+    }
+    store.setConfig('templateArgs', global.templateArgs)
+    store.setConfig('defaultTemplateName', global.defaultTemplateName)
+    console.log('Parsed templates:', Object.keys(global.templateArgs))
+}
 
 global.currentCompilingTask = ""
 

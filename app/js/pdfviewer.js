@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron')
 const remote = require('electron').remote
 
+var apiBase = remote.getGlobal('store').getConfig('apiBase')
 var baseRequest = remote.getGlobal('baseRequest')
 var currentTaskId = remote.getGlobal("currentCompilingTask")
 
@@ -9,7 +10,7 @@ var isContinue = true
 var pdfData = ""
 while (isContinue) {
     $.ajax({
-        url: 'http://latex.0x7cc.com:8080/tasks/'+currentTaskId,
+        url: apiBase + '/tasks/'+currentTaskId,
         type: "get",
         success: (data) => {
             ipcRenderer.send('alert', 'received raw data')
