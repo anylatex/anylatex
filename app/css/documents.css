@@ -1,0 +1,17 @@
+.btn-document{
+  width: 15vw;
+  height: 20vw;
+  border: 0.15vw solid black;
+}
+
+.btn-document-plus {
+  font-size: 5vw;
+  margin: 0 auto;
+}
+
+.document-name {
+  margin-top: 0.2vw;
+  width: 15vw;
+  text-align: center;
+  font-weight: 500;
+}

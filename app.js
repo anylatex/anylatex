@@ -12,6 +12,7 @@ const store = new Store({
         currentUserID: ''
     }
 })
+global.store = store
 
 // Wait until the app is ready
 app.once('ready', () => {
@@ -75,6 +76,10 @@ global.templateArgs = {}
 
 global.currentCompilingTask = ""
 
+// variables storing current the edidting document
+global.currentDocumentID = ""
+global.currentDocumentName = ""
+
 const { ipcMain } = require("electron")
 
 ipcMain.on("alert", (event, arg) => {
@@ -91,6 +96,12 @@ ipcMain.on("load-page", (event, arg) => {
             slashes: true
         }))
     }
+})
+
+// set up variables
+ipcMain.on("set-variable", (event, arg) => {
+    console.log('set variable:', arg.name)
+    global[arg.name] = arg.value
 })
 
 // add a compile task

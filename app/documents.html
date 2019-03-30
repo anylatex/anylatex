@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/documents.css">
+
+  <title>Documents</title>
+</head>
+
+<body>
+
+  <div class="container w-100 h-100 pt-4">
+    <div id="documents-panel" class="row h-25">
+      <div id="document-template" class="col-3 h-100 align-self-center">
+        <button type="button" class="btn btn-outline-dark btn-document" id="new-document" data-toggle="modal"
+          data-target="#documents-modal">
+          <div class="btn-document-plus">+</div>
+        </button>
+        <div class="document-name">New Document</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Creating Documents Modal -->
+  <div class="modal fade" id="documents-modal" tabindex="-1" role="dialog" aria-labelledby="documentsModal"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">New Document</h5>
+        </div>
+        <div class="modal-body">
+          <input id="new-document-name" type="text" class="form-control" placeholder="input document's name" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="create-document">Create</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    delete module.exports
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="./js/documents.js"></script>
+</body>
