@@ -95,6 +95,12 @@ ipcMain.on("load-page", (event, arg) => {
             protocol: "file:",
             slashes: true
         }))
+    } else if (arg == "documents") {
+        window.loadURL(url.format({
+            pathname: path.join(__dirname, "app/documents.html"),
+            protocol: "file:",
+            slashes: true
+        }))
     }
 })
 

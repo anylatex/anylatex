@@ -179,6 +179,12 @@ function toolbarHandler(event) {
         return
     }
     ipcRenderer.sendSync("alert", "click: "+command)
+    /* special commands */
+    if (command == 'return') {
+        save()
+        ipcRenderer.send('load-page', 'documents')
+        return
+    }
     if (controllingCommands.indexOf(command) >= 0) {
         if (document.queryCommandState(command)) {
             // cancel command
