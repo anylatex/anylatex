@@ -8,7 +8,7 @@ const fs = require('fs')
 
 class Store {
     constructor(opts) {
-        this.appDataPath = (electron.app || electron.remote.app).getPath('userData')
+        this.appDataPath = (electron.app).getPath('userData')
         this.configPath = path.join(this.appDataPath, opts.configName + '.json')
         this.config = parseDataFile(this.configPath, opts.defaults)
         if (!this.config['currentUserID']) {
@@ -47,12 +47,52 @@ class Store {
 
     setConfig(key, val) {
         this.config[key] = val
-        try {
-            fs.writeFileSync(this.configPath, JSON.stringify(this.config))
-            return { status: true, info: '' }
-        } catch (error) {
-            return { status: false, info: error }
+        fs.writeFileSync(this.configPath, JSON.stringify(this.config))
+        return { status: true, info: '' }
+    }
+
+    /* Document related operations */
+
+    getExistedDocuments() {
+        const dirs = p => fs.readdirSync(p).filter(f => fs.statSync(path.join(p, f)).isDirectory())
+        let documents = []
+        for (const dirpath of dirs(this.dataPath)) {
+            let statPath = path.join(this.dataPath, dirpath, 'stat.json')
+            let stat = JSON.parse(fs.readFileSync(statPath))
+            documents.push({
+                name: stat.name,
+                id: stat.id
+            })
         }
+        return documents
+    }
+
+    createDocument(documentID, name) {
+        let documentDir = path.join(this.dataPath, documentID)
+        let documentStatFile = path.join(documentDir, 'stat.json')
+        fs.mkdirSync(documentDir)
+        let stat = {id: documentID, name: name, createTime: Date.now().toString()}
+        fs.writeFileSync(documentStatFile, JSON.stringify(stat))
+    }
+
+    updateDocument(updateOptions) {
+        let { id, htmlContent, name } = updateOptions
+        if (!id) {
+            return
+        }
+        // TODO: check if this id existed
+        let documentDir = path.join(this.dataPath, id)
+        if (htmlContent) {
+            let documentPath = path.join(documentDir, 'document.html')
+            fs.writeFileSync(documentPath, htmlContent)
+        }
+        if (name) {
+            let statPath = path.join(documentDir, 'stat.json')
+            let stat = JSON.parse(fs.readFileSync(statPath))
+            stat['name'] = name
+            fs.writeFileSync(statPath, JSON.stringify(stat))
+        }
+        return true
     }
 }
 

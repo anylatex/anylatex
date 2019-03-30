@@ -3,6 +3,24 @@ const remote = require('electron').remote
 const path = require('path')
 const { Converter } = require(path.resolve('app/js/converter.js'))
 const crypto = require('crypto')
+const fs = require('fs')
+const store = remote.getGlobal('store')
+
+/* Setup current document's name and id */
+let documentID = remote.getGlobal('currentDocumentID')
+let documentName = remote.getGlobal('currentDocumentName')
+document.title = 'Editor - ' + documentName
+
+/* Load the document's content */
+let documentContentPath = path.join(store.dataPath, documentID, 'document.html')
+if (fs.existsSync(documentContentPath)) {
+    let content = fs.readFileSync(documentContentPath)
+    document.getElementById('editor').innerHTML = content
+    // enable popovers
+    $(function () {
+        $('[data-toggle="popover"]').popover()
+    })
+}
 
 /* Get Available Templates */
 let baseRequest = remote.getGlobal('baseRequest')
@@ -191,8 +209,22 @@ function toolbarHandler(event) {
 }
 
 let editor = document.getElementById('editor')
+var lastSaveTime = -1
 editor.addEventListener('keydown', editorKeyHandler)
+$('#editor').on('blur keyup paste input', save)
 document.addEventListener('selectionchange', editorSelectionHandler)
+
+function save() {
+    if (Date.now() - lastSaveTime < 2) {
+        return
+    }
+    const content = document.getElementById('editor').innerHTML
+    store.updateDocument({
+        id: documentID,
+        htmlContent: content
+    })
+    lastSaveTime = Date.now()
+}
 
 function editorKeyHandler(event) {
     var key = event.key
