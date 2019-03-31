@@ -162,13 +162,98 @@ $('#choose-image').on('change', () => {
     } 
 })
 
-function decodeImageFromBase64(source) {
+function decodeImageFromBase64(source, binaryData=true, hash=true) {
     let matches = source.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
     let image = {}
     image.type = matches[1]
-    image.data = Buffer.from(matches[2], 'base64')
-    image.hash = crypto.createHash('sha256').update(image.data.toString('binary')).digest('hex')
+    if (binaryData) {
+        image.data = Buffer.from(matches[2], 'base64')
+    } else {
+        image.data = matches[2]
+    }
+    if (hash) {
+        image.hash = crypto.createHash('sha256').update(image.data.toString('binary')).digest('hex')
+    }
     return image
+}
+
+// clear `pending` status
+(function(){
+    for (const img of document.getElementsByClassName('inserted-image')) {
+        if (img.getAttribute('upload') == 'pending') {
+            img.setAttribute('upload', 'no')
+        }
+    }
+})()
+setInterval(detectUnuploadedImages, 10000)
+
+function detectUnuploadedImages() {
+    for (const el of document.getElementsByClassName('inserted-image')) {
+        let upload = el.getAttribute('upload')
+        if (upload == 'false') {
+            checkAndUploadImage(el)
+        }
+    }
+}
+
+function checkAndUploadImage(imgEl) {
+    if (imgEl.getAttribute('upload') == 'true') {
+        return
+    }
+    imgEl.setAttribute('upload', 'pending')
+    // check if the image existed on the server
+    baseRequest.get(
+        `/images/${imgEl.getAttribute('id')}?check=true&user_id=${remote.getGlobal('userID')}`,
+        (error, response, jsonBody) => {
+            var responseCode = ''
+            if (response) {
+                responseCode = response.statusCode
+            }
+            if (responseCode != '200') {
+                ipcRenderer.send('alert', error + ': ' + responseCode + '\n\t' + JSON.stringify(jsonBody))
+                if (responseCode == '404') {
+                    ipcRenderer.send('alert', `Start uploading image ${imgEl.getAttribute('id')}...`)
+                    uploadImage(imgEl)
+                } else {
+                    ipcRenderer.send('alert', 'WARN: unknown error')
+                    imgEl.setAttribute('upload', 'false')
+                }
+            } else {
+                // image exised on the server
+                ipcRenderer.send('alert', `Image ${imgEl.getAttribute('id')} exists on the server.`)
+                imgEl.setAttribute('upload', 'true')
+            }
+        }
+    )
+}
+
+function uploadImage(imgEl) {
+    // upload the image
+    const img = decodeImageFromBase64(imgEl.getAttribute('src'), hash=false, binaryData=false)
+    const body = {
+        'user_id': remote.getGlobal('userID'),
+        'image_id': imgEl.getAttribute('id'),
+        'content': img.data
+    }
+    baseRequest.post(
+        '/images',
+        {'body': body},
+        (error, response, jsonBody) => {
+            var responseCode = ''
+            if (response) {
+                responseCode = response.statusCode
+            }
+            if (responseCode != '201') {
+                let errorInfo = `Upload image ${imgEl.getAttribute('id')} faild:\n\t`
+                                + error + ': ' + responseCode + '\n\t' + JSON.stringify(jsonBody)
+                ipcRenderer.send('alert', errorInfo)
+                imgEl.setAttribute('upload', 'false')
+            } else {
+                ipcRenderer.send("alert", `Upload image ${imgEl.getAttribute('id')} success`)
+                imgEl.setAttribute('upload', 'true')
+            }
+        }
+    )
 }
 
 $('#image-confirm').on('click', () => {
@@ -184,8 +269,10 @@ $('#image-confirm').on('click', () => {
     div.classList.add('w-75')
     let img = document.createElement('img')
     img.classList.add('img-fluid')
+    img.classList.add('inserted-image')
     img.setAttribute('id', image.hash)
     img.setAttribute('src', imgSource)
+    img.setAttribute('upload', 'false')
     div.appendChild(img)
     editor.appendChild(div)
     save(true)
