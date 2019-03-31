@@ -142,6 +142,56 @@ $('#reference-modal').on('hidden.bs.modal', () => {
     labelEl.innerHTML = ''
 })
 
+/* Image Choosing Modal */
+
+$('#open-image-selector').on('click', () => {
+    // clear
+    document.getElementById('choose-image').value = ''
+    document.getElementById('choose-image-name').innerHTML = ''
+    document.getElementById('show-choose-image').src = ''
+})
+
+$('#choose-image').on('change', () => {
+    let file = document.getElementById('choose-image').files[0]
+    let fileName = file.name
+    document.getElementById('choose-image-name').innerHTML = fileName
+    let reads = new FileReader()
+    reads.readAsDataURL(file)
+    reads.onload = function (e) {
+        document.getElementById('show-choose-image').src = this.result
+    } 
+})
+
+function decodeImageFromBase64(source) {
+    let matches = source.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+    let image = {}
+    image.type = matches[1]
+    image.data = Buffer.from(matches[2], 'base64')
+    image.hash = crypto.createHash('sha256').update(image.data.toString('binary')).digest('hex')
+    return image
+}
+
+$('#image-confirm').on('click', () => {
+    let imgSource = document.getElementById('show-choose-image').src
+    let image = decodeImageFromBase64(imgSource)
+
+    // store to the local directory
+    image.name = image.hash + '.' + image.type.split('/')[1]
+    store.updateDocument({ id: documentID, image: image })
+
+    // insert into the editor
+    let div = document.createElement('div')
+    div.classList.add('w-75')
+    let img = document.createElement('img')
+    img.classList.add('img-fluid')
+    img.setAttribute('id', image.hash)
+    img.setAttribute('src', imgSource)
+    div.appendChild(img)
+    editor.appendChild(div)
+    save(true)
+    ipcRenderer.send('alert', 'inserted ' + image.name)
+})
+
 /* Toolbar and Editor's handlers */
 
 // current format relating status
