@@ -38,6 +38,8 @@ class Store {
         // if so, rename it to current user's data directory
         if (fs.existsSync(path.join(this.appDataPath, 'tempUser'))) {
             fs.renameSync(path.join(this.appDataPath, 'tempUser'), this.dataPath)
+        } else {
+            fs.mkdirSync(this.dataPath)
         }
     }
 
@@ -88,7 +90,7 @@ class Store {
     }
 
     updateDocument(updateOptions) {
-        let { id, htmlContent, name, templateName, args, partArguments } = updateOptions
+        let { id, htmlContent, name, templateName, args, partArguments, image } = updateOptions
         if (!id) {
             return
         }
@@ -124,6 +126,14 @@ class Store {
             stat['partArguments'][name] = value
         }
         fs.writeFileSync(statPath, JSON.stringify(stat))
+        if (image) {
+            const imageDirPath = path.join(documentDir, 'images')
+            if (!fs.existsSync(imageDirPath)) {
+                fs.mkdirSync(imageDirPath)
+            }
+            const imagePath = path.join(imageDirPath, image.name)
+            fs.writeFileSync(imagePath, image.data)
+        }
         return true
     }
 }
