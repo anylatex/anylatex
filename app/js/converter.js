@@ -55,11 +55,13 @@ class Converter {
             let element = bodyDom[i]
             let elementContent = this._into_one_line(element.textContent)
             let outerHTML = this._into_one_line(element.outerHTML)
-            if (element.textContent == '') {
+            let tagName = element.tagName
+            if (element.textContent == '' && tagName != 'IMG' && !outerHTML.includes('<img')) {
+                console.log('ignore:', tagName)
                 latex = latex.replace(outerHTML, "")
                 continue
             }
-            let tagName = element.tagName
+
             switch (tagName) {
                 // Converting Heading
                 case 'H1':
@@ -93,6 +95,16 @@ class Converter {
                     } else {
                         parsedInnerLatex = `\\cite{${element.getAttribute('labels')}}`
                     }
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                // Converting images
+                case 'IMG':
+                    var imgID = element.getAttribute('id')
+                    var imgType = element.getAttribute('format')
+                    parsedInnerLatex = '\\begin{figure}[hbt]\n'
+                                        + '\\centering\n'
+                                        + `\\includegraphics[width=0.7\\linewidth]{${imgID}.${imgType}}\n`
+                                        + '\\end{figure}'
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 // Converting others

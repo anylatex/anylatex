@@ -165,7 +165,7 @@ $('#choose-image').on('change', () => {
 function decodeImageFromBase64(source, binaryData=true, hash=true) {
     let matches = source.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
     let image = {}
-    image.type = matches[1]
+    image.type = matches[1].split('/')[1]
     if (binaryData) {
         image.data = Buffer.from(matches[2], 'base64')
     } else {
@@ -271,6 +271,7 @@ $('#image-confirm').on('click', () => {
     img.classList.add('img-fluid')
     img.classList.add('inserted-image')
     img.setAttribute('id', image.hash)
+    img.setAttribute('format', image.type)
     img.setAttribute('src', imgSource)
     img.setAttribute('upload', 'false')
     div.appendChild(img)
@@ -730,13 +731,24 @@ function compile() {
     }
     args.references = references
 
+    // get images
+    // TODO: check images unuploaded
+    let images = []
+    for (const img of document.getElementsByClassName('inserted-image')) {
+        const imgID = img.getAttribute('id')
+        const imgType = img.getAttribute('format')
+        const imgName = imgID + '.' + imgType
+        images.push(imgName)
+    }
+
     // send the compiling task
     var body = {
         'user_id': remote.getGlobal('userID'),
         'body': latex,
         'args': JSON.stringify(args),
         'part_args': JSON.stringify(partArgs),
-        'template': templateName
+        'template': templateName,
+        'images': JSON.stringify(images)
     }
     ipcRenderer.send('alert', 'post task data:'+ args + partArgs)
     baseRequest.post(
