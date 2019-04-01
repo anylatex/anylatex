@@ -101,10 +101,14 @@ class Converter {
                 case 'IMG':
                     var imgID = element.getAttribute('id')
                     var imgType = element.getAttribute('format')
+                    var caption = element.getAttribute('caption')
                     parsedInnerLatex = '\\begin{figure}[hbt]\n'
                                         + '\\centering\n'
                                         + `\\includegraphics[width=0.7\\linewidth]{${imgID}.${imgType}}\n`
-                                        + '\\end{figure}'
+                    if (caption) {
+                        parsedInnerLatex += `\\caption{${caption}}\n`
+                    }
+                    parsedInnerLatex += '\\end{figure}'
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 // Converting others
