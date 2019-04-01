@@ -274,6 +274,24 @@ $('#image-confirm').on('click', () => {
     img.setAttribute('format', image.type)
     img.setAttribute('src', imgSource)
     img.setAttribute('upload', 'false')
+    let captionText = document.getElementById('image-caption').value
+    if (captionText) {
+        img.setAttribute('caption', captionText)
+    } else {
+        img.setAttribute('caption', '')
+        captionText = 'No Caption'
+    }
+    // set up popover and enable it
+    img.setAttribute('data-toggle', 'popover')
+    img.setAttribute('title', 'Caption')
+    img.setAttribute('data-content', captionText)
+    img.setAttribute('data-trigger', 'hover')
+    img.setAttribute('data-placement', 'top')
+    let popID = Math.random().toString(36).substr(2, 9)
+    img.setAttribute('popid', popID)
+    $(function () {
+        $(`[popid='${popID}'`).popover()
+    })
     div.appendChild(img)
     editor.appendChild(div)
     save(true)
