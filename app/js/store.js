@@ -90,7 +90,7 @@ class Store {
     }
 
     updateDocument(updateOptions) {
-        let { id, htmlContent, name, templateName, args, partArguments, image } = updateOptions
+        let { id, htmlContent, name, templateName, args, partArguments, image, pdf } = updateOptions
         if (!id) {
             return
         }
@@ -133,6 +133,10 @@ class Store {
             }
             const imagePath = path.join(imageDirPath, image.name)
             fs.writeFileSync(imagePath, image.data)
+        }
+        if (pdf) {
+            const pdfPath = path.join(documentDir, pdf.name)
+            fs.writeFileSync(pdfPath, pdf.data)
         }
         return true
     }

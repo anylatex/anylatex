@@ -1,81 +1,76 @@
-const { ipcRenderer } = require('electron')
+/* Copyright 2014 Mozilla Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 const remote = require('electron').remote
 
-var apiBase = remote.getGlobal('store').getConfig('apiBase')
-var baseRequest = remote.getGlobal('baseRequest')
-var currentTaskId = remote.getGlobal("currentCompilingTask")
+'use strict';
 
-// get compiling status
-var isContinue = true
-var pdfData = ""
-while (isContinue) {
-    $.ajax({
-        url: apiBase + '/tasks/'+currentTaskId,
-        type: "get",
-        success: (data) => {
-            ipcRenderer.send('alert', 'received raw data')
-            if (data['status'] == 'finished') {
-                isContinue = false
-                pdfData = data['pdf_b64']
-                ipcRenderer.send('alert', 'downloaded pdf content')
-            }
-        },
-        async: false
-    })
+if (!pdfjsLib.getDocument || !pdfjsViewer.PDFViewer) {
+  alert('Please build the pdfjs-dist library using\n' +
+        '  `gulp dist-install`');
 }
 
-// delete the task
-baseRequest.delete(
-    '/tasks/' + currentTaskId,
-    (error, response, jsonBody) => {
-        if (error) {
-            ipcRenderer.send(
-                'alert',
-                'error when deleting the task ' +
-                currentTaskId + ' error: ' + jsonBody
-            )
-        } else {
-            ipcRenderer.send('alert', 'delete task successfully')
-        }
-    }
-)
+// The workerSrc property shall be specified.
+//
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.worker.js';
 
-pdfData = atob(pdfData)
+// Some PDFs need external cmaps.
+//
+var CMAP_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/cmaps/';
+var CMAP_PACKED = true;
 
-// render pdf
-var pdfjsLib = window['pdfjs-dist/build/pdf']
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.worker.js'
-const cMapUrl= 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/cmaps/'
-const cMapPacked= true
-var loadingTask = pdfjsLib.getDocument({data: pdfData, cMapUrl: cMapUrl, cMapPacked: cMapPacked})
-loadingTask.promise.then(function (pdf) {
-    // Fetch the first page
-    for (let pageNumber = 1; pageNumber < pdf.numPages+1; pageNumber++) {
-        pdf.getPage(pageNumber).then(function (page) {
-            // adjust size
-            var scale = 5
-            var viewport = page.getViewport(scale)
-            var canvasContainer = document.getElementById('wrapper')
-            var canvas = document.createElement('canvas')
-            var context = canvas.getContext('2d')
-            canvas.width = viewport.width
-            canvas.height = viewport.height
-            canvas.style.width = "100%"
-            canvas.style.height = "100%"
-            canvasContainer.style.width = Math.floor(viewport.width / scale) + 'pt'
-            canvasContainer.style.height = Math.floor(viewport.height / scale) + 'pt'
-            canvasContainer.appendChild(canvas)
-            // render pdf into canvas context
-            var renderContext = {
-                canvasContext: context,
-                viewport: viewport
-            }
-            var renderTask = page.render(renderContext)
-            renderTask.promise.then(function () {
-            })
-        })
-    }
-}, function (reason) {
-    // pdf loading error
-    ipcRenderer.send("alert", "pdf render error:" + reason)
-})
+var DEFAULT_URL = remote.getGlobal('pdfPath');
+var SEARCH_FOR = ''; // try 'Mozilla';
+
+var container = document.getElementById('viewerContainer');
+
+// (Optionally) enable hyperlinks within PDF files.
+var pdfLinkService = new pdfjsViewer.PDFLinkService();
+
+// (Optionally) enable find controller.
+var pdfFindController = new pdfjsViewer.PDFFindController({
+  linkService: pdfLinkService,
+});
+
+var pdfViewer = new pdfjsViewer.PDFViewer({
+  container: container,
+  linkService: pdfLinkService,
+  findController: pdfFindController,
+});
+pdfLinkService.setViewer(pdfViewer);
+
+document.addEventListener('pagesinit', function () {
+  // We can use pdfViewer now, e.g. let's change default scale.
+  pdfViewer.currentScaleValue = 'page-width';
+
+  if (SEARCH_FOR) { // We can try search for things
+    pdfFindController.executeCommand('find', { query: SEARCH_FOR, });
+  }
+});
+
+// Loading document.
+var loadingTask = pdfjsLib.getDocument({
+  url: DEFAULT_URL,
+  cMapUrl: CMAP_URL,
+  cMapPacked: CMAP_PACKED,
+});
+loadingTask.promise.then(function(pdfDocument) {
+  // Document loaded, specifying document for the viewer and
+  // the (optional) linkService.
+  pdfViewer.setDocument(pdfDocument);
+
+  pdfLinkService.setDocument(pdfDocument, null);
+});

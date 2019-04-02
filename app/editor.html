@@ -5,11 +5,21 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/editor.css">
+  <link rel="stylesheet" href="../node_modules/spinkit/css/spinkit.css">
 
   <title>Editor</title>
 </head>
 
 <body>
+  <div id="loader-container" class="loader-container d-none">
+    <div class="row h-100 w-100 align-items-center justify-content-center">
+      <div class="col">
+        <div class="sk-rotating-plane loader"></div>
+        <div id="loader-hint" class="loader-hint">
+        </div>
+      </div>
+    </div>
+  </div>
 
   <nav id="navbar" class="navbar fixed-top navbar-light bg-light w-100">
     <!-- toolbar -->
