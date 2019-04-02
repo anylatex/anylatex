@@ -1,7 +1,7 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const url = require('url')
-const request = require('request');
+const superagent = require('superagent')
 const Store = require("./app/js/store")
 
 let window = null
@@ -16,6 +16,29 @@ global.store = store
 
 // Wait until the app is ready
 app.once('ready', () => {
+
+    // get user id, request if not exist
+    console.log("user id: " + store.getConfig('currentUserID'))
+    if (!store.getConfig('currentUserID')) {
+        superagent
+            .post(`${store.getConfig('apiBase')}/users`)
+            .ok(res => res.status == '201')
+            .retry(5)
+            .then(res => {
+                const userID = res.body.user_id
+                console.log('user id:', userID)
+                store.createNewUser(userID)
+                global.userID = userID
+            })
+            .catch(err => {
+                console.log(err)
+                global.userID = ""
+            })
+    } else {
+        // read from file
+        global.userID = store.getConfig('currentUserID')
+    }
+
   // Create a new window
   window = new BrowserWindow({
     width: 1300,
@@ -42,52 +65,21 @@ app.once('ready', () => {
 
 // setup base request with api base setted and json option enabled
 console.log("api: " + store.getConfig('apiBase'))
-const baseRequest = request.defaults({
-    'baseUrl': store.getConfig('apiBase'),
-    'json': true
-})
-global.baseRequest = baseRequest
 
-// get user id, request if not exist
-console.log("user id: " + store.getConfig('currentUserID'))
-if (!store.getConfig('currentUserID')) {
-    baseRequest.post('/users', function(error, response, jsonBody) {
-        if (error) {
-            console.log(error)
-            global.userID = ""
-        } else {
-            console.log('user id:', jsonBody['user_id'])
-            if (!jsonBody['user_id']) {
-                console.log('WARN: no user id in response.')
-                return
-            }
-            store.createNewUser(jsonBody['user_id'])
-            global.userID = jsonBody['user_id']
-        }
-    })
-} else {
-    // read from file
-    global.userID = store.getConfig('userID')
-}
 
 // variable storing templates
 global.templateArgs = store.getConfig('templateArgs', {})
 global.defaultTemplateName = store.getConfig('defaultTemplateName', '')
-baseRequest.get(
-    '/templates',
-    (error, response, jsonBody) => {
-        var responseCode = ''
-        if (response) {
-            responseCode = response.statusCode.toString()
-        }
-        if (error || !responseCode.startsWith('2')) {
-            console.log(error + ': ' + responseCode + '\n' + jsonBody)
-            console.log('WARN: templates not fetched')
-        } else {
-            parseTemplates(jsonBody)
-        }
-    }
-)
+superagent
+    .get(`${store.getConfig('apiBase')}/templates`)
+    .ok(res => res.status == '200')
+    .retry(3)
+    .then(res => {
+        parseTemplates(res.body)
+    })
+    .catch(err => {
+        console.log('WARN: templates not fetched\n' + err)
+    })
 
 // TODO: log updates if existed templates' arguments changed
 function parseTemplates(jsonBody) {
