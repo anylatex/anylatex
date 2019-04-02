@@ -3,7 +3,11 @@ const remote = require('electron').remote
 const path = require('path')
 const { Converter } = require(path.resolve('app/js/converter.js'))
 const crypto = require('crypto')
+const async = require('async')
+const superagent = require('superagent')
 const store = remote.getGlobal('store')
+
+const apiBase = store.getConfig('apiBase')
 
 /* Setup current document's name and id */
 let documentID = remote.getGlobal('currentDocumentID')
@@ -691,6 +695,8 @@ let compileButton = document.getElementById("compile")
 compileButton.addEventListener("click", compile)
 
 function compile() {
+    document.getElementById('navbar').classList.remove('fixed-top')
+    document.getElementById('loader-container').classList.remove('d-none')
     ipcRenderer.send('alert', 'click: compile')
     // convert args if exist
     var templateName = document.getElementById('current-template').value
@@ -760,7 +766,7 @@ function compile() {
     }
 
     // send the compiling task
-    var body = {
+    var createTaskBody = {
         'user_id': remote.getGlobal('userID'),
         'body': latex,
         'args': JSON.stringify(args),
@@ -769,22 +775,69 @@ function compile() {
         'images': JSON.stringify(images)
     }
     ipcRenderer.send('alert', 'post task data:'+ args + partArgs)
-    baseRequest.post(
-        '/tasks',
-        {'body': body},
-        (error, response, jsonBody) => {
-            var responseCode = ''
-            if (response) {
-                responseCode = response.statusCode.toString()
-            }
-            if (error || !responseCode.startsWith('2')) {
-                var debugDiv = document.getElementById('debug-info')
-                debugDiv.innerText = error + ': ' + responseCode + '\n' + jsonBody
-                debugDiv.classList.remove('d-none')
-            } else {
-                ipcRenderer.sendSync("add-task", jsonBody['task_id'])
-                ipcRenderer.send("pop-page", "pdfviewer")
-            }
+    async.waterfall([
+        (callback) => {
+            // creating a task
+            document.getElementById('loader-hint').innerText = 'Creating compiling task...'
+            superagent.post(apiBase + '/tasks').send(createTaskBody).end((err, res) => {
+                if (res && res.status == '202') {
+                    let task = res.body
+                    ipcRenderer.send('alert', 'created task:' + task.task_id)
+                    callback(null, task)
+                } else {
+                    callback(err, res, 'creating task')
+                }
+            })
+        },
+        (task, callback) => {
+            // querying the task's status
+            // timeout of 60s waiting for task finished
+            document.getElementById('loader-hint').innerText = 'Waiting for compiling...'
+            async.retry({ times: 120, interval: 500 }, (cb) => {
+                superagent.get(apiBase + `/tasks/${task.task_id}`).end((err, res) => {
+                    if (res && res.status == '200') {
+                        let task = res.body
+                        if (task.status == 'finished') cb(null, task)
+                        else cb(true, res)
+                    } else {
+                        ipcRenderer.send(
+                            'alert',
+                            `warn: unexpected response when querying task status - ${err.status}`
+                        )
+                        cb(true, res)
+                    }
+                })
+            }, (err, res) => {
+                if (err) callback(err, res, 'querying task status')
+                else callback(null, res)
+            })
+        },
+        (task, callback) => {
+            // downloading the pdf
+            document.getElementById('loader-hint').innerText = 'Downloading the pdf...'
+            superagent.get(apiBase + `/pdfs/${task.pdf_id}`).buffer(true)
+                .parse(superagent.parse['application/octet-stream'])
+                .ok(res => res.status == '200')
+                .then(res => {
+                    // clear loading animation, pop up pdf viewer
+                    document.getElementById('navbar').classList.add('fixed-top')
+                    document.getElementById('loader-container').classList.add('d-none')
+                    const pdfName = `${task.pdf_id}.pdf`
+                    const pdfPath = path.join(store.dataPath, documentID, pdfName)
+                    store.updateDocument({ id: documentID, pdf: { name: pdfName, data: res.body } })
+                    ipcRenderer.sendSync('set-variable', {name: 'pdfPath', value: pdfPath})
+                    ipcRenderer.send('pop-page', 'pdfviewer')
+                })
+                .catch(err => {
+                    callback(err, undefined, 'downloading the pdf')
+                })
+        }],
+        (err, res, info) => {
+            // clear loading animation
+            document.getElementById('navbar').classList.add('fixed-top')
+            document.getElementById('loader-container').classList.add('d-none')
+            ipcRenderer.send('alert', `ERROR when ${info}: ${err.status}`)
+            alert('error when sending requests to the server.')
         }
     )
 }

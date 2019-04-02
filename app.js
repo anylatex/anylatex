@@ -147,6 +147,7 @@ ipcMain.on("load-page", (event, arg) => {
 ipcMain.on("set-variable", (event, arg) => {
     console.log('set variable:', arg.name)
     global[arg.name] = arg.value
+    event.returnValue = "done"
 })
 
 // add a compile task
