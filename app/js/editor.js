@@ -15,7 +15,6 @@ let documentName = remote.getGlobal('currentDocumentName')
 document.title = 'Editor - ' + documentName
 
 /* Get Available Templates */
-let baseRequest = remote.getGlobal('baseRequest')
 // Templates Arguments
 let templateArgs = store.getConfig('templateArgs')
 let defaultTemplateName = store.getConfig('defaultTemplateName')
@@ -206,29 +205,25 @@ function checkAndUploadImage(imgEl) {
     }
     imgEl.setAttribute('upload', 'pending')
     // check if the image existed on the server
-    baseRequest.get(
-        `/images/${imgEl.getAttribute('id')}?check=true&user_id=${remote.getGlobal('userID')}`,
-        (error, response, jsonBody) => {
-            var responseCode = ''
-            if (response) {
-                responseCode = response.statusCode
-            }
-            if (responseCode != '200') {
-                ipcRenderer.send('alert', error + ': ' + responseCode + '\n\t' + JSON.stringify(jsonBody))
-                if (responseCode == '404') {
-                    ipcRenderer.send('alert', `Start uploading image ${imgEl.getAttribute('id')}...`)
-                    uploadImage(imgEl)
-                } else {
-                    ipcRenderer.send('alert', 'WARN: unknown error')
-                    imgEl.setAttribute('upload', 'false')
-                }
+    superagent
+        .get(`${apiBase}/images/${imgEl.getAttribute('id')}?check=true&user_id=${remote.getGlobal('userID')}`)
+        .ok(res => res.status == '200')
+        .then(res => {
+            // images exists on the server
+            ipcRenderer.send('alert', `Image ${imgEl.getAttribute('id')} exists on the server.`)
+            imgEl.setAttribute('upload', 'true')
+        })
+        .catch(err => {
+            if (err && err.status == '404') {
+                // not exist on the server
+                ipcRenderer.send('alert', `Start uploading image ${imgEl.getAttribute('id')}...`)
+                uploadImage(imgEl)
             } else {
-                // image exised on the server
-                ipcRenderer.send('alert', `Image ${imgEl.getAttribute('id')} exists on the server.`)
-                imgEl.setAttribute('upload', 'true')
+                // unknow error
+                ipcRenderer.send('alert', `WARN: unknown error ${err}`)
+                imgEl.setAttribute('upload', 'false')
             }
-        }
-    )
+        })
 }
 
 function uploadImage(imgEl) {
@@ -239,25 +234,19 @@ function uploadImage(imgEl) {
         'image_id': imgEl.getAttribute('id'),
         'content': img.data
     }
-    baseRequest.post(
-        '/images',
-        {'body': body},
-        (error, response, jsonBody) => {
-            var responseCode = ''
-            if (response) {
-                responseCode = response.statusCode
-            }
-            if (responseCode != '201') {
-                let errorInfo = `Upload image ${imgEl.getAttribute('id')} faild:\n\t`
-                                + error + ': ' + responseCode + '\n\t' + JSON.stringify(jsonBody)
-                ipcRenderer.send('alert', errorInfo)
-                imgEl.setAttribute('upload', 'false')
-            } else {
-                ipcRenderer.send("alert", `Upload image ${imgEl.getAttribute('id')} success`)
-                imgEl.setAttribute('upload', 'true')
-            }
-        }
-    )
+    superagent
+        .post(`${apiBase}/images`)
+        .send(body)
+        .ok(res => res.status == '201')
+        .then(res => {
+            ipcRenderer.send("alert", `Upload image ${imgEl.getAttribute('id')} success`)
+            imgEl.setAttribute('upload', 'true')
+        })
+        .catch(err => {
+            let errorInfo = `Upload image ${imgEl.getAttribute('id')} faild:\n\t` + err.toString()
+            ipcRenderer.send('alert', errorInfo)
+            imgEl.setAttribute('upload', 'false')
+        })
 }
 
 $('#image-confirm').on('click', () => {
@@ -265,7 +254,7 @@ $('#image-confirm').on('click', () => {
     let image = decodeImageFromBase64(imgSource)
 
     // store to the local directory
-    image.name = image.hash + '.' + image.type.split('/')[1]
+    image.name = image.hash + '.' + image.type
     store.updateDocument({ id: documentID, image: image })
 
     // insert into the editor
@@ -779,15 +768,19 @@ function compile() {
         (callback) => {
             // creating a task
             document.getElementById('loader-hint').innerText = 'Creating compiling task...'
-            superagent.post(apiBase + '/tasks').send(createTaskBody).end((err, res) => {
-                if (res && res.status == '202') {
+            superagent
+                .post(apiBase + '/tasks')
+                .send(createTaskBody)
+                .ok(res => res.status == '202')
+                .retry(5)
+                .then(res => {
                     let task = res.body
                     ipcRenderer.send('alert', 'created task:' + task.task_id)
                     callback(null, task)
-                } else {
-                    callback(err, res, 'creating task')
-                }
-            })
+                })
+                .catch(err => {
+                    callback(err, undefined, 'creating task')
+                })
         },
         (task, callback) => {
             // querying the task's status
@@ -818,6 +811,7 @@ function compile() {
             superagent.get(apiBase + `/pdfs/${task.pdf_id}`).buffer(true)
                 .parse(superagent.parse['application/octet-stream'])
                 .ok(res => res.status == '200')
+                .retry(2)
                 .then(res => {
                     // clear loading animation, pop up pdf viewer
                     document.getElementById('navbar').classList.add('fixed-top')
@@ -836,7 +830,7 @@ function compile() {
             // clear loading animation
             document.getElementById('navbar').classList.add('fixed-top')
             document.getElementById('loader-container').classList.add('d-none')
-            ipcRenderer.send('alert', `ERROR when ${info}: ${err.status}`)
+            ipcRenderer.send('alert', `ERROR when ${info}: ${err}`)
             alert('error when sending requests to the server.')
         }
     )
