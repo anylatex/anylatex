@@ -8,6 +8,7 @@ const superagent = require('superagent')
 const store = remote.getGlobal('store')
 
 const apiBase = store.getConfig('apiBase')
+const agent = superagent.agent().timeout({response: 20000})
 
 /* Setup current document's name and id */
 let documentID = remote.getGlobal('currentDocumentID')
@@ -199,54 +200,71 @@ function detectUnuploadedImages() {
     }
 }
 
-function checkAndUploadImage(imgEl) {
-    if (imgEl.getAttribute('upload') == 'true') {
-        return
-    }
-    imgEl.setAttribute('upload', 'pending')
-    // check if the image existed on the server
-    superagent
-        .get(`${apiBase}/images/${imgEl.getAttribute('id')}?check=true&user_id=${remote.getGlobal('userID')}`)
-        .ok(res => res.status == '200')
-        .then(res => {
-            // images exists on the server
-            ipcRenderer.send('alert', `Image ${imgEl.getAttribute('id')} exists on the server.`)
-            imgEl.setAttribute('upload', 'true')
-        })
-        .catch(err => {
-            if (err && err.status == '404') {
-                // not exist on the server
-                ipcRenderer.send('alert', `Start uploading image ${imgEl.getAttribute('id')}...`)
-                uploadImage(imgEl)
-            } else {
-                // unknow error
-                ipcRenderer.send('alert', `WARN: unknown error ${err}`)
-                imgEl.setAttribute('upload', 'false')
+function checkAndUploadImage(imgEl, resolve, reject) {
+    async.waterfall([
+        // check if the image existed on the server
+        (cb) => {
+            if (imgEl.getAttribute('upload') == 'true') {
+                // image already uploaded to the server
+                // raise error to avoid following callings
+                cb(true, true, `image ${imgEl.getAttribute('id')} already uploaded`)
             }
-        })
-}
-
-function uploadImage(imgEl) {
-    // upload the image
-    const img = decodeImageFromBase64(imgEl.getAttribute('src'), hash=false, binaryData=false)
-    const body = {
-        'user_id': remote.getGlobal('userID'),
-        'image_id': imgEl.getAttribute('id'),
-        'content': img.data
-    }
-    superagent
-        .post(`${apiBase}/images`)
-        .send(body)
-        .ok(res => res.status == '201')
-        .then(res => {
-            ipcRenderer.send("alert", `Upload image ${imgEl.getAttribute('id')} success`)
-            imgEl.setAttribute('upload', 'true')
-        })
-        .catch(err => {
-            let errorInfo = `Upload image ${imgEl.getAttribute('id')} faild:\n\t` + err.toString()
-            ipcRenderer.send('alert', errorInfo)
-            imgEl.setAttribute('upload', 'false')
-        })
+            imgEl.setAttribute('upload', 'pending')
+            agent
+                .get(`${apiBase}/images/${imgEl.getAttribute('id')}?check=true&user_id=${remote.getGlobal('userID')}`)
+                .ok(res => res.status == '200')
+                .then(res => {
+                    // images exists on the server
+                    imgEl.setAttribute('upload', 'true')
+                    // raise error to avoid next call
+                    cb(true, true, `Image ${imgEl.getAttribute('id')} exists on the server.`)
+                })
+                .catch(err => {
+                    if (err && err.status == '404') {
+                        // not exist on the server
+                        // not raise error to continue the next call which will upload the image
+                        cb(null, imgEl)
+                    } else {
+                        // unknow error
+                        imgEl.setAttribute('upload', 'false')
+                        // raise unknown error
+                        cb(true, undefined, `WARN: unknown error when querying image's status:\n\t${err}`)
+                    }
+                })
+        },
+        // upload the image
+        (imgEl, cb) => {
+            ipcRenderer.send('alert', `Start uploading image ${imgEl.getAttribute('id')}...`)
+            const img = decodeImageFromBase64(imgEl.getAttribute('src'), false, false)
+            const body = {
+                'user_id': remote.getGlobal('userID'),
+                'image_id': imgEl.getAttribute('id'),
+                'content': img.data
+            }
+            agent
+                .post(`${apiBase}/images`)
+                .send(body)
+                .ok(res => res.status == '201')
+                .then(res => {
+                    ipcRenderer.send("alert", `Upload image ${imgEl.getAttribute('id')} success`)
+                    imgEl.setAttribute('upload', 'true')
+                    cb(null, undefined)
+                })
+                .catch(err => {
+                    let errorInfo = `Upload image ${imgEl.getAttribute('id')} faild:\n\t` + err.toString()
+                    imgEl.setAttribute('upload', 'false')
+                    cb(true, undefined, errorInfo)
+                })           
+        }
+    ], (err, res, info) => {
+        save(true)
+        if (err) {
+            ipcRenderer.send('alert', info)
+            // real error
+            if (!res && reject) reject(`Image ${imgEl.getAttribute('id')} upload failed`)
+        }
+        else if (resolve) resolve(`Image ${imgEl.getAttribute('id')} uploaded`)
+    })
 }
 
 $('#image-confirm').on('click', () => {
@@ -747,13 +765,52 @@ function compile() {
     // get images
     // TODO: check images unuploaded
     let images = []
+    let unUploadedImages = []
     for (const img of document.getElementsByClassName('inserted-image')) {
+        if (img.getAttribute('upload') != 'true') {
+            unUploadedImages.push(img)
+        }
         const imgID = img.getAttribute('id')
         const imgType = img.getAttribute('format')
         const imgName = imgID + '.' + imgType
         images.push(imgName)
     }
+    document.getElementById('loader-hint').innerText = 'Uploading images...'
+    async.each(unUploadedImages, (imgEl, callback) => {
+        if (imgEl.getAttribute('upload') == 'true') callback()
+        new Promise((resolve, reject) => {
+            checkAndUploadImage(imgEl, resolve, reject)
+        }).then(
+            successInfo => {
+                ipcRenderer.send('alert', successInfo)
+                callback()
+            },
+            errorInfo => {
+                ipcRenderer.send('alert', errorInfo)
+                callback(errorInfo)
+            }
+        )
+    }, err => {
+        if (err) {
+            // a image failed to upload, alert user and comtinue the compiling task
+            alert(err + '\nSome images will not included in the pdf.')
+        } else  {
+            ipcRenderer.send('alert', 'All images have been uploaded')
+        }
+        // sending the compiling task
+        const compileTask = {
+            latex: latex,
+            args: args,
+            partArgs: partArgs,
+            templateName: templateName,
+            images: images
+        }
+        sendCompileTask(compileTask)
+    })
+}
 
+function sendCompileTask(compileTask) {
+    let { latex, args, partArgs, templateName, images } = compileTask
     // send the compiling task
     var createTaskBody = {
         'user_id': remote.getGlobal('userID'),
@@ -768,7 +825,7 @@ function compile() {
         (callback) => {
             // creating a task
             document.getElementById('loader-hint').innerText = 'Creating compiling task...'
-            superagent
+            agent
                 .post(apiBase + '/tasks')
                 .send(createTaskBody)
                 .ok(res => res.status == '202')
@@ -779,6 +836,7 @@ function compile() {
                     callback(null, task)
                 })
                 .catch(err => {
+                    ipcRenderer.send('alert', 'error when creating the task')
                     callback(err, undefined, 'creating task')
                 })
         },
@@ -787,7 +845,7 @@ function compile() {
             // timeout of 60s waiting for task finished
             document.getElementById('loader-hint').innerText = 'Waiting for compiling...'
             async.retry({ times: 120, interval: 500 }, (cb) => {
-                superagent.get(apiBase + `/tasks/${task.task_id}`).end((err, res) => {
+                agent.get(apiBase + `/tasks/${task.task_id}`).end((err, res) => {
                     if (res && res.status == '200') {
                         let task = res.body
                         if (task.status == 'finished') cb(null, task)
@@ -808,7 +866,7 @@ function compile() {
         (task, callback) => {
             // downloading the pdf
             document.getElementById('loader-hint').innerText = 'Downloading the pdf...'
-            superagent.get(apiBase + `/pdfs/${task.pdf_id}`).buffer(true)
+            agent.get(apiBase + `/pdfs/${task.pdf_id}`).buffer(true)
                 .parse(superagent.parse['application/octet-stream'])
                 .ok(res => res.status == '200')
                 .retry(2)
