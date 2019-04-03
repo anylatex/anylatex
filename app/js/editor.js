@@ -15,6 +15,22 @@ let documentID = remote.getGlobal('currentDocumentID')
 let documentName = remote.getGlobal('currentDocumentName')
 document.title = 'Editor - ' + documentName
 
+/* Tool Functions */
+var editorRange = ''
+// Credit: Tim Down at https://stackoverflow.com/a/6691294
+function insertElementAtCaret(html) {
+    const range = editorRange
+    range.deleteContents();
+
+    var el = document.createElement("div");
+    el.innerHTML = html;
+    var frag = document.createDocumentFragment(), node;
+    while ( (node = el.firstChild) ) {
+        frag.appendChild(node);
+    }
+    range.insertNode(frag);
+}
+
 /* Get Available Templates */
 // Templates Arguments
 let templateArgs = store.getConfig('templateArgs')
@@ -140,7 +156,7 @@ $('#reference-modal').on('hidden.bs.modal', () => {
     } else {
         reference.innerHTML = '[*]'
     }
-    document.getElementById('editor').innerHTML += (reference.outerHTML)
+    insertElementAtCaret('<span>' + reference.outerHTML + '</span>')
     // clear reference editor
     document.getElementById('reference-editor').innerHTML = ''
     labelEl.innerHTML = ''
@@ -262,6 +278,8 @@ function checkAndUploadImage(imgEl, resolve, reject) {
             ipcRenderer.send('alert', info)
             // real error
             if (!res && reject) reject(`Image ${imgEl.getAttribute('id')} upload failed`)
+            // fake error
+            else if (res && resolve) resolve()
         }
         else if (resolve) resolve(`Image ${imgEl.getAttribute('id')} uploaded`)
     })
@@ -304,7 +322,7 @@ $('#image-confirm').on('click', () => {
         $(`[popid='${popID}'`).popover()
     })
     div.appendChild(img)
-    editor.appendChild(div)
+    insertElementAtCaret(div.outerHTML)
     save(true)
     ipcRenderer.send('alert', 'inserted ' + image.name)
 })
@@ -379,6 +397,7 @@ editor.addEventListener('keydown', editorKeyHandler)
 $('#editor').on('blur keyup paste input', save)
 $('#part-editor').on('blur keyup paste input', savePart)
 document.addEventListener('selectionchange', editorSelectionHandler)
+$('#editor').bind('keyup click focus', editorCursorChange)
 
 function save(force=false) {
     if (Date.now() - lastSaveTime < 2 && !force) {
@@ -462,6 +481,13 @@ function editorKeyHandler(event) {
         }
     }
     lastPressedKey = key
+}
+
+function editorCursorChange() {
+    let sel = window.getSelection()
+    if (sel.getRangeAt && sel.rangeCount){
+        editorRange = sel.getRangeAt(0)
+    }
 }
 
 function editorSelectionHandler() {
