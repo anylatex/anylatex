@@ -840,6 +840,7 @@ function sendCompileTask(compileTask) {
     // send the compiling task
     var createTaskBody = {
         'user_id': remote.getGlobal('userID'),
+        'document_id': documentID,
         'body': latex,
         'args': JSON.stringify(args),
         'part_args': JSON.stringify(partArgs),
@@ -853,6 +854,7 @@ function sendCompileTask(compileTask) {
             document.getElementById('loader-hint').innerText = 'Creating compiling task...'
             agent
                 .post(apiBase + '/tasks')
+                .timeout({response: 10000})
                 .send(createTaskBody)
                 .ok(res => res.status == '202')
                 .retry(5)
