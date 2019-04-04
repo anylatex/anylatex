@@ -18,6 +18,10 @@
   text-align: center;
 }
 
+.editor-navbar {
+  height: 8%;
+}
+
 .editor {
   padding: 1rem;
   font-size: 1rem;

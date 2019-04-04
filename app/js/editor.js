@@ -273,7 +273,7 @@ function checkAndUploadImage(imgEl, resolve, reject) {
                 })           
         }
     ], (err, res, info) => {
-        save(true)
+        save(null, true)
         if (err) {
             ipcRenderer.send('alert', info)
             // real error
@@ -323,7 +323,7 @@ $('#image-confirm').on('click', () => {
     })
     div.appendChild(img)
     insertElementAtCaret(div.outerHTML)
-    save(true)
+    save(null, true)
     ipcRenderer.send('alert', 'inserted ' + image.name)
 })
 
@@ -357,7 +357,7 @@ function toolbarHandler(event) {
     ipcRenderer.sendSync("alert", "click: "+command)
     /* special commands */
     if (command == 'return') {
-        save(true)
+        save(null, true)
         ipcRenderer.send('load-page', 'documents')
         return
     }
@@ -392,27 +392,50 @@ function toolbarHandler(event) {
 
 let editor = document.getElementById('editor')
 var lastSaveTime = -1
+var lastSaveHtml = ''
 var lastPartSaveTime = -1
 editor.addEventListener('keydown', editorKeyHandler)
 $('#editor').on('blur keyup paste input', save)
 $('#part-editor').on('blur keyup paste input', savePart)
 document.addEventListener('selectionchange', editorSelectionHandler)
 $('#editor').bind('keyup click focus', editorCursorChange)
+// ctrl+s, force saving
+document.addEventListener('keydown', event => {
+    if( event.ctrlKey  == true && event.key == 's' ) {
+        save(null, true)
+    }
+})
 
-function save(force=false) {
-    if (Date.now() - lastSaveTime < 2 && !force) {
+function save(event, force=false) {
+    if (Date.now() - lastSaveTime < 2000 && !force) {
         return
     }
+    if (editor.innerHTML == lastSaveHtml && !force) {
+        return
+    }
+    const startTime = Date.now()
+    document.getElementById('save-hint').classList.add('d-none')
+    document.getElementById('save-loader').classList.remove('d-none')
     const content = document.getElementById('editor').innerHTML
     store.updateDocument({
         id: documentID,
         htmlContent: content
     })
+    if (Date.now() - startTime < 500) {
+        setTimeout(() => {
+            document.getElementById('save-hint').classList.remove('d-none')
+            document.getElementById('save-loader').classList.add('d-none')
+        }, 1000)
+    } else {
+        document.getElementById('save-hint').classList.remove('d-none')
+        document.getElementById('save-loader').classList.add('d-none')
+    }
     lastSaveTime = Date.now()
+    lastSaveHtml = editor.innerHTML
 }
 
-function savePart(force=false) {
-    if (Date.now() - lastPartSaveTime < 2 && !force) {
+function savePart(event, force=false) {
+    if (Date.now() - lastPartSaveTime < 2000 && !force) {
         return
     }
     const content = document.getElementById('part-editor').innerHTML
