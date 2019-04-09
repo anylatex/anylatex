@@ -1,5 +1,6 @@
 const { ipcRenderer, remote } = require('electron');
 const store = remote.getGlobal('store');
+const path = require('path');
 
 
 (function(){
@@ -17,6 +18,13 @@ const store = remote.getGlobal('store');
         nameEl.innerText = name
         nameEl.setAttribute('id', id+'name')
         newDocButton.prependTo(documentsPanel)
+        var iframe = document.createElement('iframe')
+        iframe.src = path.join(store.dataPath, id, 'document.html')
+        iframe.classList.add('w-100')
+        iframe.classList.add('h-100')
+        iframe.setAttribute('scrolling', 'no')
+        iframe.setAttribute('frameborder', '0')
+        buttonEl.append(iframe)
     }
 })()
 
@@ -32,9 +40,10 @@ $('#create-document').on('click', () => {
 $('#documents-panel').on('click', (event) => {
     let target = event.target
     var name, documentID
-    if (target.id == 'new-document') {
+    if (target.id == 'new-document' || target.tagName != 'BUTTON') {
         return
     } else {
+        console.log(target.id)
         name = $('#'+ target.id + 'name').text()
         documentID = target.id
         ipcRenderer.send('set-variable', { name: 'currentDocumentID', value: documentID })
