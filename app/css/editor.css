@@ -54,10 +54,6 @@
   font-size: 1rem;
   font-weight: bold;
 }
-.editor .highlight {
-  background: #E1ECF4;
-  border: 1px dotted #39739d;
-}
 
 .reference-editor {
   padding: 1rem;
@@ -67,20 +63,6 @@
   min-height: 100%;
 }
 
-.table-container > * {
-  pointer-events: none;
-}
-.table-container {
-  cursor: pointer;
-}
-.table-container:hover {
-  background-color: lightblue;
-  border-radius: 5px;
-}
-.table-highlight {
-  background-color: lightblue;
-  border-radius: 8px;
-}
 .modal-example-table * {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -92,6 +74,25 @@
 }
 .editor td {
   min-width: 30px;
+}
+
+.block-container > * {
+  pointer-events: none;
+}
+.block-container {
+  cursor: pointer;
+}
+.block-container:hover {
+  background-color: lightblue;
+  border-radius: 5px;
+}
+.block-highlight {
+  background-color: lightblue;
+  border-radius: 8px;
+}
+
+.display-equation {
+  text-align: center;
 }
 
 /*

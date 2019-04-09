@@ -342,25 +342,25 @@ $('#open-table-selector').on('click', () => {
 
 function tableClick(event) {
     const target = event.target
-    if (target.classList.contains('table-highlight')) {
-        target.classList.remove('table-highlight')
+    if (target.classList.contains('block-highlight')) {
+        target.classList.remove('block-highlight')
     } else {
         // remove other tables' hightlight style
         const tables = document.getElementsByClassName('table-container')
         for (const table of tables) {
             if (table === target) continue
-            if (table.classList.contains('table-highlight')) {
-                table.classList.remove('table-highlight')
+            if (table.classList.contains('block-highlight')) {
+                table.classList.remove('block-highlight')
             }
         }
-        target.classList.add('table-highlight')
+        target.classList.add('block-highlight')
     }
 }
 
 function tableConfirm(event) {
-    const selectedContainer = document.getElementsByClassName('table-highlight')[0]
+    const selectedContainer = document.querySelectorAll('.block-highlight.table-container')[0]
     if (!selectedContainer) {
-        alert('No table selected')
+        alert('No table style selected.')
         return
     }
     const selectedTable = selectedContainer.getElementsByTagName('table')[0]
@@ -412,6 +412,78 @@ function tableConfirm(event) {
     ipcRenderer.send('alert', 'inserted a table')
 }
 
+/* Equation input modal */
+
+var mathFieldSpan = document.getElementById('math-field');
+var latexSpan = document.getElementById('latex');
+
+var MQ = MathQuill.getInterface(2); // for backcompat
+var mathField = MQ.MathField(mathFieldSpan, {
+  spaceBehavesLikeTab: true, // configurable
+  handlers: {
+    edit: function() { // useful event handlers
+      latexSpan.textContent = mathField.latex(); // simple API
+    }
+  }
+});
+
+for (const equation of document.getElementsByClassName('equation-container')) {
+    equation.addEventListener('click', equationClick)
+}
+document.getElementById('equation-confirm').addEventListener('click', equationConfirm)
+
+// render example equations
+MQ.StaticMath(document.getElementById('example-inline-equation'))
+MQ.StaticMath(document.getElementById('example-display-numbered-equation'))
+MQ.StaticMath(document.getElementById('example-display-unnumbered-equation'))
+
+function equationClick(event) {
+    const target = event.target
+    if (target.classList.contains('block-highlight')) {
+        target.classList.remove('block-highlight')
+    } else {
+        // remove other equations' hightlight style
+        const equations = document.getElementsByClassName('equation-container')
+        for (const eq of equations) {
+            if (eq === target) continue
+            if (eq.classList.contains('block-highlight')) {
+                eq.classList.remove('block-highlight')
+            }
+        }
+        target.classList.add('block-highlight')
+    }
+}
+
+function equationConfirm(event) {
+    const equationStyleBlock = document.querySelectorAll('.block-highlight.equation-container')[0]
+    if (!equationStyleBlock) {
+        alert('No equation style selected.')
+        return
+    }
+    const equationStyle = equationStyleBlock.getAttribute('eq-style')
+    const latexEquation = latexSpan.textContent
+    let equationSpan = document.createElement('span')
+    let equation = document.createElement('equation')
+    const equationID = Math.random().toString(36).substr(2, 9)
+    equation.innerText = latexEquation
+    equation.id = equationID
+    equation.setAttribute('latex', latexEquation)
+    equation.setAttribute('eq-style', equationStyle)
+    equationSpan.appendChild(equation)
+    equationSpan.setAttribute('contenteditable', 'false')
+    if (equationStyle == 'inline') {
+        insertElementAtCaret(equationSpan.outerHTML + '<span></span>')
+    } else {
+        if (equationStyle == 'display-numbered') {
+            equationSpan.innerHTML += '<equation-extra>&emsp;&emsp;&emsp;&emsp;(*)</equation-extra>'
+        }
+        let div = document.createElement('div')
+        div.classList.add('display-equation')
+        div.appendChild(equationSpan)
+        insertElementAtCaret(div.outerHTML + '<br>')
+    }
+    MQ.StaticMath(document.getElementById(equationID))
+}
 
 /* Toolbar and Editor's handlers */
 
