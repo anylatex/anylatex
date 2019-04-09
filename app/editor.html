@@ -24,7 +24,7 @@
   <nav id="navbar" class="navbar fixed-top navbar-light bg-light w-100 editor-navbar">
     <!-- toolbar -->
     <div class="row align-items-center justify-content-center no-gutters w-100 h-75">
-      <div class="col-sm-12 col-md-11 col-lg-9 col-xl-8">
+      <div class="col-sm-12 col-md-11 col-lg-10 col-xl-9">
         <div id="toolbar" class="btn-group h-100" role="group">
           <button command="return" class="btn btn-light btn-sm mr-3" type="button"><img class="img-fluid"
               src="assets/editor/left-arrow.png" /></button>
@@ -52,6 +52,9 @@
           <button id="open-image-selector" class="btn btn-light btn-sm modal-open-button" type="button" data-toggle="modal"
             data-target="#image-modal" tab-index="-1" role="dialog" aria-labelledby="imageModal"><img class="img-fluid"
               src="assets/editor/image.png" /></button>
+          <button id="open-table-selector" class="btn btn-light btn-sm modal-open-button" type="button" data-toggle="modal"
+            data-target="#table-modal" tab-index="-1" role="dialog" aria-labelledby="tableModal"><img class="img-fluid"
+              src="assets/editor/grid.png" /></button>
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-light btn-sm dropdown-toggle font-weight-bolder" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
@@ -75,89 +78,6 @@
               src="assets/editor/profits.png" /></button>
           <button id="arguments-modal-button" class="btn btn-light btn-sm ml-2 font-weight-bold disabled modal-open-button" type="button"
             data-toggle="modal" data-target="#arguments-modal">TemplateArguments</button>
-          <!-- Arguments Modal -->
-          <div class="modal fade" id="arguments-modal" tabindex="-1" role="dialog" aria-labelledby="argumentsModal"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="arguments-modal-title"></h5>
-                </div>
-                <div class="modal-body" id="arguments-modal-body">
-                </div>
-                <div class="modal-footer">
-                  <button id="arguments-confirm" type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Reference Inserting Modal -->
-          <div class="modal fade" id="reference-modal" tabindex="-1" role="dialog" aria-labelledby="referenceModal"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Choose</h5>
-                </div>
-                <div class="modal-body" id="scripts-modal-body">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="radio1" id="reference-sup-check" checked>
-                    <label class="form-check-label" for="radio1">
-                      Texts<sup>[*]</sup>
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="radio1" id="reference-normal-check">
-                    <label class="form-check-label" for="radio1">
-                      Texts[*]
-                    </label>
-                  </div>
-                  <div class="mt-4">
-                    <p class="font-weight-bold">Input reference with bibtex's style:</p>
-                    <div id="reference-editor" class="reference-editor" contenteditable='plaintext-only'></div>
-                    <p class="mt-3">
-                      <b>Extracted Labels:</b><br>
-                      <span id="extracted-labels"></span>
-                    </p>
-                    <input id="reference-value" type="hidden" />
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Image Inserting Modal -->
-          <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="imageModal"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Choose images:</h5>
-                </div>
-                <div class="modal-body">
-                  <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="choose-image" accept="image/png, image/jpeg, image/bmp">
-                    <label id="choose-image-name" class="custom-file-label" for="customFile">Choose file</label>
-                    <div class="input-group mt-2">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text" id="input-image-name-label">Caption</span>
-                      </div>
-                      <input id="image-caption" type="text" class="form-control" placeholder="Image's caption" aria-label="caption"
-                        aria-describedby="input-image-name-label">
-                    </div>
-                  </div>
-                  <img class="img-fluid mt-3" id="show-choose-image" />
-                </div>
-                <div class="modal-footer">
-                  <button id="image-confirm" type="button" class="btn btn-primary modal-dismiss-button" data-dismiss="modal">Confirm</button>
-                  <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
       <div class="col-1 pl-3">
@@ -214,6 +134,161 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Arguments Modal -->
+  <div class="modal fade" id="arguments-modal" tabindex="-1" role="dialog" aria-labelledby="argumentsModal"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="arguments-modal-title"></h5>
+        </div>
+        <div class="modal-body" id="arguments-modal-body">
+        </div>
+        <div class="modal-footer">
+          <button id="arguments-confirm" type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Reference Inserting Modal -->
+  <div class="modal fade" id="reference-modal" tabindex="-1" role="dialog" aria-labelledby="referenceModal"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Choose</h5>
+        </div>
+        <div class="modal-body" id="scripts-modal-body">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="radio1" id="reference-sup-check" checked>
+            <label class="form-check-label" for="radio1">
+              Texts<sup>[*]</sup>
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="radio1" id="reference-normal-check">
+            <label class="form-check-label" for="radio1">
+              Texts[*]
+            </label>
+          </div>
+          <div class="mt-4">
+            <p class="font-weight-bold">Input reference with bibtex's style:</p>
+            <div id="reference-editor" class="reference-editor" contenteditable='plaintext-only'></div>
+            <p class="mt-3">
+              <b>Extracted Labels:</b><br>
+              <span id="extracted-labels"></span>
+            </p>
+            <input id="reference-value" type="hidden" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Image Inserting Modal -->
+  <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="imageModal"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Choose images:</h5>
+        </div>
+        <div class="modal-body">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="choose-image" accept="image/png, image/jpeg, image/bmp">
+            <label id="choose-image-name" class="custom-file-label" for="customFile">Choose file</label>
+            <div class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="input-image-name-label">Caption</span>
+              </div>
+              <input id="image-caption" type="text" class="form-control" placeholder="Image's caption" aria-label="caption"
+                aria-describedby="input-image-name-label">
+            </div>
+          </div>
+          <img class="img-fluid mt-3" id="show-choose-image" />
+        </div>
+        <div class="modal-footer">
+          <button id="image-confirm" type="button" class="btn btn-primary modal-dismiss-button" data-dismiss="modal">Confirm</button>
+          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Table Inserting Modal -->
+  <div class="modal fade" id="table-modal" tabindex="-1" role="dialog" aria-labelledby="tableModal"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Insert tables:</h5>
+        </div>
+        <div class="modal-body">
+          <div class="row pl-5 pr-5 w-100 mb-3">
+            <div class="col-12">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text font-weight-bold" id="table-caption-label">Caption</span>
+                </div>
+                <input id="table-caption" type="text" class="form-control" placeholder="caption"
+                  aria-describedby="table-caption-label">
+              </div>
+            </div>
+          </div>
+          <div class="row pl-5 pr-5 mb-2 w-100 align-items-center justify-content-center">
+            <div class="col-6">
+              <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text font-weight-bold" id="table-row-label">Row</span>
+                  </div>
+                  <input id="table-row-number" type="text" class="form-control" placeholder="3" aria-describedby="table-row-label">
+                </div>
+              </div>
+            <div class="col-6">
+              <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text font-weight-bold" id="table-col-label">Col</span>
+                  </div>
+                  <input id="table-col-number" type="text" class="form-control" placeholder="3" aria-describedby="table-col-label">
+                </div>
+              </div>
+          </div>
+          <div class="row p-2 w-100 h-75 align-items-center justify-content-center">
+            <div class="col-auto m-1 p-2 table-container">
+              <table id="all-table" class="modal-example-table" frame="box" rules="all">
+                <tr>
+                  <th>Head 1</th>
+                  <th>Head 2</th>
+                </tr>
+                <tr>
+                  <td>Text</td>
+                  <td>Text</td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-auto m-1 p-2 table-container">
+              <table id="lrm-table" class="modal-example-table" frame="hsides" rules="all">
+                <tr>
+                  <th>Head 1</th>
+                  <th>Head 2</th>
+                </tr>
+                <tr>
+                  <td>Text</td>
+                  <td>Text</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="table-confirm" type="button" class="btn btn-primary modal-dismiss-button" data-dismiss="modal">Confirm</button>
+          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>

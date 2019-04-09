@@ -67,6 +67,33 @@
   min-height: 100%;
 }
 
+.table-container > * {
+  pointer-events: none;
+}
+.table-container {
+  cursor: pointer;
+}
+.table-container:hover {
+  background-color: lightblue;
+  border-radius: 5px;
+}
+.table-highlight {
+  background-color: lightblue;
+  border-radius: 8px;
+}
+.modal-example-table * {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.editor th {
+  background-color: rgba(220, 220, 220, 0.7);
+}
+.editor td {
+  min-width: 30px;
+}
+
 /*
 #tree {
   padding: 1rem;

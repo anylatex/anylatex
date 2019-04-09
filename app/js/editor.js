@@ -29,6 +29,8 @@ function insertElementAtCaret(html) {
         frag.appendChild(node);
     }
     range.insertNode(frag);
+    // force saving
+    save(null, true)
 }
 
 /* Get Available Templates */
@@ -323,9 +325,93 @@ $('#image-confirm').on('click', () => {
     })
     div.appendChild(img)
     insertElementAtCaret(div.outerHTML)
-    save(null, true)
     ipcRenderer.send('alert', 'inserted ' + image.name)
 })
+
+/* Table inserting modal */
+
+for (const table of document.getElementsByClassName('table-container')) {
+    table.addEventListener('click', tableClick)
+}
+document.getElementById('table-confirm').addEventListener('click', tableConfirm)
+
+$('#open-table-selector').on('click', () => {
+    // clear
+    document.getElementById('table-caption').value = ''
+})
+
+function tableClick(event) {
+    const target = event.target
+    if (target.classList.contains('table-highlight')) {
+        target.classList.remove('table-highlight')
+    } else {
+        // remove other tables' hightlight style
+        const tables = document.getElementsByClassName('table-container')
+        for (const table of tables) {
+            if (table === target) continue
+            if (table.classList.contains('table-highlight')) {
+                table.classList.remove('table-highlight')
+            }
+        }
+        target.classList.add('table-highlight')
+    }
+}
+
+function tableConfirm(event) {
+    const selectedContainer = document.getElementsByClassName('table-highlight')[0]
+    if (!selectedContainer) {
+        alert('No table selected')
+        return
+    }
+    const selectedTable = selectedContainer.getElementsByTagName('table')[0]
+    const tableStyle = selectedTable.id
+    const tableRowNumber = parseInt(
+        document.getElementById('table-row-number').value || document.getElementById('table-row-number').placeholder)
+    const tableColNumber = parseInt(
+        document.getElementById('table-col-number').value || document.getElementById('table-col-number').placeholder)
+
+    // create the table
+    var frame, rules
+    if (tableStyle == 'all-table') {
+        frame = 'box'
+        rules = 'all'
+    } else if (tableStyle == 'lrm-table') {
+        frame = 'hsides'
+        rules = 'all'
+    } else {
+        alert('Unknow table style: ' + tableStyle)
+        return
+    }
+    const tableCaption = document.getElementById('table-caption').value || 'No Caption'
+    const tablePopID = Math.random().toString(36).substr(2, 9)
+    var tableAttributes = `frame=${frame} ` + `rules=${rules} `
+                            + `row=${tableRowNumber} ` + `col=${tableColNumber} `
+                            + 'data-toggle=popover ' + 'title=Caption '
+                            + `data-content='${tableCaption}' ` + 'data-trigger=hover '
+                            + `data-placement=top ` + `popid=${tablePopID} `
+    if (tableCaption != 'No Caption') tableAttributes += `caption=${tableCaption}`
+    let html = [`<table ${tableAttributes}`]
+    let colInRow = ''
+    html.push('<tr>')
+    for (let i = 0; i < tableColNumber; i++) {
+        html.push('<th></th>')
+        colInRow += '<td></td>'
+    }
+    html.push('</tr>')
+    for (let i = 0; i < tableRowNumber -1; i++) {
+        html.push(`<tr>${colInRow}</tr>`)
+    }
+    html.push('</table>')
+
+    // insert the table and enable popover
+    const htmlString = html.join('\n')
+    insertElementAtCaret(htmlString)
+    $(function() {
+        $(`[popid='${tablePopID}']`).popover()
+    })
+    ipcRenderer.send('alert', 'inserted a table')
+}
+
 
 /* Toolbar and Editor's handlers */
 
