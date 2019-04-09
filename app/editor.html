@@ -3,6 +3,7 @@
 
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathquill@0.10.1-a/build/mathquill.css">
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/editor.css">
   <link rel="stylesheet" href="../node_modules/spinkit/css/spinkit.css">
@@ -63,7 +64,8 @@
             <div id="headings-dropdown" class="dropdown-menu">
             </div>
           </div>
-          <button class="btn btn-light btn-sm" type="button"><img class="img-fluid"
+          <button id="open-equation-selector" class="btn btn-light btn-sm modal-open-button" type="button" data-toggle="modal"
+            data-target="#equation-modal" tab-index="-1" role="dialog" aria-labelledby="equationModal"><img class="img-fluid"
               src="assets/editor/symbol.png" /></button>
           <div class="btn-group" role="group">
             <button id="dropdown-button" type="button" class="btn btn-light btn-sm dropdown-toggle font-weight-bolder"
@@ -257,7 +259,7 @@
               </div>
           </div>
           <div class="row p-2 w-100 h-75 align-items-center justify-content-center">
-            <div class="col-auto m-1 p-2 table-container">
+            <div class="col-auto m-1 p-2 table-container block-container block-highlight">
               <table id="all-table" class="modal-example-table" frame="box" rules="all">
                 <tr>
                   <th>Head 1</th>
@@ -269,7 +271,7 @@
                 </tr>
               </table>
             </div>
-            <div class="col-auto m-1 p-2 table-container">
+            <div class="col-auto m-1 p-2 table-container block-container">
               <table id="lrm-table" class="modal-example-table" frame="hsides" rules="all">
                 <tr>
                   <th>Head 1</th>
@@ -290,6 +292,44 @@
       </div>
     </div>
   </div>
+  <!-- Equation Inserting Modal -->
+  <div class="modal fade" id="equation-modal" tabindex="-1" role="dialog" aria-labelledby="equationModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Insert equations:</h5>
+        </div>
+        <div class="modal-body">
+          <div class="row w-100 h-75 justify-content-center">
+            <div class="col-auto p-2 m-1 block-container equation-container" eq-style="inline">
+              <p><b>Inline Mode</b></p>
+              <p>Equation is <span id="example-inline-equation">f(x) = x^2</span>.</p>
+            </div>
+            <div class="col-auto p-2 m-1 block-container equation-container block-highlight" eq-style="display-numbered">
+              <p><b>Display Mode - Numbered</b></p>
+              <p>Equation is:</p>
+              <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-numbered-equation">f(x) = x^2</span>&emsp;&emsp;(1)</p>
+            </div>
+            <div class="col-auto p-2 m-1 block-container equation-container" eq-style="display-unnumbered">
+              <p><b>Display Mode - Unnumbered</b></p>
+              <p>Equation is:</p>
+              <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-unnumbered-equation">f(x) = x^2</span></p>
+            </div>
+          </div>
+        
+        <div class="mt-2 w-100 p-3">
+          <p>Type math here: <span id="math-field" class="w-50"></span></p>
+          <p>LaTeX of what you typed: <span id="latex"></span></p>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button"
+            data-dismiss="modal">Confirm</button>
+          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     delete module.exports
@@ -297,6 +337,7 @@
   <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathquill@0.10.1-a/build/mathquill.js"></script>
   <script src="js/editor.js"></script>
 </body>
 

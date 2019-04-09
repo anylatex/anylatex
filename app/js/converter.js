@@ -56,7 +56,8 @@ class Converter {
             let elementContent = this._into_one_line(element.textContent)
             let outerHTML = this._into_one_line(element.outerHTML)
             let tagName = element.tagName
-            if (element.textContent == '' && tagName != 'IMG' && !outerHTML.includes('<img')) {
+            if (element.textContent == '' && tagName != 'IMG' && !outerHTML.includes('<img')
+                && tagName != 'EQUATION' && !outerHTML.includes('<equation')) {
                 console.log('ignore:', tagName)
                 latex = latex.replace(outerHTML, "")
                 continue
@@ -178,24 +179,28 @@ class Converter {
                                         + '\\end{table}'
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
-                case 'TBODY':
-                    parsedInnerLatex = `${this._convert_elements(element.innerHTML, parentNode)}`
-                    console.log(parsedInnerLatex)
+                // Converting equations
+                case 'EQUATION':
+                    var equationStyle = element.getAttribute('eq-style')
+                    var equationLatex = element.getAttribute('latex')
+                    if (equationStyle === 'inline') {
+                        parsedInnerLatex = `\$${equationLatex}\$`
+                    } else if (equationStyle === 'display-numbered') {
+                        parsedInnerLatex = '\n\\begin{equation}\n'
+                                            + equationLatex + '\n'
+                                            + '\\end{equation}\n'
+                    } else if (equationStyle === 'display-unnumbered') {
+                        parsedInnerLatex = '\n\\begin{displaymath}\n'
+                                            + equationLatex + '\n'
+                                            + '\\end{displaymath}\n'
+                    } else {
+                        console.log('unknown equation style: ', equationStyle)
+                        parsedInnerLatex = ''
+                    }
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
-                case 'TR':
-                    // td and th will be parsed as `content\n`
-                    var tds = this._convert_elements(element.innerHTML, parentNode).split('\n').join('&')
-                    parsedInnerLatex = `\n${tds}\\\\\n`
-                    latex = latex.replace(outerHTML, parsedInnerLatex)
-                    break
-                case 'TD':
-                    parsedInnerLatex = `${this._convert_elements(element.innerHTML, parentNode)}\n`
-                    latex = latex.replace(outerHTML, parsedInnerLatex)
-                    break
-                case 'TH':
-                    parsedInnerLatex = `\\emph{${this._convert_elements(element.innerHTML, parentNode)}}\n`
-                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                case 'EQUATION-EXTRA':
+                    latex = latex.replace(outerHTML, '')
                     break
                 // Converting others
                 case 'DIV':
