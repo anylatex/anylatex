@@ -42,7 +42,7 @@ class Converter {
         return parsedInnerLatex
     }
 
-    _convert_elements(html) {
+    _convert_elements(html, parentNode='') {
         var htmlDom = this._getDOM(html)
         var bodyDom = this._getParsedDomBodyElements(htmlDom)
         if (bodyDom.length == 0) {
@@ -61,7 +61,6 @@ class Converter {
                 latex = latex.replace(outerHTML, "")
                 continue
             }
-
             switch (tagName) {
                 // Converting Heading
                 case 'H1':
@@ -102,51 +101,138 @@ class Converter {
                     var imgID = element.getAttribute('id')
                     var imgType = element.getAttribute('format')
                     var caption = element.getAttribute('caption')
-                    parsedInnerLatex = '\\begin{figure}[hbt]\n'
-                                        + '\\centering\n'
-                                        + `\\includegraphics[width=0.7\\linewidth]{${imgID}.${imgType}}\n`
-                    if (caption) {
-                        parsedInnerLatex += `\\caption{${caption}}\n`
+                    if (parentNode == 'TABLE') {
+                        // images inside tables
+                        parsedInnerLatex = `\\includegraphics[width=0.7\\linewidth]{${imgID}.${imgType}}\n`
+                    } else {
+                        parsedInnerLatex = '\\begin{figure}[hbt]\n'
+                                            + '\\centering\n'
+                                            + `\\includegraphics[width=0.7\\linewidth]{${imgID}.${imgType}}\n`
+                        if (caption) {
+                            parsedInnerLatex += `\\caption{${caption}}\n`
+                        }
+                        parsedInnerLatex += '\\end{figure}'
                     }
-                    parsedInnerLatex += '\\end{figure}'
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                // Converting tables
+                case 'TABLE':
+                    var frameStyle = element.getAttribute('frame')
+                    var rulesStyle = element.getAttribute('rules')
+                    var topLine, bottomLine, leftLine, rightLine, rowLine, colLine
+                    // parse frame style: only support `box` and `hsides`
+                    if (frameStyle == 'box') {
+                        topLine = bottomLine = rightLine = leftLine = true
+                    } else if (frameStyle == 'hsides') {
+                        topLine = bottomLine = true
+                        rightLine = leftLine = false
+                    }
+                    // parse rules style: only support `all`
+                    if (rulesStyle == 'all') {
+                        rowLine = colLine = true
+                    }
+                    // row format in LaTeX
+                    var colNumber = parseInt(element.getAttribute('col'))
+                    var rowFormat = Array(colNumber).fill('c')
+                    if (colLine) rowFormat = rowFormat.join('|')
+                    else rowFormat = rowFormat.join('')
+                    if (leftLine) rowFormat = '|' + rowFormat
+                    if (rightLine) rowFormat = rowFormat + '|'
+                    // convert the table
+                    var tableCaption = element.getAttribute('caption')
+                    var tbodyRE = /<tbody>(.*?)<\/tbody>/gs
+                    var trRE = /<tr>(.*?)<\/tr>/gs
+                    var thRE = /<th>(.*?)<\/th>/gs
+                    var tdRE = /<td>(.*?)<\/td>/gs
+                    var parsedTBody = this._into_one_line(element.innerHTML).replace(tbodyRE, '$1')
+                    var parsedRows = []
+                    while (true) {
+                        let result = trRE.exec(parsedTBody)
+                        if (!result) break
+                        let row = result[1]
+                        let parsedRow = []
+                        while (true) {
+                            let result = thRE.exec(row)
+                            if (!result) break
+                            let content = this._convert_elements(result[1], 'TABLE')
+                            parsedRow.push(`\\textbf{${content}}`)
+                        }
+                        while (true) {
+                            let result = tdRE.exec(row)
+                            if (!result) break
+                            let content = this._convert_elements(result[1], 'TABLE')
+                            parsedRow.push(`${content}`)
+                        }
+                        parsedRow = parsedRow.join('& ')
+                        parsedRows.push(parsedRow + '\\\\\n')
+                    }
+                    if (rowLine) parsedRows = parsedRows.join('\\hline\n')
+                    else parsedRows = parsedRows.join('')
+                    if (topLine) parsedRows = '\\hline\n' + parsedRows
+                    if (bottomLine) parsedRows = parsedRows + '\\hline\n'
+                    parsedInnerLatex = '\\begin{table}[hbt]\n' + '\\centering'
+                    if (tableCaption) parsedInnerLatex += `\\caption{${tableCaption}}\n`
+                    parsedInnerLatex += `\\begin{tabular}{${rowFormat}}\n`
+                                        + parsedRows
+                                        + '\\end{tabular}\n'
+                                        + '\\end{table}'
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'TBODY':
+                    parsedInnerLatex = `${this._convert_elements(element.innerHTML, parentNode)}`
+                    console.log(parsedInnerLatex)
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'TR':
+                    // td and th will be parsed as `content\n`
+                    var tds = this._convert_elements(element.innerHTML, parentNode).split('\n').join('&')
+                    parsedInnerLatex = `\n${tds}\\\\\n`
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'TD':
+                    parsedInnerLatex = `${this._convert_elements(element.innerHTML, parentNode)}\n`
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'TH':
+                    parsedInnerLatex = `\\emph{${this._convert_elements(element.innerHTML, parentNode)}}\n`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 // Converting others
                 case 'DIV':
-                    parsedInnerLatex = `\n${this._convert_elements(element.innerHTML)}\n`
+                    parsedInnerLatex = `\n${this._convert_elements(element.innerHTML, parentNode)}\n`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     // latex += this._convert_elements(element.innerHTML) + '\n'
                     break
                 case 'P':
-                    parsedInnerLatex = `\n${this._convert_elements(element.innerHTML)}\n`
+                    parsedInnerLatex = `\n${this._convert_elements(element.innerHTML, parentNode)}\n`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'SPAN':
-                    parsedInnerLatex = `${this._convert_elements(element.innerHTML)}`
+                    parsedInnerLatex = `${this._convert_elements(element.innerHTML, parentNode)}`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'B':
-                    parsedInnerLatex = `\\textbf{${this._convert_elements(element.innerHTML)}}`
+                    parsedInnerLatex = `\\textbf{${this._convert_elements(element.innerHTML, parentNode)}}`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'I':
-                    parsedInnerLatex = `\\emph{${this._convert_elements(element.innerHTML)}}`
+                    parsedInnerLatex = `\\emph{${this._convert_elements(element.innerHTML, parentNode)}}`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'U':
-                    parsedInnerLatex = `\\underline{${this._convert_elements(element.innerHTML)}}`
+                    parsedInnerLatex = `\\underline{${this._convert_elements(element.innerHTML, parentNode)}}`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'UL':
-                    parsedInnerLatex = `\\begin{itemize}\n${this._convert_elements(element.innerHTML)}\n\\end{itemize}\n`
+                    parsedInnerLatex = `\\begin{itemize}\n${this._convert_elements(element.innerHTML, parentNode)}\n\\end{itemize}\n`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'OL':
-                    parsedInnerLatex = `\\begin{enumerate}\n${this._convert_elements(element.innerHTML)}\n\\end{enumerate}\n`
+                    parsedInnerLatex = `\\begin{enumerate}\n${this._convert_elements(element.innerHTML, parentNode)}\n\\end{enumerate}\n`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'LI':
-                    parsedInnerLatex = `\\item ${this._convert_elements(element.innerHTML)}\n`
+                    parsedInnerLatex = `\\item ${this._convert_elements(element.innerHTML, parentNode)}\n`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
             }
