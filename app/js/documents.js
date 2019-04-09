@@ -43,7 +43,6 @@ $('#documents-panel').on('click', (event) => {
     if (target.id == 'new-document' || target.tagName != 'BUTTON') {
         return
     } else {
-        console.log(target.id)
         name = $('#'+ target.id + 'name').text()
         documentID = target.id
         ipcRenderer.send('set-variable', { name: 'currentDocumentID', value: documentID })
