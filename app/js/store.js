@@ -1,6 +1,7 @@
 const electron = require('electron')
 const path = require('path')
 const fs = require('fs')
+const rimraf = require('rimraf')
 
 
 // TODO: changing data path when userid is gained when using the application
@@ -79,6 +80,11 @@ class Store {
         }
         let stat = JSON.parse(fs.readFileSync(documentStatFile))
         return { documentContent: htmlContent, stat: stat }
+    }
+
+    deleteDocument(documentID) {
+        const documentDir = path.join(this.dataPath, documentID)
+        rimraf.sync(documentDir)
     }
 
     createDocument(documentID, name) {
