@@ -6,6 +6,8 @@
   "dependencies": {
     "async": "^2.6.2",
     "electron": "^4.0.5",
+    "jquery-contextmenu": "^2.8.0",
+    "rimraf": "^2.6.3",
     "spinkit": "^1.2.5",
     "superagent": "^5.0.2"
   },
