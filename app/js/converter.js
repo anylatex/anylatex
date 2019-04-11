@@ -102,19 +102,23 @@ class Converter {
                     var imgID = element.getAttribute('id')
                     var imgType = element.getAttribute('format')
                     var caption = element.getAttribute('caption')
+                    var linewidth = element.getAttribute('linewidth')
                     if (parentNode == 'TABLE') {
                         // images inside tables
-                        parsedInnerLatex = `\\includegraphics[width=0.7\\linewidth]{${imgID}.${imgType}}\n`
+                        parsedInnerLatex = `\\includegraphics[width=${linewidth}\\linewidth]{${imgID}.${imgType}}\n`
                     } else {
                         parsedInnerLatex = '\\begin{figure}[hbt]\n'
                                             + '\\centering\n'
-                                            + `\\includegraphics[width=0.7\\linewidth]{${imgID}.${imgType}}\n`
+                                            + `\\includegraphics[width=${linewidth}\\linewidth]{${imgID}.${imgType}}\n`
                         if (caption) {
                             parsedInnerLatex += `\\caption{${caption}}\n`
                         }
                         parsedInnerLatex += '\\end{figure}'
                     }
                     latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'IMGSIZEHINT':
+                    latex = latex.replace(outerHTML, '')
                     break
                 // Converting tables
                 case 'TABLE':

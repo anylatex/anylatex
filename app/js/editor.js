@@ -287,6 +287,69 @@ function checkAndUploadImage(imgEl, resolve, reject) {
     })
 }
 
+// init interact dragging
+const minimumLinewidth = 0.2
+const maximumLinewidth = 1
+interact('img')
+    .resizable({
+        // resize from all edges and corners
+        edges: { left: false, right: true, bottom: true, top: false },
+
+        preserveAspectRatio: true,
+
+        modifiers: [
+            // keep the edges inside the parent
+            interact.modifiers.restrictEdges({
+                outer: 'parent',
+                endOnly: true,
+            }),
+
+        ],
+
+        inertia: true
+    })
+    .on('resizestart', event => {
+        // set original width and height
+        var target = event.target,
+            originWidth = parseFloat(target.getAttribute('origin-width')) || 0,
+            originHeight = parseFloat(target.getAttribute('origin-height')) || 0
+        if (!originWidth) target.setAttribute('origin-width', event.rect.width)
+        if (!originHeight) target.setAttribute('origin-height', event.rect.height)
+        // show image size
+        document.getElementById(target.getAttribute('popid') + 'size').classList.remove('d-none')
+        // disable the popover
+        $(`[popid='${target.getAttribute('popid')}'`).popover('hide')
+        $(`[popid='${target.getAttribute('popid')}'`).popover('disable')
+    })
+    .on('resizemove', event => {
+        var target = event.target,
+            x = (parseFloat(target.getAttribute('data-x')) || 0),
+            y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+        var originWidth = parseFloat(target.getAttribute('origin-width'))
+        var deltaWidth = originWidth - event.rect.width
+        var curLineWidth = parseFloat(target.getAttribute('default-linewidth')) - (deltaWidth / originWidth)
+        curLineWidth = Math.floor(curLineWidth * 100) / 100
+        if (curLineWidth < minimumLinewidth || curLineWidth > maximumLinewidth) {
+            return
+        }
+        target.setAttribute('linewidth', curLineWidth)
+        document.getElementById(target.getAttribute('popid') + 'size').innerText = `Image Width = ${curLineWidth} line width`
+        // update the element's style
+        target.style.width = event.rect.width + 'px';
+        target.style.height = event.rect.height + 'px';
+
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+    })
+    .on('resizeend', event => {
+        var target = event.target
+        // hide image's size text
+        document.getElementById(target.getAttribute('popid') + 'size').classList.add('d-none')
+        // enable the popover
+        $(`[popid='${target.getAttribute('popid')}'`).popover('enable')
+    })
+
 $('#image-confirm').on('click', () => {
     let imgSource = document.getElementById('show-choose-image').src
     let image = decodeImageFromBase64(imgSource)
@@ -297,7 +360,13 @@ $('#image-confirm').on('click', () => {
 
     // insert into the editor
     let div = document.createElement('div')
-    div.classList.add('w-75')
+    div.classList.add('mb-3')
+    let imgSize = document.createElement('imgsizehint')
+    imgSize.classList.add('d-none')
+    imgSize.classList.add('text-muted')
+    imgSize.classList.add('small')
+    imgSize.classList.add('font-weight-bold')
+    imgSize.setAttribute('contenteditable', 'false')
     let img = document.createElement('img')
     img.classList.add('img-fluid')
     img.classList.add('inserted-image')
@@ -312,6 +381,19 @@ $('#image-confirm').on('click', () => {
         img.setAttribute('caption', '')
         captionText = 'No Caption'
     }
+    // set up initial width ratio
+    var defaultLinewidth = 0.6
+    img.setAttribute('default-linewidth', defaultLinewidth)
+    img.setAttribute('linewidth', defaultLinewidth)
+    // set up width and height
+    var containerWidth = editor.offsetWidth
+    var imgAspectRatio = img.naturalWidth / img.naturalHeight
+    var displayWidth = containerWidth * defaultLinewidth
+    var displayHeight = displayWidth / imgAspectRatio
+    img.width = displayWidth
+    img.height = displayHeight
+    // center the image
+    div.style.textAlign = 'center'
     // set up popover and enable it
     img.setAttribute('data-toggle', 'popover')
     img.setAttribute('title', 'Caption')
@@ -320,10 +402,13 @@ $('#image-confirm').on('click', () => {
     img.setAttribute('data-placement', 'top')
     let popID = Math.random().toString(36).substr(2, 9)
     img.setAttribute('popid', popID)
+    imgSize.setAttribute('id', popID + 'size')
     $(function () {
         $(`[popid='${popID}'`).popover()
     })
     div.appendChild(img)
+    div.appendChild(document.createElement('br'))
+    div.appendChild(imgSize)
     insertElementAtCaret(div.outerHTML)
     ipcRenderer.send('alert', 'inserted ' + image.name)
 })
