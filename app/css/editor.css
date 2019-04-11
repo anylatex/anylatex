@@ -95,6 +95,10 @@
   text-align: center;
 }
 
+img {
+  touch-action: none;
+}
+
 /*
 #tree {
   padding: 1rem;
