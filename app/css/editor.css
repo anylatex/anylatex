@@ -95,8 +95,26 @@
   text-align: center;
 }
 
-img {
+.image-container {
+  position: relative;
   touch-action: none;
+  display: inline-block;
+}
+
+.image-container:hover:before, .image-container:active:before {
+  display: block;
+  content: "";
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  border-bottom: 3px solid black;
+  border-right: 3px solid black;
+}
+
+.disable-select {
+  user-select: none;
 }
 
 /*
