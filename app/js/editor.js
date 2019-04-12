@@ -323,6 +323,7 @@ interact('div.image-container')
         $(`[popid='${target.getAttribute('popid')}'`).popover('disable')
         // disable select
         document.getElementById('editor').classList.add('disable-select')
+        document.getElementById('editor').setAttribute('contenteditable', 'false')
     })
     .on('resizemove', event => {
         var container = event.target
@@ -355,6 +356,7 @@ interact('div.image-container')
         target.setAttribute('data-content', target.getAttribute('caption') + ' | ' + target.getAttribute('linewidth') + ' line width')
         $(`[popid='${target.getAttribute('popid')}'`).popover('enable')
         document.getElementById('editor').classList.remove('disable-select')
+        document.getElementById('editor').setAttribute('contenteditable', 'true')
     })
 
 $('#image-confirm').on('click', () => {
@@ -370,12 +372,12 @@ $('#image-confirm').on('click', () => {
     div.classList.add('mb-3')
     let container = document.createElement('div')
     container.classList.add('image-container')
+    container.setAttribute('contenteditable', 'false')
     let imgSize = document.createElement('imgsizehint')
     imgSize.classList.add('d-none')
     imgSize.classList.add('text-muted')
     imgSize.classList.add('small')
     imgSize.classList.add('font-weight-bold')
-    imgSize.setAttribute('contenteditable', 'false')
     let img = document.createElement('img')
     img.classList.add('img-fluid')
     img.classList.add('inserted-image')
@@ -417,9 +419,9 @@ $('#image-confirm').on('click', () => {
     })
     // bind selecting function
     container.appendChild(img)
+    container.appendChild(document.createElement('br'))
+    container.appendChild(imgSize)
     div.appendChild(container)
-    div.appendChild(document.createElement('br'))
-    div.appendChild(imgSize)
     insertElementAtCaret(div.outerHTML)
     ipcRenderer.send('alert', 'inserted ' + image.name)
 })
