@@ -2,6 +2,13 @@
   width: 15vw;
   height: 20vw;
   border: 0.15vw solid black;
+  overflow: hidden;
+  float: left;
+}
+
+.btn-document:hover {
+  -webkit-box-shadow: 0px 5px 40px -5px rgba(0,0,0,0.57);
+  transition: all 0.2s ease 0s;
 }
 
 .btn-document-plus {
@@ -14,4 +21,11 @@
   width: 15vw;
   text-align: center;
   font-weight: 500;
+}
+
+.frame {
+  width: 30vw;
+  height: 20vw;
+  -webkit-transform: scale(0.4);
+  -webkit-transform-origin: 0 0;
 }
