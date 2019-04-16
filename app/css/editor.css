@@ -24,21 +24,23 @@
 .gutter.gutter-horizontal {
   cursor: ew-resize;
   background-color: black;
-  height: 90vh;
-  width: 20px;
+  height: 100vh;
 }
 
 .editor-navbar {
-  height: 8%;
+  height: 6%;
 }
 
+#editor-panel {
+  height: 93%;
+}
 .editor {
   padding: 1rem;
   font-size: 1rem;
   box-shadow: 0px 0px 10px 0px black;
   border: 0.5px solid black;
-  overflow-y: auto;
-  min-height: 100%;
+  max-height: 100%;
+  overflow-y: scroll;
 }
 .editor:focus {
   box-shadow: 0px 0px 20px 0px black;
@@ -128,8 +130,8 @@
 }
 
 #tree-panel {
-  min-width: 20vw;
-  max-width: 20vw;
+  min-width: 15vw;
+  max-width: 15vw;
   min-height: 100vh;
 
 }
@@ -137,7 +139,7 @@
   background-color: rgb(247, 247, 247);
 }
 #tree-panel.hide{
-  margin-left: -21vw;
+  margin-left: -16vw;
 }
 
 #pin-icon {

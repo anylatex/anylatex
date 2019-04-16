@@ -13,7 +13,7 @@
   <title>Editor</title>
 </head>
 
-<body>
+<body style="height: 95%; overflow: hidden;">
   <div id="loader-container" class="loader-container d-none">
     <div class="row h-100 w-100 align-items-center justify-content-center">
       <div class="col">
@@ -97,7 +97,9 @@
     </div>
   </nav>
 
-  <div class="mt-5 mb-4 ml-2 mr-2 w-100 h-100 d-flex">
+  <div class="row mt-5 mb-4 ml-2 mr-2 w-100 h-100">
+
+    <div id="content-panel" class="col split h-100 d-flex">
 
       <!-- Tree Panel -->
       <div id="tree-panel" class="pinned">
@@ -120,12 +122,11 @@
       </div>
 
       <!-- Editor Panel -->
-      <div class="h-100 w-100 mt-1 split" id="editor-panel">
+      <div class="w-100 mt-1 ml-4" id="editor-panel">
         <!-- text area -->
         <div class="h-100 w-100">
-          <div class="row mt-4 no-gutters" style="height: 90%">
-            <div class="col-1"></div>
-            <div class="col-10 h-100">
+          <div class="row h-100 mt-4 no-gutters">
+            <div class="col h-100">
               <div id="part-args-editor" class="row h-25 mt-4 align-items-center justify-content-center no-gutters d-none">
                 <div class="col h-100">
                   <div id="part-args-name" class="font-weight-bold mb-4"></div>
@@ -135,10 +136,17 @@
               </div>
               <div id="editor" class="editor" contenteditable></div>
             </div>
-            <div class="col-1"></div>
           </div>
         </div>
       </div>
+
+    </div>
+
+    <div id="pdf-panel" class="col split">
+      <div class="row h-100 w-100 pl-2 pt-4 pb-4">
+        <iframe class="w-100" src="./pdfviewer.html"></iframe>
+      </div>
+    </div>
 
   </div>
 
