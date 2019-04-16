@@ -4,12 +4,14 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.8.1",
     "async": "^2.6.2",
     "electron": "^4.0.5",
     "interactjs": "^1.4.0-rc.9",
     "jquery-contextmenu": "^2.8.0",
     "rimraf": "^2.6.3",
     "spinkit": "^1.2.5",
+    "split.js": "^1.5.10",
     "superagent": "^5.0.2"
   },
   "devDependencies": {

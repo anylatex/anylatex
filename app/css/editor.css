@@ -18,6 +18,16 @@
   text-align: center;
 }
 
+.split, .gutter.gutter-horizontal {
+  float: left;
+}
+.gutter.gutter-horizontal {
+  cursor: ew-resize;
+  background-color: black;
+  height: 90vh;
+  width: 20px;
+}
+
 .editor-navbar {
   height: 8%;
 }
@@ -117,17 +127,24 @@
   user-select: none;
 }
 
-/*
-#tree {
-  padding: 1rem;
-  font-size: 1.1rem;
-  box-shadow: 0 .3rem .2rem black;
-  border: 0.3px solid black;
-  overflow-y: auto;
+#tree-panel {
+  min-width: 20vw;
+  max-width: 20vw;
+  min-height: 100vh;
+
 }
-*/
 #tree {
-  position: fixed;
+  background-color: rgb(247, 247, 247);
+}
+#tree-panel.hide{
+  margin-left: -21vw;
+}
+
+#pin-icon {
+  transform: rotate(90deg);
+}
+#pin-icon.pinned {
+  transform: rotate(0deg);
 }
 
 a.anchor-link {
@@ -170,6 +187,6 @@ ul, #tree{
 }
 
 /* Show the nested list when the user clicks on the caret */
-.active {
+.nested.active {
   display: block;
 }

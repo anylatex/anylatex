@@ -96,7 +96,7 @@ class Store {
     }
 
     updateDocument(updateOptions) {
-        let { id, htmlContent, name, templateName, args, partArguments, image, pdf } = updateOptions
+        let { id, htmlContent, name, templateName, args, partArguments, image, pdf, splitSizes } = updateOptions
         if (!id) {
             return
         }
@@ -130,6 +130,9 @@ class Store {
                 stat['partArguments'] = {}
             }
             stat['partArguments'][name] = value
+        }
+        if (splitSizes) {
+            stat['splitSizes'] = JSON.stringify(splitSizes)
         }
         fs.writeFileSync(statPath, JSON.stringify(stat))
         if (image) {
