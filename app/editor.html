@@ -4,9 +4,11 @@
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathquill@0.10.1-a/build/mathquill.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/editor.css">
   <link rel="stylesheet" href="../node_modules/spinkit/css/spinkit.css">
+  <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
 
   <title>Editor</title>
 </head>
@@ -95,16 +97,17 @@
     </div>
   </nav>
 
-  <div class="mt-5 mb-2 ml-2 mr-2 w-100 h-100">
+  <div class="mt-5 mb-4 ml-2 mr-2 w-100 h-100 d-flex">
 
-    <div class="row align-items-center justify-content-center w-100 h-100">
-      <!-- tree view -->
-      <div class="col-sm-3 col-md-3 col-lg-3 h-100 mt-5 pl-2">
-        <ul id="tree" class="rounded text-left w-25">
-          <div>
-            <span class="font-weight-bold">目录</span>
-            <a id="refresh-link" class="ml-1 mb-5" href="#" style="color: black; font-size: 0.8rem">刷新</a>
+      <!-- Tree Panel -->
+      <div id="tree-panel" class="pinned">
+        <ul id="tree" class="mt-4 rounded text-left">
+          <div class="text-right pt-3 pr-3">
+            <button id="pin-tree-panel" class="btn btn-light pinned"><i id="pin-icon"
+                class="pinned fas fa-thumbtack"></i></button>
           </div>
+          <p class="font-weight-bold">目录</p>
+          <a id="refresh-link" class="ml-1 mb-5" href="#" style="color: black; font-size: 0.8rem">刷新</a>
           <div class="w-75">
             <hr class="mt-2 mb-2">
           </div>
@@ -115,26 +118,27 @@
           </div>
         </ul>
       </div>
-      <!-- Editor -->
-      <div class="col-sm-9 col-md-9 col-lg-9 h-100">
-        <!-- Debug Info -->
-        <div class="row mt-2 mb-2 d-none text-muted" id="debug-info"></div>
+
+      <!-- Editor Panel -->
+      <div class="h-100 w-100 mt-1 split" id="editor-panel">
         <!-- text area -->
-        <div class="row mt-4 align-items-center justify-content-center no-gutters" style="height: 90%">
-          <div class="col-9 h-100">
-            <div id="part-args-editor" class="row h-25 mt-4 align-items-center justify-content-center no-gutters d-none">
-              <div class="col h-100">
-                <div id="part-args-name" class="font-weight-bold mb-4"></div>
-                <div id="part-editor" class="editor w-100" contenteditable></div>
-                <button class="btn btn-primary mt-2" id="part-args-confirm">Confirm</button>
+        <div class="h-100 w-100">
+          <div class="row mt-4 no-gutters" style="height: 90%">
+            <div class="col-1"></div>
+            <div class="col-10 h-100">
+              <div id="part-args-editor" class="row h-25 mt-4 align-items-center justify-content-center no-gutters d-none">
+                <div class="col h-100">
+                  <div id="part-args-name" class="font-weight-bold mb-4"></div>
+                  <div id="part-editor" class="editor w-100" contenteditable></div>
+                  <button class="btn btn-primary mt-2" id="part-args-confirm">Confirm</button>
+                </div>
               </div>
+              <div id="editor" class="editor" contenteditable></div>
             </div>
-            <div id="editor" class="editor" contenteditable></div>
+            <div class="col-1"></div>
           </div>
-          <div class="col-3"></div>
         </div>
       </div>
-    </div>
 
   </div>
 

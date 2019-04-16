@@ -5,6 +5,7 @@ const { Converter } = require(path.resolve('app/js/converter.js'))
 const crypto = require('crypto')
 const async = require('async')
 const superagent = require('superagent')
+const Split = require('split.js')
 const store = remote.getGlobal('store')
 
 const apiBase = store.getConfig('apiBase')
@@ -14,6 +15,30 @@ const agent = superagent.agent().timeout({response: 20000})
 let documentID = remote.getGlobal('currentDocumentID')
 let documentName = remote.getGlobal('currentDocumentName')
 document.title = 'Editor - ' + documentName
+
+/* Split panels */
+//;(function(){
+//    const { stat } = store.getOneDocumentData(documentID)
+//    var storedSizes = stat['splitSizes']
+//    var sizes
+//    if (storedSizes) {
+//        sizes = JSON.parse(storedSizes)
+//        sizes = sizes.map(value => {
+//            return parseInt(value.toString())
+//        })
+//        console.log(sizes)
+//        sizes = [40, 60]
+//    } else {
+//        sizes = [30, 70]
+//    }
+//    Split(['#tree-panel', '#editor-panel'], {
+//        sizes: sizes,
+//        onDragEnd: endSizes => {
+//            store.updateDocument({ id: documentID, splitSizes: endSizes })
+//        }
+//    })
+//}())
+
 
 /* Tool Functions */
 var editorRange = ''
@@ -1339,6 +1364,58 @@ function generateOutline() {
 // tree's handler
 var toggler = document.getElementById("tree");
 toggler.addEventListener('click', treeHandler)
+var treePanel = $('#tree-panel')
+
+// display the panel when the mouse moving to the left side
+$(window).on('mousemove', event => {
+    if (treePanel.hasClass('pinned')) {
+        return
+    } else if (event.pageX < 20 || treePanel.is(':hover')) {
+        // display the tree
+        if (treePanel.hasClass('hide')) treePanel.removeClass('hide')
+    } else {
+        // hide the tree
+        if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
+    }
+})
+
+// move the panel to the visible area when it is pinned
+$(function() {
+    var $treePanel = $("#tree-panel"), 
+        $window    = $(window),
+        offset     = $treePanel.offset(),
+        topPadding = 50
+
+    $window.scroll(function() {
+        if ($window.scrollTop() > offset.top) {
+            $treePanel.stop().animate({
+                marginTop: $window.scrollTop() - offset.top + topPadding
+            })
+        } else {
+            $treePanel.stop().animate({
+                marginTop: 0
+            })
+        }
+    })
+})
+
+// pin event
+var pinTreeButton = $('#pin-tree-panel')
+pinTreeButton.on('click', event => {
+    if (pinTreeButton.hasClass('pinned')) {
+        pinTreeButton.removeClass('pinned')
+        // change the icon's style
+        $('#pin-icon').removeClass('pinned')
+        // unpin the panel
+        treePanel.removeClass('pinned')
+    } else {
+        pinTreeButton.addClass('pinned')
+        // change the icon's style
+        $('#pin-icon').addClass('pinned')
+        // pin the panel
+        treePanel.addClass('pinned')
+    }
+})
 
 function treeHandler(event) {
     var target = event.target
