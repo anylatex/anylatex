@@ -17,27 +17,30 @@ let documentName = remote.getGlobal('currentDocumentName')
 document.title = 'Editor - ' + documentName
 
 /* Split panels */
-//;(function(){
-//    const { stat } = store.getOneDocumentData(documentID)
-//    var storedSizes = stat['splitSizes']
-//    var sizes
-//    if (storedSizes) {
-//        sizes = JSON.parse(storedSizes)
-//        sizes = sizes.map(value => {
-//            return parseInt(value.toString())
-//        })
-//        console.log(sizes)
-//        sizes = [40, 60]
-//    } else {
-//        sizes = [30, 70]
-//    }
-//    Split(['#tree-panel', '#editor-panel'], {
-//        sizes: sizes,
-//        onDragEnd: endSizes => {
-//            store.updateDocument({ id: documentID, splitSizes: endSizes })
-//        }
-//    })
-//}())
+;(function(){
+    const { stat } = store.getOneDocumentData(documentID)
+    var storedSizes = stat['splitSizes']
+    var sizes
+    if (storedSizes) {
+        sizes = JSON.parse(storedSizes)
+        sizes = sizes.map(value => {
+            return parseInt(value.toString())
+        })
+    } else {
+        sizes = [70, 30]
+    }
+    Split(['#content-panel', '#pdf-panel'], {
+        elementStyle: function (dimension, size, gutterSize) { 
+            return {'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)'}
+        },
+        sizes: sizes,
+        minSize: [650, 350],
+        gutterSize: 2,
+        onDragEnd: endSizes => {
+            store.updateDocument({ id: documentID, splitSizes: endSizes })
+        }
+    })
+}())
 
 
 /* Tool Functions */
