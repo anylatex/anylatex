@@ -83,8 +83,9 @@ function setupTemplatesDropdown() {
 }
 
 /* Load the document's content */
-(function(){
-    let { documentContent, stat } = store.getOneDocumentData(documentID)
+var compiledHtml = ''
+;(function(){
+    let { documentContent, stat, pdfExists } = store.getOneDocumentData(documentID)
     // recover document's content
     if (documentContent) {
         document.getElementById('editor').innerHTML = documentContent
@@ -117,6 +118,16 @@ function setupTemplatesDropdown() {
             argElement.value = value
         }
     }
+
+    // Load compiled PDF
+    if (pdfExists != false) {
+        // TODO: check if content in editor corresponding to the existed pdf
+        compiledHtml = document.getElementById('editor').innerHTML
+        ipcRenderer.send('alert', 'load existed pdf: ' + pdfExists)
+        ipcRenderer.send('set-variable', {name: 'isCompileFinish', value: true})
+        ipcRenderer.send('set-variable', {name: 'pdfPath', value: pdfExists})
+    }
+
 })()
 
 /* Modal buttons' handlers */
@@ -1035,7 +1046,6 @@ function confirmPartArg() {
 let compileButton = document.getElementById("compile")
 compileButton.addEventListener("click", compile)
 var isCompiling = false
-var compiledHtml = ''
 
 setInterval(() => {
     if (compiledHtml != editor.innerHTML) {

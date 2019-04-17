@@ -79,18 +79,21 @@ var loadingPDF = (pdfPATH) => {
 
 }
 
+var isFirstLoad = true
+const documentID = remote.getGlobal('currentDocumentID')
 setInterval(() => {
     const isCompileFinished = remote.getGlobal('isCompileFinish')
     var loader = document.getElementById('loader')
     if (isCompileFinished) {
-        if (loader.classList.contains('d-none')) {
+        if (loader.classList.contains('d-none') && !isFirstLoad) {
             return
         }
+        isFirstLoad = false
         // hide loader
         loader.classList.add('d-none')
         // render pdf
         const pdfPath = remote.getGlobal('pdfPath')
-        if (pdfPath) {
+        if (pdfPath && pdfPath.search(`${documentID}.pdf`) >= 0) {
             loadingPDF(remote.getGlobal('pdfPath'))
         }
     } else if (isCompileFinished === false) {

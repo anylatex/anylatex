@@ -79,7 +79,10 @@ class Store {
             htmlContent = fs.readFileSync(documentPath)
         }
         let stat = JSON.parse(fs.readFileSync(documentStatFile))
-        return { documentContent: htmlContent, stat: stat }
+        let pdfPath = path.join(documentDir, `${documentID}.pdf`)
+        var pdfExists = false
+        if (fs.existsSync(pdfPath)) pdfExists = pdfPath
+        return { documentContent: htmlContent, stat: stat, pdfExists: pdfExists }
     }
 
     deleteDocument(documentID) {
