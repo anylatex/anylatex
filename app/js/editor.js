@@ -695,10 +695,13 @@ $('#editor').on('blur keyup paste input', save)
 $('#part-editor').on('blur keyup paste input', savePart)
 document.addEventListener('selectionchange', editorSelectionHandler)
 $('#editor').bind('keyup click focus', editorCursorChange)
-// ctrl+s, force saving
+// ctrl+s, force saving and recompiling
 document.addEventListener('keydown', event => {
     if( event.ctrlKey  == true && event.key == 's' ) {
         save(null, true)
+        if (compiledHtml != editor.innerHTML) {
+            compile()
+        }
     }
 })
 
@@ -1047,11 +1050,11 @@ let compileButton = document.getElementById("compile")
 compileButton.addEventListener("click", compile)
 var isCompiling = false
 
-setInterval(() => {
-    if (compiledHtml != editor.innerHTML) {
-        compile()
-    }
-}, 1000)
+// setInterval(() => {
+//     if (compiledHtml != editor.innerHTML) {
+//         compile()
+//     }
+// }, 1000)
 
 function compile() {
     if (isCompiling) return
