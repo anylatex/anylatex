@@ -27,7 +27,8 @@ document.title = 'Editor - ' + documentName
             return parseInt(value.toString())
         })
     } else {
-        sizes = [70, 30]
+        // TODO: why total is 80?
+        sizes = [50, 30]
     }
     Split(['#content-panel', '#pdf-panel'], {
         elementStyle: function (dimension, size, gutterSize) { 
@@ -35,7 +36,7 @@ document.title = 'Editor - ' + documentName
         },
         sizes: sizes,
         minSize: [650, 350],
-        gutterSize: 2,
+        gutterSize: 3,
         onDragEnd: endSizes => {
             store.updateDocument({ id: documentID, splitSizes: endSizes })
         }
@@ -1033,10 +1034,19 @@ function confirmPartArg() {
 // Compile button's handler
 let compileButton = document.getElementById("compile")
 compileButton.addEventListener("click", compile)
+var isCompiling = false
+var compiledHtml = ''
+
+setInterval(() => {
+    if (compiledHtml != editor.innerHTML) {
+        compile()
+    }
+}, 1000)
 
 function compile() {
-    document.getElementById('navbar').classList.remove('fixed-top')
-    document.getElementById('loader-container').classList.remove('d-none')
+    if (isCompiling) return
+    isCompiling = true
+    ipcRenderer.sendSync('set-variable', {name: 'isCompileFinish', value: false})
     ipcRenderer.send('alert', 'click: compile')
     // convert args if exist
     var templateName = document.getElementById('current-template').value
@@ -1108,7 +1118,6 @@ function compile() {
         const imgName = imgID + '.' + imgType
         images.push(imgName)
     }
-    document.getElementById('loader-hint').innerText = 'Uploading images...'
     async.each(unUploadedImages, (imgEl, callback) => {
         if (imgEl.getAttribute('upload') == 'true') callback()
         new Promise((resolve, reject) => {
@@ -1126,7 +1135,9 @@ function compile() {
     }, err => {
         if (err) {
             // a image failed to upload, alert user and comtinue the compiling task
-            alert(err + '\nSome images will not included in the pdf.')
+            const errInfo = err + '\nSome images will not included in the pdf.'
+            ipcRenderer.send('set-variable', {name: 'compileHint', value: errInfo})
+            ipcRenderer.send('alert', errInfo)
         } else  {
             ipcRenderer.send('alert', 'All images have been uploaded')
         }
@@ -1136,14 +1147,15 @@ function compile() {
             args: args,
             partArgs: partArgs,
             templateName: templateName,
-            images: images
+            images: images,
+            html: html
         }
         sendCompileTask(compileTask)
     })
 }
 
 function sendCompileTask(compileTask) {
-    let { latex, args, partArgs, templateName, images } = compileTask
+    let { latex, args, partArgs, templateName, images, html } = compileTask
     // send the compiling task
     var createTaskBody = {
         'user_id': remote.getGlobal('userID'),
@@ -1158,7 +1170,7 @@ function sendCompileTask(compileTask) {
     async.waterfall([
         (callback) => {
             // creating a task
-            document.getElementById('loader-hint').innerText = 'Creating compiling task...'
+            ipcRenderer.send('set-variable', {name: 'compileHint', value: 'Creating compiling task...'})
             agent
                 .post(apiBase + '/tasks')
                 .timeout({response: 10000})
@@ -1177,9 +1189,9 @@ function sendCompileTask(compileTask) {
         },
         (task, callback) => {
             // querying the task's status
-            // timeout of 60s waiting for task finished
-            document.getElementById('loader-hint').innerText = 'Waiting for compiling...'
-            async.retry({ times: 120, interval: 500 }, (cb) => {
+            // waiting for task finished
+            ipcRenderer.send('set-variable', {name: 'compileHint', value: 'Waiting for compiling task...'})
+            async.retry({ times: 120, interval: 100 }, (cb) => {
                 agent.get(apiBase + `/tasks/${task.task_id}`).end((err, res) => {
                     if (res && res.status == '200') {
                         let task = res.body
@@ -1200,31 +1212,30 @@ function sendCompileTask(compileTask) {
         },
         (task, callback) => {
             // downloading the pdf
-            document.getElementById('loader-hint').innerText = 'Downloading the pdf...'
+            ipcRenderer.send('set-variable', {name: 'compileHint', value: 'Downloading the pdf...'})
             agent.get(apiBase + `/pdfs/${task.pdf_id}`).buffer(true)
                 .parse(superagent.parse['application/octet-stream'])
                 .ok(res => res.status == '200')
                 .retry(2)
                 .then(res => {
                     // clear loading animation, pop up pdf viewer
-                    document.getElementById('navbar').classList.add('fixed-top')
-                    document.getElementById('loader-container').classList.add('d-none')
-                    const pdfName = `${task.pdf_id}.pdf`
+                    const pdfName = `${documentID}.pdf`
                     const pdfPath = path.join(store.dataPath, documentID, pdfName)
                     store.updateDocument({ id: documentID, pdf: { name: pdfName, data: res.body } })
                     ipcRenderer.sendSync('set-variable', {name: 'pdfPath', value: pdfPath})
-                    ipcRenderer.send('pop-page', 'pdfviewer')
+                    ipcRenderer.sendSync('set-variable', {name: 'isCompileFinish', value: true})
+                    isCompiling = false
+                    compiledHtml = html
                 })
                 .catch(err => {
                     callback(err, undefined, 'downloading the pdf')
                 })
         }],
         (err, res, info) => {
-            // clear loading animation
-            document.getElementById('navbar').classList.add('fixed-top')
-            document.getElementById('loader-container').classList.add('d-none')
             ipcRenderer.send('alert', `ERROR when ${info}: ${err}`)
-            alert('error when sending requests to the server.')
+            alert(`error when ${info}: ${err}`)
+            ipcRenderer.sendSync('set-variable', {name: 'isCompileFinish', value: true})
+            isCompiling = false
         }
     )
 }

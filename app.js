@@ -45,12 +45,16 @@ app.once('ready', () => {
     // background color of the page, this prevents any white flickering
     backgroundColor: "#D6D8DC",
     // Don't show the window until it's ready, this prevents any white flickering
-    show: false
+    show: false,
+    webPreferences: {
+        webviewTag: true,
+        nodeIntegration: true
+    }
   })
 
   window.maximize()
-  window.setResizable(false)
-  window.on('unmaximize', () => window.maximize())
+  window.setResizable(true)
+  //window.on('unmaximize', () => window.maximize())
 
   // Load a URL in the window to the local index.html path
   window.loadURL(url.format({
@@ -139,7 +143,7 @@ ipcMain.on("load-page", (event, arg) => {
 
 // set up variables
 ipcMain.on("set-variable", (event, arg) => {
-    console.log('set variable:', arg.name)
+    console.log('set variable:', arg.name, arg.value)
     global[arg.name] = arg.value
     event.returnValue = "done"
 })
