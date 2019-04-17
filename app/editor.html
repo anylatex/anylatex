@@ -14,15 +14,6 @@
 </head>
 
 <body style="height: 95%; overflow: hidden;">
-  <div id="loader-container" class="loader-container d-none">
-    <div class="row h-100 w-100 align-items-center justify-content-center">
-      <div class="col">
-        <div class="sk-rotating-plane loader"></div>
-        <div id="loader-hint" class="loader-hint">
-        </div>
-      </div>
-    </div>
-  </div>
 
   <nav id="navbar" class="navbar fixed-top navbar-light bg-light w-100 editor-navbar">
     <!-- toolbar -->
@@ -142,10 +133,8 @@
 
     </div>
 
-    <div id="pdf-panel" class="col split">
-      <div class="row h-100 w-100 pl-2 pt-4 pb-4">
-        <iframe class="w-100" src="./pdfviewer.html"></iframe>
-      </div>
+    <div id="pdf-panel" class="col mt-4 mb-4 mr-1 split">
+      <webview class="w-100 h-100" src="./pdfviewer.html" nodeintegration></webview>
     </div>
 
   </div>

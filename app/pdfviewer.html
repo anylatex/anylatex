@@ -18,11 +18,17 @@ limitations under the License.
   <meta name="google" content="notranslate">
   <title>PDF.js viewer using built components</title>
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/web/pdf_viewer.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
     body {
       background-color: #808080;
       margin: 0;
       padding: 0;
+      overflow-y: hidden;
+    }
+    nav {
+      height: 5vh;
     }
     #viewerContainer {
       overflow: auto;
@@ -32,17 +38,29 @@ limitations under the License.
     }
   </style>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/web/pdf_viewer.css">
-
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/web/pdf_viewer.js"></script>
 </head>
 
 <body tabindex="1">
+  <nav class="navbar navbar-expand-lg navbar-light bg-dark">
+    <div id="loader" class="d-none">
+      <div class="d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm text-muted" role="status" aria-hidden="true"></div>
+        &nbsp;&nbsp;
+        <strong id="loader-hint" class="text-muted">Loading...</strong>
+      </div>
+    </div>
+  </nav>
   <div id="viewerContainer">
     <div id="viewer" class="pdfViewer"></div>
   </div>
 
+  <script>
+    delete module.exports
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script src="./js/pdfviewer.js"></script>
 </body>
 </html>

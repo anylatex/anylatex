@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-const remote = require('electron').remote
+const { ipcRenderer, remote } = require('electron')
 
 'use strict';
 
@@ -32,7 +32,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 var CMAP_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/cmaps/';
 var CMAP_PACKED = true;
 
-var DEFAULT_URL = remote.getGlobal('pdfPath');
+//var DEFAULT_URL = remote.getGlobal('pdfPath');
 var SEARCH_FOR = ''; // try 'Mozilla';
 
 var container = document.getElementById('viewerContainer');
@@ -62,15 +62,47 @@ document.addEventListener('pagesinit', function () {
 });
 
 // Loading document.
-var loadingTask = pdfjsLib.getDocument({
-  url: DEFAULT_URL,
-  cMapUrl: CMAP_URL,
-  cMapPacked: CMAP_PACKED,
-});
-loadingTask.promise.then(function(pdfDocument) {
-  // Document loaded, specifying document for the viewer and
-  // the (optional) linkService.
-  pdfViewer.setDocument(pdfDocument);
+var loadingPDF = (pdfPATH) => {
+    ipcRenderer.send('set-variable', { name: 'renderPDF', value: false })
+    var loadingTask = pdfjsLib.getDocument({
+        url: pdfPATH,
+        cMapUrl: CMAP_URL,
+        cMapPacked: CMAP_PACKED,
+    });
+    loadingTask.promise.then(function (pdfDocument) {
+        // Document loaded, specifying document for the viewer and
+        // the (optional) linkService.
+        pdfViewer.setDocument(pdfDocument);
 
-  pdfLinkService.setDocument(pdfDocument, null);
-});
+        pdfLinkService.setDocument(pdfDocument, null);
+    });
+
+}
+
+setInterval(() => {
+    const isCompileFinished = remote.getGlobal('isCompileFinish')
+    var loader = document.getElementById('loader')
+    if (isCompileFinished) {
+        if (loader.classList.contains('d-none')) {
+            return
+        }
+        // hide loader
+        loader.classList.add('d-none')
+        // render pdf
+        const pdfPath = remote.getGlobal('pdfPath')
+        if (pdfPath) {
+            loadingPDF(remote.getGlobal('pdfPath'))
+        }
+    } else if (isCompileFinished === false) {
+        // show loader
+        if(loader.classList.contains('d-none')) {
+            loader.classList.remove('d-none')
+        }
+        const hint = remote.getGlobal('compileHint')
+        document.getElementById('loader-hint').innerText = hint
+    } else {
+        if (!loader.classList.contains('d-none')) {
+            loader.classList.add('d-none')
+        }
+    }
+}, 100)
