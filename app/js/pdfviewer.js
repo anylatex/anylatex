@@ -61,9 +61,15 @@ document.addEventListener('pagesinit', function () {
   }
 });
 
+var lastScrollPageNumber = ''
+
 // Loading document.
 var loadingPDF = (pdfPATH) => {
     ipcRenderer.send('set-variable', { name: 'renderPDF', value: false })
+    const pageNumber = pdfViewer.currentPageNumber
+    if (pageNumber) {
+        lastScrollPageNumber = pageNumber
+    }
     var loadingTask = pdfjsLib.getDocument({
         url: pdfPATH,
         cMapUrl: CMAP_URL,
@@ -75,6 +81,11 @@ var loadingPDF = (pdfPATH) => {
         pdfViewer.setDocument(pdfDocument);
 
         pdfLinkService.setDocument(pdfDocument, null);
+        if (lastScrollPageNumber > 0) {
+            setTimeout(() => pdfViewer.scrollPageIntoView({pageNumber: lastScrollPageNumber}), 500)
+
+        }
+
     });
 
 }
