@@ -319,13 +319,54 @@
             </div>
           </div>
         
-        <div class="mt-2 w-100 p-3">
-          <p>Type math here: </p>
-          <textarea id="math-field" class="w-50"></textarea>
-          <p id="rendered-input-equation"></p>
-          <p>LaTeX of what you typed: <span id="latex"></span></p>
+        <div class="row mt-2 w-100 p-3">
+          <div class="col-5">
+            <p>Type math here: </p>
+            <textarea id="math-field" class="w-75"></textarea>
+            <p id="rendered-input-equation"></p>
+            <p>LaTeX: <span id="latex"></span></p>
+          </div>
+          <div class="col-7">
+            <p>Examples:</p>
+            <div class="row">
+              <div class="col asciimath-example" id="ex1">f'(x)=x^2</div>
+              <div class="col" id="render-ex1"></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col asciimath-example" id="ex2">sum_(i=1)^n i</div>
+              <div class="col" id="render-ex2"></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col asciimath-example" id="ex3">(a/b)/c</div>
+              <div class="col" id="render-ex3"></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col asciimath-example" id="ex4">sin^-1(x)</div>
+              <div class="col" id="render-ex4"></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col asciimath-example" id="ex5">x^2+y_1+z_12^34</div>
+              <div class="col" id="render-ex5"></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col asciimath-example" id="ex6">int_0^1f(x)dx</div>
+              <div class="col" id="render-ex6"></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col asciimath-example" id="ex7">[[a,b],[c,d]]((n),(k))</div>
+              <div class="col" id="render-ex7"></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col asciimath-example" id="ex8">sqrt sqrt root(3)(x)</div>
+              <div class="col" id="render-ex8"></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col asciimath-example" id="ex9">{(x^2 + x, if x!=0),(text{undefined},if x=0):}</div>
+              <div class="col" id="render-ex9"></div>
+            </div>
+          </div>
         </div>
-        </div>
+        <a href='http://asciimath.org/'>For full symbols' list</a>
         <div class="modal-footer">
           <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button"
             data-dismiss="modal">Confirm</button>
