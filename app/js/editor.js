@@ -707,65 +707,86 @@ for (const active of document.getElementsByClassName('context-menu-active')) {
 }
 
 $.contextMenu({
-    selector: 'img, table, equation',
+    selector: 'img, table, equation, h1, h2, h3, h4, h5, h6',
     callback: function(key, options) {
+        var type
         if (key === 'reference') {
-            const tagName = $(this).prop('tagName')
-            // currently only support making reference of numbered elements,
-            // such as images or tables with captions, numbered equations.
-            // Elements with no captions but also will have numbers are not supported.
-            // TODO 
-            var referenceData
-            if (tagName === 'IMG') {
-                const caption = $(this).attr('caption')
-                if (!caption) {
-                    alert('Can not make reference of images with no captions.')
-                    return
-                }
-                referenceData = {
-                    referenceLabel: $(this).attr('id'),
-                    title: 'Image Reference',
-                    content: `Reference to ${$(this).attr('caption')}`,
-                    cite: false,
-                    icon: '<i class="far fa-image"></i>'
-                }
-            } else if (tagName === 'TABLE') {
-                const caption = $(this).attr('caption')
-                if (!caption) {
-                    alert('Can not make reference of tables with no captions.')
-                    return
-                }
-                referenceData = {
-                    referenceLabel: $(this).attr('id'),
-                    title: 'Table Reference',
-                    content: `Reference to ${$(this).attr('caption')}`,
-                    cite: false,
-                    icon: '<i class="fas fa-table"></i>'
-                }
-            } else if (tagName === 'EQUATION') {
-                const displayStyle = $(this).attr('eq-style')
-                if (displayStyle != 'display-numbered') {
-                    alert('Can not make reference of unnumbered equations.')
-                    return
-                }
-                referenceData = {
-                    referenceLabel: $(this).attr('id'),
-                    title: 'Equation Reference',
-                    content: `Reference to an equation`,
-                    cite: false,
-                    icon: '<i class="fas fa-superscript"></i>'
-                }
-            }
-            const reference = getReferenceHTMLElement(referenceData)
-            insertElementAtCaret(reference.outerHTML)
+            type = 'element'
         }
+        else if (key === 'pageReference') {
+            type = 'page'
+        }
+        const tagName = $(this).prop('tagName')
+        // currently only support making reference of numbered elements,
+        // such as images or tables with captions, numbered equations.
+        // Elements with no captions but also will have numbers are not supported.
+        // TODO 
+        var referenceData
+        if (tagName === 'IMG') {
+            const caption = $(this).attr('caption')
+            if (!caption) {
+                alert('Can not make reference of images with no captions.')
+                return
+            }
+            referenceData = {
+                referenceLabel: $(this).attr('id'),
+                title: 'Image Reference',
+                content: `Reference to ${$(this).attr('caption')}`,
+                cite: false,
+                icon: '<i class="far fa-image"></i>'
+            }
+        } else if (tagName === 'TABLE') {
+            const caption = $(this).attr('caption')
+            if (!caption) {
+                alert('Can not make reference of tables with no captions.')
+                return
+            }
+            referenceData = {
+                referenceLabel: $(this).attr('id'),
+                title: 'Table Reference',
+                content: `Reference to ${$(this).attr('caption')}`,
+                cite: false,
+                icon: '<i class="fas fa-table"></i>'
+            }
+        } else if (tagName === 'EQUATION') {
+            const displayStyle = $(this).attr('eq-style')
+            if (displayStyle != 'display-numbered') {
+                alert('Can not make reference of unnumbered equations.')
+                return
+            }
+            referenceData = {
+                referenceLabel: $(this).attr('id'),
+                title: 'Equation Reference',
+                content: `Reference to an equation`,
+                cite: false,
+                icon: '<i class="fas fa-superscript"></i>'
+            }
+        } else if (tagName.startsWith('H')) {
+            // insert id into the heading
+            var headingID = $(this).attr('id')
+            if (!headingID) {
+                headingID = Math.random().toString(36).substr(2, 9)
+                $(this).attr('id', headingID)
+            }
+            const content = $(this).text()
+            referenceData = {
+                referenceLabel: headingID,
+                title: 'Heading reference',
+                content: `Refernce to heading ${content}`,
+                cite: false,
+                icon: '<i class="fas fa-heading"></i>'
+            }
+        }
+        const reference = getReferenceHTMLElement(referenceData, type)
+        insertElementAtCaret(reference.outerHTML)
     },
     items: {
         "reference": {name: "Make Reference of This", icon: "edit"},
+        "pageReference": {name: "Make Reference of This Page", icon: "edit"}
     }
 })
 
-function getReferenceHTMLElement(referenceData) {
+function getReferenceHTMLElement(referenceData, type) {
     const { referenceLabel, title, content, cite, sup, icon, bibtexText } = referenceData
     let reference = document.createElement('reference')
     reference.setAttribute('labels', referenceLabel)
@@ -784,7 +805,6 @@ function getReferenceHTMLElement(referenceData) {
     })
     // reference icon
     const insertedIcon = icon || '*'
-    reference.innerHTML = `<i class="fas fa-chevron-left"></i>${insertedIcon}<i class="fas fa-chevron-right"></i>`
     // cite or normal cross reference
     if (cite) {
         reference.classList.add('bibtex')
@@ -792,6 +812,15 @@ function getReferenceHTMLElement(referenceData) {
         reference.setAttribute('type', 'cite')
     } else {
         reference.setAttribute('type', 'label')
+    }
+    // whether refer to the page
+    reference.setAttribute('ref-type', type)
+    if (type === 'page') {
+        reference.innerHTML = `<i class="fas fa-paragraph"></i>: ${insertedIcon}`
+        reference.innerHTML = `<i class="fas fa-chevron-left"></i>${reference.innerHTML}<i class="fas fa-chevron-right"></i>`
+        reference.setAttribute('title', 'Page Referencing')
+    } else if (type === 'element') {
+        reference.innerHTML = `<i class="fas fa-chevron-left"></i>${insertedIcon}<i class="fas fa-chevron-right"></i>`
     }
     // whether sup
     if (cite && sup) {
