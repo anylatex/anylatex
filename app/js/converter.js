@@ -35,14 +35,19 @@ class Converter {
         return str.split('\n').join('')
     }
 
-    _convert_headings(headingValue, elementContent) {
+    _convert_headings(headingValue, elementContent, element) {
         let headingLatex = this.headings[headingValue]
         var parsedInnerLatex = ''
         if (!headingLatex) {
             console.log('warn: unsupported heaing: h1')
             parsedInnerLatex = `${elementContent}\n`
         } else {
-            parsedInnerLatex = `\\${headingLatex}{${elementContent}}\n`
+            const headingID = element.id
+            if (headingID) {
+                parsedInnerLatex = `\\${headingLatex}{${elementContent}} \\label{${headingID}}\n`
+            } else {
+                parsedInnerLatex = `\\${headingLatex}{${elementContent}}\n`
+            }
         }
         return parsedInnerLatex
     }
@@ -71,27 +76,27 @@ class Converter {
             switch (tagName) {
                 // Converting Heading
                 case 'H1':
-                    parsedInnerLatex = this._convert_headings(0, elementContent)
+                    parsedInnerLatex = this._convert_headings(0, elementContent, element)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'H2':
-                    parsedInnerLatex = this._convert_headings(1, elementContent)
+                    parsedInnerLatex = this._convert_headings(1, elementContent, element)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'H3':
-                    parsedInnerLatex = this._convert_headings(2, elementContent)
+                    parsedInnerLatex = this._convert_headings(2, elementContent, element)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'H4':
-                    parsedInnerLatex = this._convert_headings(3, elementContent)
+                    parsedInnerLatex = this._convert_headings(3, elementContent, element)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'H5':
-                    parsedInnerLatex = this._convert_headings(4, elementContent)
+                    parsedInnerLatex = this._convert_headings(4, elementContent, element)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 case 'H6':
-                    parsedInnerLatex = this._convert_headings(5, elementContent)
+                    parsedInnerLatex = this._convert_headings(5, elementContent, element)
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 // Converting references
@@ -104,8 +109,11 @@ class Converter {
                             parsedInnerLatex = `\\cite{${referenceLabel}}`
                         }
                     } else if (element.getAttribute('type') === 'label') {
+                        var refType = element.getAttribute('ref-type'), refCommand
+                        if (refType === 'element') refCommand = '\\ref'
+                        else if (refType === 'page') refCommand = '\\pageref'
                         // the end whitespace is needed
-                        parsedInnerLatex = `\\ref{${referenceLabel}}`
+                        parsedInnerLatex = `${refCommand}{${referenceLabel}}`
                     }
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
