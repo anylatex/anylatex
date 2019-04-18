@@ -547,28 +547,28 @@ function tableConfirm(event) {
 
 /* Equation input modal */
 
-var mathFieldSpan = document.getElementById('math-field');
+var mathInputField = document.getElementById('math-field');
 var latexSpan = document.getElementById('latex');
-
-var MQ = MathQuill.getInterface(2); // for backcompat
-var mathField = MQ.MathField(mathFieldSpan, {
-  spaceBehavesLikeTab: true, // configurable
-  handlers: {
-    edit: function() { // useful event handlers
-      latexSpan.textContent = mathField.latex(); // simple API
-    }
-  }
-});
-
+$(mathInputField).on('paste keyup input', () => {
+    // convert to LaTeX
+    const input = $(mathInputField).val()
+    const latex = AMTparseAMtoTeX(input)
+    latexSpan.innerText = latex
+    // render the equation
+    katex.render(latex, document.getElementById('rendered-input-equation'))
+})
 for (const equation of document.getElementsByClassName('equation-container')) {
     equation.addEventListener('click', equationClick)
 }
 document.getElementById('equation-confirm').addEventListener('click', equationConfirm)
 
 // render example equations
-MQ.StaticMath(document.getElementById('example-inline-equation'))
-MQ.StaticMath(document.getElementById('example-display-numbered-equation'))
-MQ.StaticMath(document.getElementById('example-display-unnumbered-equation'))
+const inlineEqExample = document.getElementById('example-inline-equation')
+katex.render(AMTparseAMtoTeX(inlineEqExample.innerText), inlineEqExample)
+const numberedEqExample = document.getElementById('example-display-numbered-equation')
+katex.render(AMTparseAMtoTeX(numberedEqExample.innerText), numberedEqExample)
+const unnumberedEqExample = document.getElementById('example-display-unnumbered-equation')
+katex.render(AMTparseAMtoTeX(unnumberedEqExample.innerText), unnumberedEqExample)
 
 function equationClick(event) {
     const target = event.target
@@ -615,7 +615,7 @@ function equationConfirm(event) {
         div.appendChild(equationSpan)
         insertElementAtCaret(div.outerHTML + '<br>')
     }
-    MQ.StaticMath(document.getElementById(equationID))
+    katex.render(latexSpan.innerText, document.getElementById(equationID))
 }
 
 /* Toolbar and Editor's handlers */
