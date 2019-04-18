@@ -569,6 +569,14 @@ const numberedEqExample = document.getElementById('example-display-numbered-equa
 katex.render(AMTparseAMtoTeX(numberedEqExample.innerText), numberedEqExample)
 const unnumberedEqExample = document.getElementById('example-display-unnumbered-equation')
 katex.render(AMTparseAMtoTeX(unnumberedEqExample.innerText), unnumberedEqExample)
+// render example use cases
+for (const example of document.getElementsByClassName('asciimath-example')) {
+    console.log(example.innerText)
+    const displayElement = document.getElementById(`render-${example.id}`)
+    katex.render(AMTparseAMtoTeX(example.innerText), displayElement, {
+        throwOnError: false
+    })
+}
 
 function equationClick(event) {
     const target = event.target
