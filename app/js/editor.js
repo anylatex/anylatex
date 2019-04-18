@@ -60,6 +60,8 @@ function insertElementAtCaret(html) {
     range.insertNode(frag);
     // force saving
     save(null, true)
+    // trigger content change event
+    editorContentChangeHandler(null)
 }
 
 /* Get Available Templates */
@@ -177,28 +179,17 @@ $('#reference-modal').on('hidden.bs.modal', () => {
     }
     let bibtexText = document.getElementById('reference-editor').innerText
 
-    let reference = document.createElement('reference')
-    reference.classList.add('reference')
-    reference.setAttribute('reference', bibtexText)
-    reference.setAttribute('labels', labelText)
-    reference.setAttribute('contenteditable', 'false')
-    // set up popover and enable it
-    reference.setAttribute('data-toggle', 'popover')
-    reference.setAttribute('title', labelText)
-    reference.setAttribute('data-content', bibtexText)
-    reference.setAttribute('data-trigger', 'hover')
-    reference.setAttribute('data-placement', 'top')
-    let id = '_' + Math.random().toString(36).substr(2, 9)
-    reference.setAttribute('id', id)
-    $(function () {
-        $('#'+id).popover()
-    })
-    if (document.getElementById('reference-sup-check').checked) {
-        reference.innerHTML = '<sup>[*]</sup>'
-    } else {
-        reference.innerHTML = '[*]'
+    const referenceData = {
+        referenceLabel: labelText,
+        title: labelText,
+        content: bibtexText,
+        cite: true,
+        sup: document.getElementById('reference-sup-check').checked,
+        icon: '<i class="far fa-file-alt"></i>',
+        bibtexText: bibtexText
     }
-    insertElementAtCaret('<span>' + reference.outerHTML + '</span>')
+    const reference = getReferenceHTMLElement(referenceData)
+    insertElementAtCaret(reference.outerHTML)
     // clear reference editor
     document.getElementById('reference-editor').innerHTML = ''
     labelEl.innerHTML = ''
@@ -522,7 +513,8 @@ function tableConfirm(event) {
     }
     const tableCaption = document.getElementById('table-caption').value || 'No Caption'
     const tablePopID = Math.random().toString(36).substr(2, 9)
-    var tableAttributes = `frame=${frame} ` + `rules=${rules} `
+    const tableID = Math.random().toString(36).substr(2, 9)
+    var tableAttributes = `id=${tableID}` + `frame=${frame} ` + `rules=${rules} `
                             + `row=${tableRowNumber} ` + `col=${tableColNumber} `
                             + 'data-toggle=popover ' + 'title=Caption '
                             + `data-content='${tableCaption}' ` + 'data-trigger=hover '
@@ -691,8 +683,9 @@ var lastSaveTime = -1
 var lastSaveHtml = ''
 var lastPartSaveTime = -1
 editor.addEventListener('keydown', editorKeyHandler)
-$('#editor').on('blur keyup paste input', save)
+$('#editor').on('blur keyup paste input', editorContentChangeHandler)
 $('#part-editor').on('blur keyup paste input', savePart)
+editor.addEventListener('mouseover', editorHoverHandler)
 document.addEventListener('selectionchange', editorSelectionHandler)
 $('#editor').bind('keyup click focus', editorCursorChange)
 // ctrl+s, force saving and recompiling
@@ -704,6 +697,110 @@ document.addEventListener('keydown', event => {
         }
     }
 })
+
+// register tables and images' context menu
+// first clear `context-menu-active` classes
+for (const active of document.getElementsByClassName('context-menu-active')) {
+    if (active.classList.contains('context-menu-active')) {
+        active.classList.remove('context-menu-active')
+    }
+}
+
+$.contextMenu({
+    selector: 'img, table, equation',
+    callback: function(key, options) {
+        if (key === 'reference') {
+            const tagName = $(this).prop('tagName')
+            // currently only support making reference of numbered elements,
+            // such as images or tables with captions, numbered equations.
+            // Elements with no captions but also will have numbers are not supported.
+            // TODO 
+            var referenceData
+            if (tagName === 'IMG') {
+                const caption = $(this).attr('caption')
+                if (!caption) {
+                    alert('Can not make reference of images with no captions.')
+                    return
+                }
+                referenceData = {
+                    referenceLabel: $(this).attr('id'),
+                    title: 'Image Reference',
+                    content: `Reference to ${$(this).attr('caption')}`,
+                    cite: false,
+                    icon: '<i class="far fa-image"></i>'
+                }
+            } else if (tagName === 'TABLE') {
+                const caption = $(this).attr('caption')
+                if (!caption) {
+                    alert('Can not make reference of tables with no captions.')
+                    return
+                }
+                referenceData = {
+                    referenceLabel: $(this).attr('id'),
+                    title: 'Table Reference',
+                    content: `Reference to ${$(this).attr('caption')}`,
+                    cite: false,
+                    icon: '<i class="fas fa-table"></i>'
+                }
+            } else if (tagName === 'EQUATION') {
+                const displayStyle = $(this).attr('eq-style')
+                if (displayStyle != 'display-numbered') {
+                    alert('Can not make reference of unnumbered equations.')
+                    return
+                }
+                referenceData = {
+                    referenceLabel: $(this).attr('id'),
+                    title: 'Equation Reference',
+                    content: `Reference to an equation`,
+                    cite: false,
+                    icon: '<i class="fas fa-superscript"></i>'
+                }
+            }
+            const reference = getReferenceHTMLElement(referenceData)
+            insertElementAtCaret(reference.outerHTML)
+        }
+    },
+    items: {
+        "reference": {name: "Make Reference of This", icon: "edit"},
+    }
+})
+
+function getReferenceHTMLElement(referenceData) {
+    const { referenceLabel, title, content, cite, sup, icon, bibtexText } = referenceData
+    let reference = document.createElement('reference')
+    reference.setAttribute('labels', referenceLabel)
+    reference.setAttribute('contenteditable', 'false')
+    // set up popover and enable it
+    reference.setAttribute('data-toggle', 'popover')
+    reference.setAttribute('title', title)
+    reference.setAttribute('data-content', content)
+    reference.setAttribute('data-trigger', 'hover')
+    reference.setAttribute('data-placement', 'top')
+    let id = '_' + Math.random().toString(36).substr(2, 9)
+    reference.setAttribute('id', id)
+    // enable popover
+    $(function () {
+        $('#'+id).popover()
+    })
+    // reference icon
+    const insertedIcon = icon || '*'
+    reference.innerHTML = `<i class="fas fa-chevron-left"></i>${insertedIcon}<i class="fas fa-chevron-right"></i>`
+    // cite or normal cross reference
+    if (cite) {
+        reference.classList.add('bibtex')
+        reference.setAttribute('bibtex', bibtexText)
+        reference.setAttribute('type', 'cite')
+    } else {
+        reference.setAttribute('type', 'label')
+    }
+    // whether sup
+    if (cite && sup) {
+        reference.setAttribute('sup', true)
+        reference.innerHTML = `<sup>${reference.innerHTML}</sup>`
+    }
+    // return html element
+    return reference
+}
 
 function save(event, force=false) {
     if (Date.now() - lastSaveTime < 2000 && !force) {
@@ -746,6 +843,55 @@ function savePart(event, force=false) {
         }
     })
     lastPartSaveTime = Date.now()
+}
+
+var curHighlightedRefedElement
+// clear previously highlighted element
+for (const ele of document.getElementsByClassName('referenced-highlight')) {
+    ele.classList.remove('referenced-highlight')
+}
+function editorHoverHandler(event) {
+    const target = event.target
+    const tagName = target.tagName
+    // clear previously highlighted element
+    if (curHighlightedRefedElement) {
+        curHighlightedRefedElement.classList.remove('referenced-highlight')
+    }
+    if (tagName === 'REFERENCE') {
+        const referencedID = target.getAttribute('labels')
+        curHighlightedRefedElement = document.getElementById(referencedID)
+        if (curHighlightedRefedElement) {
+            curHighlightedRefedElement.classList.add('referenced-highlight')
+        }
+    }
+}
+
+function editorContentChangeHandler(event) {
+    // check unfounded reference elements
+    for (const reference of document.getElementsByTagName('reference')) {
+        if (reference.getAttribute('type') === 'cite') continue
+        const referenceID = reference.getAttribute('labels')
+        const referencedElement = document.getElementById(referenceID)
+        if (!referencedElement && !reference.classList.contains('unfounded-reference-highlight')) {
+            reference.classList.add('unfounded-reference-highlight')
+            reference.setAttribute('data-content', reference.getAttribute('data-content') + '(missing)')
+        } else if (referencedElement && reference.classList.contains('unfounded-reference-highlight')) {
+            // for some reason, reference founded again.
+            const tagName = referencedElement.tagName
+            if (tagName === 'IMG' || tagName === 'TABLE') {
+                if (!referencedElement.getAttribute('caption')) {
+                    continue
+                }
+            } else if (tagName === 'EQUATION') {
+                if (referencedElement.getAttribute('eq-style') != 'display-numbered') {
+                    continue
+                }
+            }
+            reference.classList.remove('unfounded-reference-highlight')
+            reference.setAttribute('data-content', reference.getAttribute('data-content').replace('(missing)', ''))
+        }
+    }
+    save(event)
 }
 
 function editorKeyHandler(event) {
@@ -1112,8 +1258,8 @@ function compile() {
 
     // get references
     var references = ''
-    for (const refEl of document.getElementsByClassName('reference')) {
-        let referenceText = refEl.getAttribute('reference')
+    for (const refEl of document.getElementsByClassName('bibtex')) {
+        let referenceText = refEl.getAttribute('bibtex')
         references += referenceText
     }
     args.references = references
