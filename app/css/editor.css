@@ -75,7 +75,13 @@
 reference > * {
   pointer-events: none;
 }
-.referenced-highlight {
+table > * {
+  pointer-events: none;
+}
+equation > * {
+  pointer-events: none;
+}
+.reference-highlight {
   outline: 2px groove orange;
 }
 .unfounded-reference-highlight {
