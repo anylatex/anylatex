@@ -514,13 +514,13 @@ function tableConfirm(event) {
     const tableCaption = document.getElementById('table-caption').value || 'No Caption'
     const tablePopID = Math.random().toString(36).substr(2, 9)
     const tableID = Math.random().toString(36).substr(2, 9)
-    var tableAttributes = `id=${tableID}` + `frame=${frame} ` + `rules=${rules} `
+    var tableAttributes = `id=${tableID} ` + `frame=${frame} ` + `rules=${rules} `
                             + `row=${tableRowNumber} ` + `col=${tableColNumber} `
                             + 'data-toggle=popover ' + 'title=Caption '
                             + `data-content='${tableCaption}' ` + 'data-trigger=hover '
                             + `data-placement=top ` + `popid=${tablePopID} `
     if (tableCaption != 'No Caption') tableAttributes += `caption=${tableCaption}`
-    let html = [`<table ${tableAttributes}`]
+    let html = [`<table style="margin: 0px auto;" ${tableAttributes}`]
     let colInRow = ''
     html.push('<tr>')
     for (let i = 0; i < tableColNumber; i++) {
