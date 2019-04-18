@@ -72,6 +72,16 @@
   min-width: 30px;
 }
 
+reference > * {
+  pointer-events: none;
+}
+.referenced-highlight {
+  outline: 2px groove orange;
+}
+.unfounded-reference-highlight {
+  outline: 1px solid red;
+}
+
 .block-container > * {
   pointer-events: none;
 }
@@ -144,7 +154,7 @@ a.anchor-link:hover {
 }
 
 /* Remove default bullets */
-ul, #tree{
+ul#tree{
   list-style-type: none;
   height: 80%;
 }

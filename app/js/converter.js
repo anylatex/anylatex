@@ -12,10 +12,15 @@ class Converter {
     }
 
     convert(html) {
+        html = this._decode_html_space(html)
         this.translatedLatex = '%s'
         let convertedElements = this._convert_elements(html)
         this.translatedLatex = util.format(this.translatedLatex, convertedElements)
         return this.translatedLatex
+    }
+
+    _decode_html_space(html) {
+        return html.replace(/&nbsp;/g, ' ')
     }
 
     _getDOM(html) {
@@ -57,7 +62,8 @@ class Converter {
             let outerHTML = this._into_one_line(element.outerHTML)
             let tagName = element.tagName
             if (element.textContent == '' && tagName != 'IMG' && !outerHTML.includes('<img')
-                && tagName != 'EQUATION' && !outerHTML.includes('<equation')) {
+                && tagName != 'EQUATION' && !outerHTML.includes('<equation')
+                && tagName != 'REFERENCE' && !outerHTML.includes('<reference')) {
                 console.log('ignore:', tagName)
                 latex = latex.replace(outerHTML, "")
                 continue
@@ -90,10 +96,16 @@ class Converter {
                     break
                 // Converting references
                 case 'REFERENCE':
-                    if (element.children[0] && element.children[0].tagName == 'SUP') {
-                        parsedInnerLatex = `\\supercite{${element.getAttribute('labels')}}`
-                    } else {
-                        parsedInnerLatex = `\\cite{${element.getAttribute('labels')}}`
+                    var referenceLabel = element.getAttribute('labels')
+                    if (element.getAttribute('type') === 'cite') {
+                        if (element.getAttribute('sup')) {
+                            parsedInnerLatex = `\\supercite{${referenceLabel}}`
+                        } else {
+                            parsedInnerLatex = `\\cite{${referenceLabel}}`
+                        }
+                    } else if (element.getAttribute('type') === 'label') {
+                        // the end whitespace is needed
+                        parsedInnerLatex = `\\ref{${referenceLabel}}`
                     }
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
@@ -113,6 +125,7 @@ class Converter {
                         if (caption) {
                             parsedInnerLatex += `\\caption{${caption}}\n`
                         }
+                        parsedInnerLatex += `\\label{${imgID}}\n`
                         parsedInnerLatex += '\\end{figure}'
                     }
                     latex = latex.replace(outerHTML, parsedInnerLatex)
@@ -180,6 +193,7 @@ class Converter {
                     parsedInnerLatex += `\\begin{tabular}{${rowFormat}}\n`
                                         + parsedRows
                                         + '\\end{tabular}\n'
+                                        + `\\label{${element.id}}\n`
                                         + '\\end{table}'
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
@@ -192,6 +206,7 @@ class Converter {
                     } else if (equationStyle === 'display-numbered') {
                         parsedInnerLatex = '\n\\begin{equation}\n'
                                             + equationLatex + '\n'
+                                            + `\\label{${element.id}}\n`
                                             + '\\end{equation}\n'
                     } else if (equationStyle === 'display-unnumbered') {
                         parsedInnerLatex = '\n\\begin{displaymath}\n'
