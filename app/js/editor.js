@@ -121,6 +121,9 @@ var compiledHtml = ''
         }
     }
 
+    // generate outline tree
+    generateOutline()
+
     // Load compiled PDF
     if (pdfExists != false) {
         // TODO: check if content in editor corresponding to the existed pdf
@@ -1559,7 +1562,7 @@ function generateOutline() {
             span.className = 'caret'
             element.appendChild(span)
             var ul = document.createElement('ul')
-            ul.setAttribute('id', hashId)
+            ul.setAttribute('id', 'anchor' + hashId)
             ul.className = 'nested'
             element.appendChild(ul)
         } else {
@@ -1578,7 +1581,7 @@ function generateOutline() {
                 getChildrenList[childrenId],
                 childrenId
             )
-            document.querySelector("ul[id='"+parentId+"']").appendChild(children)
+            document.querySelector("ul[id='anchor"+parentId+"']").appendChild(children)
             makeChildrenElements(getChildrenList[childrenId], childrenId)
         }
     }

@@ -31,15 +31,15 @@
   border: 1.5px solid grey;
 }
 .editor h1 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 .editor h2 {
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   font-weight: bold;
 }
 .editor h3 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: bold;
 }
 .editor h4 {
@@ -150,6 +150,7 @@ equation > * {
 }
 
 a.anchor-link {
+  font-size: 0.9rem;
   color: #000000;
   text-decoration:none;
   transition: transform .3s;
@@ -163,6 +164,7 @@ a.anchor-link:hover {
 ul#tree{
   list-style-type: none;
   height: 80%;
+  overflow-x: hidden;
 }
 
 /* Style the caret/arrow */
