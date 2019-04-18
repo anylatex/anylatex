@@ -779,6 +779,14 @@ $.contextMenu({
         }
         const reference = getReferenceHTMLElement(referenceData, type)
         insertElementAtCaret(reference.outerHTML)
+        // add the reference element's id to the referenced element
+        let refEleIDs = $(this).attr('refs')
+        if (!refEleIDs) {
+            refEleIDs = reference.id
+        } else {
+            refEleIDs += `,${reference.id}`
+        }
+        $(this).attr('refs', refEleIDs)
     },
     items: {
         "reference": {name: "Make Reference of This", icon: "edit"},
@@ -874,24 +882,51 @@ function savePart(event, force=false) {
     lastPartSaveTime = Date.now()
 }
 
-var curHighlightedRefedElement
-// clear previously highlighted element
-for (const ele of document.getElementsByClassName('referenced-highlight')) {
-    ele.classList.remove('referenced-highlight')
-}
 function editorHoverHandler(event) {
     const target = event.target
     const tagName = target.tagName
     // clear previously highlighted element
-    if (curHighlightedRefedElement) {
-        curHighlightedRefedElement.classList.remove('referenced-highlight')
+    for (const ele of document.getElementsByClassName('reference-highlight')) {
+        ele.classList.remove('reference-highlight')
     }
     if (tagName === 'REFERENCE') {
         const referencedID = target.getAttribute('labels')
-        curHighlightedRefedElement = document.getElementById(referencedID)
-        if (curHighlightedRefedElement) {
-            curHighlightedRefedElement.classList.add('referenced-highlight')
+        const ele = document.getElementById(referencedID)
+        if (ele) {
+            ele.classList.add('reference-highlight')
         }
+    } else {
+        const refEleIDs = target.getAttribute('refs')
+        if (!refEleIDs) {
+            return
+        }
+        const refs = refEleIDs.split(',')
+        let newRefs = Array()
+        for (const refID of refs) {
+            const ref = document.getElementById(refID)
+            if (ref) {
+                ref.classList.add('reference-highlight')
+                newRefs.push(refID)
+            }
+        }
+        // update reference times
+        var popoverContent = target.getAttribute('data-content')
+        if (!popoverContent) {
+            return
+        }
+        var contentParts = popoverContent.split('|')
+        if (/Referenced\s\d\stimes/.test(contentParts[contentParts.length - 1])) {
+            contentParts[contentParts.length - 1] = ` Referenced ${newRefs.length} times`
+        } else {
+            contentParts.push(`Referenced ${newRefs.length} times`)
+        }
+        contentParts = contentParts.map((val) => {
+            return val.trim()
+        })
+        target.setAttribute('data-content', contentParts.join(' | '))
+        target.setAttribute('refs', newRefs.join(','))
+        $(target).popover('hide')
+        $(target).popover('show')
     }
 }
 
