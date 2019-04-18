@@ -3,13 +3,13 @@
 
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathquill@0.10.1-a/build/mathquill.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/editor.css">
   <link rel="stylesheet" href="../node_modules/spinkit/css/spinkit.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
   <link rel="stylesheet" href="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css">
+  <link rel="stylesheet" href="../node_modules/katex/dist/katex.css">
 
   <title>Editor</title>
 </head>
@@ -320,7 +320,9 @@
           </div>
         
         <div class="mt-2 w-100 p-3">
-          <p>Type math here: <span id="math-field" class="w-50"></span></p>
+          <p>Type math here: </p>
+          <textarea id="math-field" class="w-50"></textarea>
+          <p id="rendered-input-equation"></p>
           <p>LaTeX of what you typed: <span id="latex"></span></p>
         </div>
         </div>
@@ -339,10 +341,12 @@
   <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathquill@0.10.1-a/build/mathquill.js"></script>
   <script src="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.js"></script>
   <script src="../node_modules/jquery-contextmenu/dist/jquery.ui.position.js"></script>
   <script src="../node_modules/interactjs/dist/interact.js"></script>
+  <script src="../node_modules/katex/dist/katex.js"></script>
+  <script src="js/ASCIIMathML.js"></script>
+  <script src="js/ASCIIMathTeXImg.js"></script>
   <script src="js/editor.js"></script>
 </body>
 
