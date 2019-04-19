@@ -16,7 +16,8 @@
     "popper.js": "^1.15.0",
     "rimraf": "^2.6.3",
     "split.js": "^1.5.10",
-    "superagent": "^5.0.2"
+    "superagent": "^5.0.2",
+    "webpack": "^4.30.0"
   },
   "devDependencies": {
     "electron": "^4.0.5",
@@ -34,12 +35,17 @@
       "target": [
         "zip"
       ]
+    },
+    "mac": {
+      "target": [
+        "dmg", "zip"
+      ]
     }
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron app.js",
-    "dist": "electron-builder --win --linux --x64"
+    "dist": "electron-builder --win --linux --mac --x64"
   },
   "author": "gyh",
   "license": "ISC"
