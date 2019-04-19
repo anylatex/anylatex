@@ -4,6 +4,8 @@
 *.eslintrc.json
 # config
 config.json
+# build
+dist/
 
 # Logs
 logs
