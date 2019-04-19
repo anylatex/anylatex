@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+const path = require('path')
 const { ipcRenderer, remote } = require('electron')
 
 'use strict';
@@ -24,12 +25,11 @@ if (!pdfjsLib.getDocument || !pdfjsViewer.PDFViewer) {
 
 // The workerSrc property shall be specified.
 //
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.worker.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc = path.resolve(__dirname, '../node_modules/pdfjs-dist/build/pdf.worker.js')
 
 // Some PDFs need external cmaps.
 //
-var CMAP_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/cmaps/';
+var CMAP_URL = path.resolve(__dirname, "../node_modules/pdfjs-dist/cmaps/") + '/'
 var CMAP_PACKED = true;
 
 //var DEFAULT_URL = remote.getGlobal('pdfPath');
