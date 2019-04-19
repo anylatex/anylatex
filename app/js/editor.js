@@ -901,6 +901,7 @@ function save(event, force=false) {
     const startTime = Date.now()
     document.getElementById('save-hint').classList.add('d-none')
     document.getElementById('save-loader').classList.remove('d-none')
+    document.getElementById('save-button').title = 'saving'
     const content = document.getElementById('editor').innerHTML
     store.updateDocument({
         id: documentID,
@@ -910,10 +911,12 @@ function save(event, force=false) {
         setTimeout(() => {
             document.getElementById('save-hint').classList.remove('d-none')
             document.getElementById('save-loader').classList.add('d-none')
+            document.getElementById('save-button').title = 'saved'
         }, 1000)
     } else {
         document.getElementById('save-hint').classList.remove('d-none')
         document.getElementById('save-loader').classList.add('d-none')
+        document.getElementById('save-button').title = 'saved'
     }
     lastSaveTime = Date.now()
     lastSaveHtml = editor.innerHTML
@@ -1188,13 +1191,13 @@ function setTemplateArguments(templateName){
     partArgsDiv.innerHTML = ''
     if (!currentTemplateArgs) {
         // no args
-        if (templateModalButton.classList.contains('disabled') < 0 ) {
-            templateModalButton.classList.add('disabled')
+        if (!templateModalButton.classList.contains('d-none')) {
+            templateModalButton.classList.add('d-none')
         }
         return
     }
-    if (templateModalButton.classList.contains('disabled') >= 0) {
-        templateModalButton.classList.remove('disabled')
+    if (templateModalButton.classList.contains('d-none')) {
+        templateModalButton.classList.remove('d-none')
     }
     let argNames = Object.keys(currentTemplateArgs)
     for (let i = 0; i < argNames.length; i++) {

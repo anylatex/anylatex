@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/editor.css">
-  <link rel="stylesheet" href="../node_modules/spinkit/css/spinkit.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
   <link rel="stylesheet" href="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css">
   <link rel="stylesheet" href="../node_modules/katex/dist/katex.css">
@@ -16,77 +15,64 @@
 
 <body style="height: 95%; overflow: hidden;">
 
-  <nav id="navbar" class="navbar fixed-top navbar-light bg-light w-100 editor-navbar">
+  <nav id="navbar" class="navbar fixed-top navbar-light bg-light w-100 editor-navbar justify-content-center">
     <!-- toolbar -->
-    <div class="row align-items-center justify-content-center no-gutters w-100 h-75">
-      <div class="col-sm-12 col-md-11 col-lg-10 col-xl-9">
-        <div id="toolbar" class="btn-group h-100" role="group">
-          <button command="return" class="btn btn-light btn-sm mr-3" type="button"><img class="img-fluid"
-              src="assets/editor/left-arrow.png" /></button>
-          <button command="bold" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/bold.png" /></button>
-          <button command="italic" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/italic.png" /></button>
-          <button command="underline" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/underline.png" /></button>
-          <button command="justifyLeft" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/left-align.png" /></button>
-          <button command="justifyCenter" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/align-center.png" /></button>
-          <button command="justifyRight" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/right-align.png" /></button>
-          <button command="justifyFull" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/justify.png" /></button>
-          <button command="insertUnorderedList" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/list.png" /></button>
-          <button command="insertOrderedList" value="" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/list-1.png" /></button>
-          <button class="btn btn-light btn-sm modal-open-button" type="button" data-toggle="modal"
-            data-target="#reference-modal" tab-index="-1" role="dialog" aria-labelledby="referenceModal"><img class="img-fluid"
-              src="assets/editor/reference.png" /></button>
-          <button id="open-image-selector" class="btn btn-light btn-sm modal-open-button" type="button" data-toggle="modal"
-            data-target="#image-modal" tab-index="-1" role="dialog" aria-labelledby="imageModal"><img class="img-fluid"
-              src="assets/editor/image.png" /></button>
-          <button id="open-table-selector" class="btn btn-light btn-sm modal-open-button" type="button" data-toggle="modal"
-            data-target="#table-modal" tab-index="-1" role="dialog" aria-labelledby="tableModal"><img class="img-fluid"
-              src="assets/editor/grid.png" /></button>
-          <div class="btn-group" role="group">
-            <button type="button" class="btn btn-light btn-sm dropdown-toggle font-weight-bolder" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false">
-              Sections
-            </button>
-            <div id="headings-dropdown" class="dropdown-menu">
-            </div>
-          </div>
-          <button id="open-equation-selector" class="btn btn-light btn-sm modal-open-button" type="button" data-toggle="modal"
-            data-target="#equation-modal" tab-index="-1" role="dialog" aria-labelledby="equationModal"><img class="img-fluid"
-              src="assets/editor/symbol.png" /></button>
-          <div class="btn-group" role="group">
-            <button id="dropdown-button" type="button" class="btn btn-light btn-sm dropdown-toggle font-weight-bolder"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Templates
-            </button>
-            <div class="dropdown-menu" id="templates-dropdown">
-              <input type="hidden" value="" id="current-template" />
-            </div>
-          </div>
-          <button id="compile" class="btn btn-light btn-sm" type="button"><img class="img-fluid"
-              src="assets/editor/profits.png" /></button>
-          <button id="arguments-modal-button" class="btn btn-light btn-sm ml-2 font-weight-bold disabled modal-open-button" type="button"
-            data-toggle="modal" data-target="#arguments-modal">TemplateArguments</button>
+    <div id="toolbar" class="btn-group h-100" role="group">
+      <button command="return" class="btn btn-light mr-3" type="button"><i
+          class="fas fa-long-arrow-alt-left"></i></button>
+      <button command="bold" value="" class="btn btn-light" type="button"><i class="fas fa-bold"></i></button>
+      <button command="italic" value="" class="btn btn-light" type="button"><i class="fas fa-italic"></i></button>
+      <button command="underline" value="" class="btn btn-light" type="button"><i class="fas fa-underline"></i></button>
+      <button command="justifyLeft" value="" class="btn btn-light" type="button"><i
+          class="fas fa-align-left"></i></button>
+      <button command="justifyCenter" value="" class="btn btn-light" type="button"><i
+          class="fas fa-align-center"></i></button>
+      <button command="justifyRight" value="" class="btn btn-light" type="button"><i
+          class="fas fa-align-right"></i></button>
+      <button command="justifyFull" value="" class="btn btn-light" type="button"><i
+          class="fas fa-align-justify"></i></button>
+      <button command="insertUnorderedList" value="" class="btn btn-light" type="button"><i
+          class="fas fa-list-ul"></i></button>
+      <button command="insertOrderedList" value="" class="btn btn-light" type="button"><i
+          class="fas fa-list-ol"></i></button>
+      <button class="btn btn-light modal-open-button" type="button" data-toggle="modal" data-target="#reference-modal"
+        tab-index="-1" role="dialog" aria-labelledby="referenceModal"><i class="fas fa-book"></i></button>
+      <button id="open-image-selector" class="btn btn-light modal-open-button" type="button" data-toggle="modal"
+        data-target="#image-modal" tab-index="-1" role="dialog" aria-labelledby="imageModal"><i
+          class="far fa-images"></i></button>
+      <button id="open-table-selector" class="btn btn-light modal-open-button" type="button" data-toggle="modal"
+        data-target="#table-modal" tab-index="-1" role="dialog" aria-labelledby="tableModal"><i
+          class="fas fa-table"></i></button>
+      <button id="open-equation-selector" class="btn btn-light modal-open-button" type="button" data-toggle="modal"
+        data-target="#equation-modal" tab-index="-1" role="dialog" aria-labelledby="equationModal"><i
+          class="fas fa-square-root-alt"></i></button>
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-light dropdown-toggle font-weight-bolder" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          Sections
+        </button>
+        <div id="headings-dropdown" class="dropdown-menu">
         </div>
       </div>
-      <div class="col-1 pl-3">
-          <div id="save-loader" class="sk-wave pt-3 pb-2 d-none">
-              <div class="sk-rect sk-rect1"></div>
-              <div class="sk-rect sk-rect2"></div>
-              <div class="sk-rect sk-rect3"></div>
-            </div>
-          <div id="save-hint" class="text-muted font-weight-bold">
-            saved &#x2714
-          </div>
+      <div class="btn-group" role="group">
+        <button id="dropdown-button" type="button" class="btn btn-light dropdown-toggle font-weight-bolder"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Templates
+        </button>
+        <div class="dropdown-menu" id="templates-dropdown">
+          <input type="hidden" value="" id="current-template" />
+        </div>
       </div>
-    </div>
+      <button id="arguments-modal-button" class="btn btn-light font-weight-bold d-none modal-open-button" type="button"
+        data-toggle="modal" data-target="#arguments-modal">TemplateArguments</button>
+      <button id="compile" class="btn btn-light" type="button"><i class="fas fa-sync"></i></button>
+      <button id="save-button" title="saved" class="btn disabled font-weight-bold"
+        style="white-space: nowrap; cursor: default">
+        <div id="save-loader" class="d-none" role="status">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </div>
+        <span id="save-hint">&#x2714</span>
+      </button>
   </nav>
 
   <div class="row mt-5 mb-4 ml-2 mr-2 w-100 h-100">
