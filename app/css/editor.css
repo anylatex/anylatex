@@ -11,6 +11,9 @@
 .editor-navbar {
   height: 6%;
 }
+#toolbar > button {
+  font-size: 2.3vh;
+}
 
 #editor-panel {
   height: 93%;
