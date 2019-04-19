@@ -1,6 +1,6 @@
 {
   "name": "anylatex",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "app.js",
   "dependencies": {
@@ -33,7 +33,7 @@
     },
     "linux": {
       "target": [
-        "zip"
+        "deb", "zip"
       ]
     },
     "mac": {
@@ -45,8 +45,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron app.js",
-    "dist": "electron-builder --win --linux --mac --x64"
+    "dist": "electron-builder --win --linux --x64",
+    "release": "electron-builder --publish always"
   },
-  "author": "gyh",
-  "license": "ISC"
+  "homepage": "https://github.com/anylatex/anylatex",
+  "author": {
+    "name": "gyh",
+    "email": "guoyh01@gmail.com"
+  },
+  "license": "MIT"
 }
