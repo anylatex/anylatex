@@ -302,7 +302,216 @@
           <h5 class="modal-title">Insert equations:</h5>
         </div>
         <div class="modal-body">
-          <div class="row w-100 h-75 justify-content-center">
+          <div id="math-button-panel" class="w-100 p-3">
+            <div class="row">Common letters:</div>
+            <div class="row">
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="alpha"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="beta"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="gamma"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="delta"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="epsilon"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="varepsilon"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="theta"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="lambda"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="pi"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="Pi"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="mu"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="rho"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="sigma"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="phi"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="Phi"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="chi"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="psi"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="Psi"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="Omega"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title='bb{AaBbCc}'></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title='bbb{AaBbCc}'></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title='cc{AaBbCc}'></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title='tt{AaBbCc}'></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title='fr{AaBbCc}'></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title='sf{AaBbCc}'></button>
+            </div>
+            <div class="row mt-1 mb-1">Operation symbols:</div>
+            <div class="row">
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="+"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="-"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="*"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="**"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="***"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="xx"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="-:"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="|><|"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="o+"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="ox"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="o."></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="sum_(i=1)^n i"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="prod"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="^^"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="^^^"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="vv"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="vvv"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="nn"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="nnn"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="uu"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="uuu"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="nnn"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="abs(x)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="floor(x)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="ceil(x)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="norm(vecx)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="[[a,b],[c,d]]"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="((n),(k))"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="sin(x)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="sin^1(x)"></button>
+            </div>
+            <div class="row mt-1 mb-1">Miscellaneous symbols:</div>
+            <div class="row">
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="2/3"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="2^3"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="sqrt x"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="root(3)(x)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="int_0^1 dx"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="oint"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="del"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="grad"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="+-"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="O/"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="oo"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="aleph"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title=":."></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title=":'"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="|...|"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="|cdots|"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="/_"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="/_\"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="uarr"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="darr"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="rarr"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="larr"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="rArr"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="lArr"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="hArr"></button>
+            </div>
+            <div class="row mt-1 mb-1">Relation symbols:</div>
+            <div class="row">
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="="></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="!="></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="<"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title=">"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="<="></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title=">="></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="-<"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="-<="></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title=">-"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title=">-="></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="in"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="!in"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="sub"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="sup"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="sube"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="supe"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="-="></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="~="></button>
+            </div>
+            <div class="row mt-1 mb-1">Logical symbols:</div>
+            <div class="row">
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="and"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="or"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="not"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="=>"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="if"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="<=>"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="AA"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="EE"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="_|_"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="TT"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="|--"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="|=="></button>
+            </div>
+            <div class="row mt-1 mb-1">Accents:</div>
+            <div class="row">
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="hat x"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="bar x"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="ul x"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="vec x"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="dot x"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="ddot x"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="overset(x)(=)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="underset(x)(=)	"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="ubrace(1+2)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="obrace(1+2)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="color(red)(x)"></button>
+              <button class="col btn btn-light btn-sm math-buttons m-1" title="cancel(x)"></button>
+            </div>
+            <div class="row mt-2 text-muted">Full symbol list at http://asciimath.org/</div>
+          </div>
+
+          <div class="mt-2 ml-3">
+            <div class="row">
+              <strong>Type math below:&nbsp;</strong>
+              <span class="text-muted">(starts with "\" to input latex command)</span>
+            </div>
+            <div class="row mt-2"><textarea id="math-field" class="w-75"></textarea></div>
+            <div class="row mt-3 mb-3" id="rendered-input-equation"></div>
+            <div class="row mt-2"><strong>LaTeX: </strong><span id="latex"></span></div>
+          </div>
+
+          <div class="w-100 mt-4">
+            <button class="btn btn-outline-dark" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                Click to see some examples
+            </button>
+            <div class="collapse" id="collapseExample">
+              <div class="card card-body">
+                <table border="1" cellpadding="10">
+                  <tr>
+                    <th>Input</th>
+                    <th>Display</th>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex1">f'(x)=x^2</td>
+                    <td id="render-ex1"></td>
+                  </div>
+                  <tr>
+                    <td class="asciimath-example" id="ex2">sqrt sqrt root3x</td>
+                    <td id="render-ex2"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex3">(a/b)/c</td>
+                    <td id="render-ex3"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex4">(a,b]={x in RR | a < x <= b}</td>
+                    <td id="render-ex4"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex5">x^2+y_1+z_12^34</td>
+                    <td id="render-ex5"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex6">stackrel"def"= or \stackrel{\Delta}{=}" "("or ":=)</td>
+                    <td id="render-ex6"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex7"><< a,b >> and {:(x,y),(u,v):}</td>
+                    <td id="render-ex7"></td>
+                  </div>
+                  <tr>
+                    <td class="asciimath-example" id="ex8">{::}_(\ 92)^238U</td>
+                    <td id="render-ex8"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex9">{(x^2 + x, if x!=0),(text{undefined},if x=0):}</td>
+                    <td id="render-ex9"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex10">d/dxf(x) = lim_(h->0)(f(x+h)-f(x))/h</td>
+                    <td id="render-ex10"></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4 w-100 h-75 justify-content-center">
             <div class="col-auto p-2 m-1 block-container equation-container" eq-style="inline">
               <p><b>Inline Mode</b></p>
               <p>Equation is <span id="example-inline-equation">f(x) = x^2</span>.</p>
@@ -318,55 +527,7 @@
               <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-unnumbered-equation">f(x) = x^2</span></p>
             </div>
           </div>
-        
-        <div class="row mt-2 w-100 p-3">
-          <div class="col-5">
-            <p>Type math here: </p>
-            <textarea id="math-field" class="w-75"></textarea>
-            <p id="rendered-input-equation"></p>
-            <p>LaTeX: <span id="latex"></span></p>
-          </div>
-          <div class="col-7">
-            <p>Examples:</p>
-            <div class="row">
-              <div class="col asciimath-example" id="ex1">f'(x)=x^2</div>
-              <div class="col" id="render-ex1"></div>
-            </div>
-            <div class="row mt-3">
-              <div class="col asciimath-example" id="ex2">sum_(i=1)^n i</div>
-              <div class="col" id="render-ex2"></div>
-            </div>
-            <div class="row mt-3">
-              <div class="col asciimath-example" id="ex3">(a/b)/c</div>
-              <div class="col" id="render-ex3"></div>
-            </div>
-            <div class="row mt-3">
-              <div class="col asciimath-example" id="ex4">sin^-1(x)</div>
-              <div class="col" id="render-ex4"></div>
-            </div>
-            <div class="row mt-3">
-              <div class="col asciimath-example" id="ex5">x^2+y_1+z_12^34</div>
-              <div class="col" id="render-ex5"></div>
-            </div>
-            <div class="row mt-3">
-              <div class="col asciimath-example" id="ex6">int_0^1f(x)dx</div>
-              <div class="col" id="render-ex6"></div>
-            </div>
-            <div class="row mt-3">
-              <div class="col asciimath-example" id="ex7">[[a,b],[c,d]]((n),(k))</div>
-              <div class="col" id="render-ex7"></div>
-            </div>
-            <div class="row mt-3">
-              <div class="col asciimath-example" id="ex8">sqrt sqrt root(3)(x)</div>
-              <div class="col" id="render-ex8"></div>
-            </div>
-            <div class="row mt-3">
-              <div class="col asciimath-example" id="ex9">{(x^2 + x, if x!=0),(text{undefined},if x=0):}</div>
-              <div class="col" id="render-ex9"></div>
-            </div>
-          </div>
         </div>
-        <a href='http://asciimath.org/'>For full symbols' list</a>
         <div class="modal-footer">
           <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button"
             data-dismiss="modal">Confirm</button>

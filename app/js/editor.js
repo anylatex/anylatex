@@ -46,6 +46,18 @@ document.title = 'Editor - ' + documentName
 
 /* Tool Functions */
 var editorRange = ''
+// Credit Raab at https://stackoverflow.com/a/11077016
+function insertTextAtCaret(field, text) {
+    if (field.selectionStart || field.selectionStart == '0') {
+        var startPos = field.selectionStart;
+        var endPos = field.selectionEnd;
+        field.value = field.value.substring(0, startPos)
+            + text
+            + field.value.substring(endPos, field.value.length);
+    } else {
+        field.value += text;
+    }
+}
 // Credit: Tim Down at https://stackoverflow.com/a/6691294
 function insertElementAtCaret(html) {
     const range = editorRange
@@ -549,33 +561,62 @@ function tableConfirm(event) {
 
 var mathInputField = document.getElementById('math-field');
 var latexSpan = document.getElementById('latex');
-$(mathInputField).on('paste keyup input', () => {
+$(mathInputField).on('paste keyup input', renderInputFieldMath)
+for (const equation of document.getElementsByClassName('equation-container')) {
+    equation.addEventListener('click', equationClick)
+}
+document.getElementById('equation-confirm').addEventListener('click', equationConfirm)
+document.getElementById('math-button-panel').addEventListener('click', insertMathSymbol)
+
+$('#open-equation-selector').on('click', () => {
+    // clear
+    mathInputField.value = ''
+    document.getElementById('rendered-input-equation').innerHTML = ''
+    latexSpan.innerText = ''
+})
+
+function renderMath(latexInput, element) {
+    try {
+        katex.render(latexInput, element, {
+            throwOnError: true
+        })
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+// render example equations
+const inlineEqExample = document.getElementById('example-inline-equation')
+renderMath(AMTparseAMtoTeX(inlineEqExample.innerText), inlineEqExample)
+const numberedEqExample = document.getElementById('example-display-numbered-equation')
+renderMath(AMTparseAMtoTeX(numberedEqExample.innerText), numberedEqExample)
+const unnumberedEqExample = document.getElementById('example-display-unnumbered-equation')
+renderMath(AMTparseAMtoTeX(unnumberedEqExample.innerText), unnumberedEqExample)
+// render example use cases
+for (const example of document.getElementsByClassName('asciimath-example')) {
+    const displayElement = document.getElementById(`render-${example.id}`)
+    renderMath(AMTparseAMtoTeX(example.innerText), displayElement)
+}
+// render math buttons
+for (const button of document.getElementsByClassName('math-buttons')) {
+    const am = button.getAttribute('title')
+    renderMath(AMTparseAMtoTeX(am), button)
+}
+
+function insertMathSymbol(event) {
+    const target = event.target
+    const amCommand = target.getAttribute('title')
+    insertTextAtCaret(mathInputField, amCommand)
+    renderInputFieldMath(null)
+}
+
+function renderInputFieldMath(event) {
     // convert to LaTeX
     const input = $(mathInputField).val()
     const latex = AMTparseAMtoTeX(input)
     latexSpan.innerText = latex
     // render the equation
-    katex.render(latex, document.getElementById('rendered-input-equation'))
-})
-for (const equation of document.getElementsByClassName('equation-container')) {
-    equation.addEventListener('click', equationClick)
-}
-document.getElementById('equation-confirm').addEventListener('click', equationConfirm)
-
-// render example equations
-const inlineEqExample = document.getElementById('example-inline-equation')
-katex.render(AMTparseAMtoTeX(inlineEqExample.innerText), inlineEqExample)
-const numberedEqExample = document.getElementById('example-display-numbered-equation')
-katex.render(AMTparseAMtoTeX(numberedEqExample.innerText), numberedEqExample)
-const unnumberedEqExample = document.getElementById('example-display-unnumbered-equation')
-katex.render(AMTparseAMtoTeX(unnumberedEqExample.innerText), unnumberedEqExample)
-// render example use cases
-for (const example of document.getElementsByClassName('asciimath-example')) {
-    console.log(example.innerText)
-    const displayElement = document.getElementById(`render-${example.id}`)
-    katex.render(AMTparseAMtoTeX(example.innerText), displayElement, {
-        throwOnError: false
-    })
+    renderMath(latex, document.getElementById('rendered-input-equation'))
 }
 
 function equationClick(event) {
