@@ -9,6 +9,7 @@
     "interactjs": "^1.4.0-rc.9",
     "jquery": "^3.4.0",
     "jquery-contextmenu": "^2.8.0",
+    "jquery.nicescroll": "^3.7.6",
     "katex": "^0.10.1",
     "rimraf": "^2.6.3",
     "split.js": "^1.5.10",
