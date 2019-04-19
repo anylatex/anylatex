@@ -17,7 +17,7 @@
 
   <nav id="navbar" class="navbar fixed-top navbar-light bg-light w-100 editor-navbar justify-content-center">
     <!-- toolbar -->
-    <div id="toolbar" class="btn-group h-100" role="group">
+    <div id="toolbar" class="btn-group" role="group">
       <button command="return" class="btn btn-light mr-3" type="button"><i
           class="fas fa-long-arrow-alt-left"></i></button>
       <button command="bold" value="" class="btn btn-light" type="button"><i class="fas fa-bold"></i></button>
@@ -66,11 +66,10 @@
       <button id="arguments-modal-button" class="btn btn-light font-weight-bold d-none modal-open-button" type="button"
         data-toggle="modal" data-target="#arguments-modal">TemplateArguments</button>
       <button id="compile" class="btn btn-light" type="button"><i class="fas fa-sync"></i></button>
-      <button id="save-button" title="saved" class="btn disabled font-weight-bold"
+      <button id="save-button" title="saved" class="btn font-weight-bold"
         style="white-space: nowrap; cursor: default">
-        <div id="save-loader" class="d-none" role="status">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        </div>
+        <span id="save-loader" class="d-none spinner-border" role="status" aria-hidden="true"
+          style="width: 1.5rem; height: 1.5rem;"></span>
         <span id="save-hint">&#x2714</span>
       </button>
   </nav>
