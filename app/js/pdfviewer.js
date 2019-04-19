@@ -63,6 +63,7 @@ document.addEventListener('pagesinit', function () {
 
 var lastScrollPageNumber = ''
 
+var scrollbar = null
 // Loading document.
 var loadingPDF = (pdfPATH) => {
     ipcRenderer.send('set-variable', { name: 'renderPDF', value: false })
@@ -82,10 +83,18 @@ var loadingPDF = (pdfPATH) => {
 
         pdfLinkService.setDocument(pdfDocument, null);
         if (lastScrollPageNumber > 0) {
-            setTimeout(() => pdfViewer.scrollPageIntoView({pageNumber: lastScrollPageNumber}), 500)
-
+            setTimeout(() => {
+                pdfViewer.scrollPageIntoView({pageNumber: lastScrollPageNumber})
+                // enable the custom scrollbar
+                if (!scrollbar) {
+                    scrollbar = $("#viewerContainer").niceScroll({
+                        grabcursorenabled: false
+                    })
+                } else {
+                    scrollbar.resize()
+                }
+            }, 500)
         }
-
     });
 
 }

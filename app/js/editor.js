@@ -43,6 +43,13 @@ document.title = 'Editor - ' + documentName
     })
 }())
 
+/* Setup custom scrollbars */
+var editorScrollBar
+$(function() {  
+    editorScrollBar = $("#editor").niceScroll({
+        grabcursorenabled: false
+    })
+});
 
 /* Tool Functions */
 var editorRange = ''
@@ -1010,6 +1017,8 @@ function editorContentChangeHandler(event) {
             reference.setAttribute('data-content', reference.getAttribute('data-content').replace('(missing)', ''))
         }
     }
+    // update the scroll bar
+    editorScrollBar.resize()
     save(event)
 }
 
