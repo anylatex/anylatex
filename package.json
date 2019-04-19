@@ -6,8 +6,8 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.8.1",
     "async": "^2.6.2",
-    "electron": "^4.0.5",
     "interactjs": "^1.4.0-rc.9",
+    "jquery": "^3.4.0",
     "jquery-contextmenu": "^2.8.0",
     "katex": "^0.10.1",
     "rimraf": "^2.6.3",
@@ -16,11 +16,23 @@
     "superagent": "^5.0.2"
   },
   "devDependencies": {
+    "electron": "^4.0.5",
+    "electron-builder": "^20.39.0",
     "eslint": "^5.15.1"
+  },
+  "build": {
+    "appId": "com.gyh.anylatex",
+    "win": {
+      "target": ["zip"]
+    },
+    "linux": {
+      "target": ["zip"]
+    }
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron app.js"
+    "start": "electron app.js",
+    "dist": "electron-builder --win --linux --x64"
   },
   "author": "gyh",
   "license": "ISC"

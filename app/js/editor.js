@@ -1,7 +1,7 @@
 const { ipcRenderer } = require('electron')
 const remote = require('electron').remote
 const path = require('path')
-const { Converter } = require(path.resolve('app/js/converter.js'))
+const { Converter } = require(path.resolve(__dirname, 'js/converter.js'))
 const crypto = require('crypto')
 const async = require('async')
 const superagent = require('superagent')
