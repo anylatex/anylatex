@@ -1034,6 +1034,9 @@ function editorContentChangeHandler(event) {
             reference.setAttribute('data-content', reference.getAttribute('data-content').replace('(missing)', ''))
         }
     }
+    // update outline
+    // TODO: need to optimize
+    generateOutline()
     // update the scroll bar
     editorScrollBar.resize()
     save(event)
