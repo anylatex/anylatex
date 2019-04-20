@@ -11,7 +11,7 @@
 .editor-navbar {
   height: 6%;
 }
-#toolbar > button {
+#toolbar i {
   font-size: 2.3vh;
 }
 
@@ -21,17 +21,13 @@
 .editor {
   padding: 1rem;
   font-size: 1rem;
-  box-shadow: 0px 0px 10px 0px black;
-  border: 0.5px solid black;
+  box-shadow: 0px 0px 3px 1px black;
+  border: 1px solid black;
   min-height: 100%;
   max-height: 100%;
   overflow: scroll;
   min-width: 100%;
   word-break: break-all;
-}
-.editor:focus {
-  box-shadow: 0px 0px 20px 0px black;
-  border: 1.5px solid grey;
 }
 .editor h1 {
   font-size: 1.5rem;
@@ -52,6 +48,11 @@
 .editor h5, h6 {
   font-size: 1rem;
   font-weight: bold;
+}
+
+webview {
+  border: 1px solid black;
+  box-shadow: 0px 0px 3px 1px black;
 }
 
 .reference-editor {

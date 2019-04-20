@@ -4,6 +4,7 @@
 <head>
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css">
+  <link rel="stylesheet" href="../node_modules/spinkit/css/spinkit.css">
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/documents.css">
 
@@ -11,6 +12,17 @@
 </head>
 
 <body>
+
+  <div id="page-loader-container" class="page-loader-container">
+    <div class="row h-100 w-100 align-items-center justify-content-center">
+      <div class="col">
+        <div class="sk-rotating-plane loader"></div>
+        <div class="page-loader-hint">
+          Loading...
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="w-100 h-100 pt-2">
     <div id="documents-panel" class="row ml-5 mr-5">
@@ -47,9 +59,9 @@
     delete module.exports
   </script>
   <script src="../node_modules/jquery/dist/jquery.js"></script>
-  <script src="../node_modules/popper.js/dist/popper.min.js"></script>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.js"></script>
   <script src="../node_modules/jquery-contextmenu/dist/jquery.ui.position.js"></script>
+  <script src="../node_modules/jquery.nicescroll/dist/jquery.nicescroll.js"></script>
   <script src="./js/documents.js"></script>
 </body>

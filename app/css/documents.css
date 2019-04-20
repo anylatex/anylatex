@@ -24,8 +24,8 @@
 }
 
 .frame {
-  width: 25vw;
-  height: 25vh;
+  width: 30vw;
+  height: 100vh;
   -webkit-transform: scale(0.4);
   -webkit-transform-origin: 0 0;
 }

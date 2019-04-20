@@ -12,23 +12,42 @@ const apiBase = store.getConfig('apiBase')
 const agent = superagent.agent().timeout({response: 20000})
 
 /* Setup current document's name and id */
-let documentID = remote.getGlobal('currentDocumentID')
-let documentName = remote.getGlobal('currentDocumentName')
+const documentID = remote.getGlobal('currentDocumentID')
+const documentName = remote.getGlobal('currentDocumentName')
 document.title = 'Editor - ' + documentName
 
-/* Split panels */
+/* Setup custom scrollbars */
+var editorScrollBar
+$(function() {  
+    editorScrollBar = $(".editor").niceScroll({
+        grabcursorenabled: false
+    })
+})
+
+/* Split panels, update tree's pinned status */
 ;(function(){
     const { stat } = store.getOneDocumentData(documentID)
+    var pinTree = stat['pinTree']
+    // tree is pinned by default in html.
+    // so, here will only need to detect if tree is unpinned
+    if (pinTree === false) {
+        var pinTreeButton = $('#pin-tree-panel')
+        var treePanel = $('#tree-panel')
+        pinTreeButton.removeClass('pinned')
+        // change the icon's style
+        $('#pin-icon').removeClass('pinned')
+        // unpin the panel
+        treePanel.removeClass('pinned')
+        // hide the tree
+        if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
+    }
     var storedSizes = stat['splitSizes']
     var sizes
     if (storedSizes) {
         sizes = JSON.parse(storedSizes)
-        sizes = sizes.map(value => {
-            return parseInt(value.toString())
-        })
     } else {
-        // TODO: why total is 80?
-        sizes = [50, 30]
+        // TODO: why total is not 100?
+        sizes = [40, 40]
     }
     Split(['#content-panel', '#pdf-panel'], {
         elementStyle: function (dimension, size, gutterSize) { 
@@ -37,19 +56,14 @@ document.title = 'Editor - ' + documentName
         sizes: sizes,
         minSize: [650, 350],
         gutterSize: 3,
+        onDrag: () => {
+            editorScrollBar.resize()
+        },
         onDragEnd: endSizes => {
             store.updateDocument({ id: documentID, splitSizes: endSizes })
         }
     })
 }())
-
-/* Setup custom scrollbars */
-var editorScrollBar
-$(function() {  
-    editorScrollBar = $("#editor").niceScroll({
-        grabcursorenabled: false
-    })
-});
 
 /* Tool Functions */
 var editorRange = ''
@@ -124,18 +138,21 @@ var compiledHtml = ''
     document.getElementById('dropdown-button').innerText = `Templates(${template})`
     setTemplateHeadings(template)
     setTemplateArguments(template)
-    if (partArguments) {
+    if (templateArgs[template]['partArgs']) {
+        const templatePartArgNames = Object.keys(templateArgs[template]['partArgs'])
         for (const argName of Object.keys(partArguments)) {
+            if (templatePartArgNames.indexOf(argName) < 0) continue
             const argValue = partArguments[argName]
             document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
         }
     }
-    if (args) {
+    if (templateArgs[template]['args']) {
         let argNames = Object.keys(args)
-        for (let i = 0; i < argNames.length; i++) {
-            const name = argNames[i]
-            const value = args[name]
-            let argElement = document.getElementById(name)
+        let templateArgNames = Object.keys(templateArgs[template]['args'])
+        for (const argName of argNames) {
+            if (templateArgNames.indexOf(argName) < 0) continue
+            const value = args[argName]
+            let argElement = document.getElementById(argName)
             argElement.value = value
         }
     }
@@ -154,19 +171,19 @@ var compiledHtml = ''
 
 })()
 
-/* Modal buttons' handlers */
-let modalOpenButtons = document.getElementsByClassName('modal-open-button')
-let modalCloseButtons = document.getElementsByClassName('modal-dismiss-button')
-Array.from(modalOpenButtons).forEach(function(element) {
-    element.addEventListener('click', () => {
-        document.getElementById('navbar').classList.remove('fixed-top')
-    })
-});
-Array.from(modalCloseButtons).forEach(function(element) {
-    element.addEventListener('click', () => {
-        document.getElementById('navbar').classList.add('fixed-top')
-    })
-});
+// cancel loading animation
+setTimeout(() => {
+    document.getElementById('page-loader-container').classList.add('d-none')
+}, 800)
+
+
+/* Modal handlers */
+//$('.modal').on('show.bs.modal', function (e) {
+//    document.getElementById('navbar').classList.remove('fixed-top')
+//})
+//$('.modal').on('hidden.bs.modal', function (e) {
+//    document.getElementById('navbar').classList.add('fixed-top')
+//})
 
 
 /* Reference Modal */
@@ -1266,6 +1283,21 @@ function setTemplateArguments(templateName){
         input.setAttribute('value', '')
         partArgsEditorDiv.appendChild(input)
     }
+    const { stat } = store.getOneDocumentData(documentID)
+    const savedArgs = stat['args']
+    const savedPartArguments = stat['partArguments']
+    // recover args if exist
+    for (const argName of Object.keys(savedArgs)) {
+        if (argNames.indexOf(argName) < 0) continue
+        const argValue = savedArgs[argName]
+        document.getElementById(argName).value = argValue
+    }
+    // recover arguements if exist
+    for (const argName of Object.keys(savedPartArguments)) {
+        if (partArgNames.indexOf(argName) < 0) continue
+        const argValue = savedPartArguments[argName]
+        document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
+    }
 }
 
 function templateDropdownHandler(event) {
@@ -1703,19 +1735,23 @@ $(function() {
 // pin event
 var pinTreeButton = $('#pin-tree-panel')
 pinTreeButton.on('click', event => {
+    var pinTree
     if (pinTreeButton.hasClass('pinned')) {
         pinTreeButton.removeClass('pinned')
         // change the icon's style
         $('#pin-icon').removeClass('pinned')
         // unpin the panel
         treePanel.removeClass('pinned')
+        pinTree = false
     } else {
         pinTreeButton.addClass('pinned')
         // change the icon's style
         $('#pin-icon').addClass('pinned')
         // pin the panel
         treePanel.addClass('pinned')
+        pinTree = true
     }
+    store.updateDocument({ id: documentID, pinTree: pinTree})
 })
 
 function treeHandler(event) {

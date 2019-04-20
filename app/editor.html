@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
   <link rel="stylesheet" href="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css">
   <link rel="stylesheet" href="../node_modules/katex/dist/katex.css">
+  <link rel="stylesheet" href="../node_modules/spinkit/css/spinkit.css">
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/editor.css">
 
@@ -13,8 +14,18 @@
 </head>
 
 <body style="height: 95%; overflow: hidden;">
+  <div id="page-loader-container" class="page-loader-container">
+    <div class="row h-100 w-100 align-items-center justify-content-center">
+      <div class="col">
+        <div class="sk-rotating-plane loader"></div>
+        <div class="page-loader-hint">
+          Loading...
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <nav id="navbar" class="navbar fixed-top navbar-light bg-light w-100 editor-navbar justify-content-center">
+  <nav id="navbar" class="navbar navbar-light bg-light w-100 editor-navbar justify-content-center">
     <!-- toolbar -->
     <div id="toolbar" class="btn-group" role="group">
       <button command="return" class="btn btn-light mr-3" type="button"><i
@@ -73,7 +84,7 @@
       </button>
   </nav>
 
-  <div class="row mt-5 mb-4 ml-2 mr-2 w-100 h-100">
+  <div class="row mb-4 ml-2 mr-2 w-100 h-100">
 
     <div id="content-panel" class="col split h-100 d-flex">
 
@@ -98,7 +109,7 @@
       </div>
 
       <!-- Editor Panel -->
-      <div class="w-100 mt-1 ml-4" id="editor-panel">
+      <div class="w-100 ml-4" id="editor-panel">
         <!-- text area -->
         <div class="h-100 w-100">
           <div class="row h-100 mt-4 no-gutters">
@@ -118,8 +129,9 @@
 
     </div>
 
-    <div id="pdf-panel" class="col mt-4 mb-4 mr-1 split">
-      <webview class="w-100 h-100" src="./pdfviewer.html" nodeintegration></webview>
+    <!-- PDF Panel -->
+    <div id="pdf-panel" class="col mt-4 mb-4 mr-1 pb-2 split">
+      <webview class="w-100 h-100 pb-2" src="./pdfviewer.html" nodeintegration></webview>
     </div>
 
   </div>

@@ -64,9 +64,17 @@ app.once('ready', () => {
   }))
 
   // Show window when page is ready
-  window.once('ready-to-show', () => {
-    window.show()
-  })
+  //window.once('ready-to-show', () => {
+  //  window.show()
+  //})
+  window.webContents.on('did-finish-load', function() {
+    window.show();
+});
+})
+
+// terminate all processes after closing the window
+app.on('window-all-closed', () => {
+    app.quit();
 })
 
 // setup base request with api base setted and json option enabled
