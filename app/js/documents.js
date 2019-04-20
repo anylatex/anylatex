@@ -1,10 +1,16 @@
-const { ipcRenderer, remote } = require('electron');
-const store = remote.getGlobal('store');
-const path = require('path');
+const { ipcRenderer, remote } = require('electron')
+const store = remote.getGlobal('store')
+const path = require('path')
 
+
+$(function() {  
+    $("body").niceScroll({
+        grabcursorenabled: false
+    })
+})
 
 // find all documents
-(function(){
+;(function(){
     const existedDocuments = store.getExistedDocuments()
     const documentsPanel = document.getElementById('documents-panel')
     let docButtonTemplate = $('#document-template')
@@ -29,6 +35,9 @@ const path = require('path');
         buttonEl.append(iframe)
     }
 })()
+
+// cancel loading animation
+document.getElementById('page-loader-container').classList.add('d-none')
 
 // register context menus
 $.contextMenu({

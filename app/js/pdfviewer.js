@@ -13,8 +13,40 @@
  * limitations under the License.
  */
 
+const fs = require('fs')
 const path = require('path')
 const { ipcRenderer, remote } = require('electron')
+const dialog = remote.dialog
+
+const documentID = remote.getGlobal('currentDocumentID')
+const documentName = remote.getGlobal('currentDocumentName')
+
+// register context menu
+$.contextMenu({
+    selector: '#viewerContainer', 
+    callback: function(key, options) {
+        if (key === 'save') {
+            const pdfPath = remote.getGlobal('pdfPath')
+            if (!pdfPath || pdfPath.search(`${documentID}.pdf`) < 0) {
+                alert('no pdf available.')
+                return
+            }
+            const filePath = dialog.showSaveDialog({
+                defaultPath: documentName + '.pdf'
+            })
+            if (!filePath) return
+            fs.copyFile(pdfPath, filePath, (err) => {
+                if (err) {
+                    ipcRenderer.send('alert', 'ERROR when saving pdf:' + err)
+                    alert('Save pdf fail: ' + err)
+                }
+            })
+        }
+    },
+    items: {
+        "save": {name: "save"}
+    }
+})
 
 'use strict';
 
@@ -24,7 +56,6 @@ if (!pdfjsLib.getDocument || !pdfjsViewer.PDFViewer) {
 }
 
 // The workerSrc property shall be specified.
-//
 pdfjsLib.GlobalWorkerOptions.workerSrc = path.resolve(__dirname, '../node_modules/pdfjs-dist/build/pdf.worker.js')
 
 // Some PDFs need external cmaps.
@@ -54,12 +85,18 @@ pdfLinkService.setViewer(pdfViewer);
 
 document.addEventListener('pagesinit', function () {
   // We can use pdfViewer now, e.g. let's change default scale.
-  pdfViewer.currentScaleValue = 'page-width';
+  pdfViewer.currentScaleValue = 'page-width'
+  pdfViewer._setScale('page-width')
 
   if (SEARCH_FOR) { // We can try search for things
     pdfFindController.executeCommand('find', { query: SEARCH_FOR, });
   }
 });
+
+window.addEventListener('resize', function () {
+  pdfViewer.currentScaleValue = 'page-width'
+  pdfViewer._setScale('page-width')
+})
 
 var lastScrollPageNumber = ''
 
@@ -93,6 +130,8 @@ var loadingPDF = (pdfPATH) => {
                 } else {
                     scrollbar.resize()
                 }
+                // hide navbar
+                document.getElementById('navbar').classList.add('d-none')
             }, 500)
         }
     });
@@ -100,10 +139,21 @@ var loadingPDF = (pdfPATH) => {
 }
 
 var isFirstLoad = true
-const documentID = remote.getGlobal('currentDocumentID')
 setInterval(() => {
     const isCompileFinished = remote.getGlobal('isCompileFinish')
     var loader = document.getElementById('loader')
+    const pdfPath = remote.getGlobal('pdfPath')
+    if (isCompileFinished === undefined && (!pdfPath || pdfPath.search(`${documentID}.pdf`) < 0)) {
+        // no pdf, show navbar to give hints
+        if (document.getElementById('navbar').classList.contains('d-none')) {
+            const spinner = document.getElementById('loader-spinner')
+            document.getElementById('navbar').classList.remove('d-none')
+            loader.classList.remove('d-none')
+            spinner.classList.add('d-none')
+            document.getElementById('loader-hint').innerText = 'Press "ctrl+s" or click "compile" button above to compile the PDF'
+        }
+        return
+    }
     if (isCompileFinished) {
         if (loader.classList.contains('d-none') && !isFirstLoad) {
             return
@@ -112,12 +162,19 @@ setInterval(() => {
         // hide loader
         loader.classList.add('d-none')
         // render pdf
-        const pdfPath = remote.getGlobal('pdfPath')
         if (pdfPath && pdfPath.search(`${documentID}.pdf`) >= 0) {
             loadingPDF(remote.getGlobal('pdfPath'))
         }
     } else if (isCompileFinished === false) {
+        // show navbar
+        if (document.getElementById('navbar').classList.contains('d-none')) {
+            document.getElementById('navbar').classList.remove('d-none')
+        }
         // show loader
+        const spinner = document.getElementById('loader-spinner')
+        if (spinner.classList.contains('d-none')) {
+            spinner.classList.remove('d-none')
+        }
         if(loader.classList.contains('d-none')) {
             loader.classList.remove('d-none')
         }

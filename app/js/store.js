@@ -12,6 +12,9 @@ class Store {
         this.appDataPath = (electron.app).getPath('userData')
         this.configPath = path.join(this.appDataPath, opts.configName + '.json')
         this.config = parseDataFile(this.configPath, opts.defaults)
+        if (!fs.existsSync(this.appDataPath)) {
+            fs.mkdirSync(this.appDataPath)
+        }
         if (!this.config['currentUserID']) {
             // no current user
             this.dataPath = path.join(this.appDataPath, 'tempUser')
@@ -99,7 +102,8 @@ class Store {
     }
 
     updateDocument(updateOptions) {
-        let { id, htmlContent, name, templateName, args, partArguments, image, pdf, splitSizes } = updateOptions
+        let { id, htmlContent, name, templateName, args,
+                partArguments, image, pdf, splitSizes, pinTree } = updateOptions
         if (!id) {
             return
         }
@@ -136,6 +140,9 @@ class Store {
         }
         if (splitSizes) {
             stat['splitSizes'] = JSON.stringify(splitSizes)
+        }
+        if (pinTree != undefined) {
+            stat['pinTree'] = pinTree
         }
         fs.writeFileSync(statPath, JSON.stringify(stat))
         if (image) {

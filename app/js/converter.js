@@ -231,7 +231,7 @@ class Converter {
                     break
                 // Converting others
                 case 'DIV':
-                    parsedInnerLatex = `\n${this._convert_elements(element.innerHTML, parentNode)}\n`
+                    parsedInnerLatex = `\n\n${this._convert_elements(element.innerHTML, parentNode)}\n\n`
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     // latex += this._convert_elements(element.innerHTML) + '\n'
                     break
