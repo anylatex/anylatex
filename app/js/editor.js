@@ -903,7 +903,7 @@ function getReferenceHTMLElement(referenceData, type) {
         reference.innerHTML = `<i class="fas fa-paragraph"></i>: ${insertedIcon}`
         reference.innerHTML = `<i class="fas fa-chevron-left"></i>${reference.innerHTML}<i class="fas fa-chevron-right"></i>`
         reference.setAttribute('title', 'Page Referencing')
-    } else if (type === 'element') {
+    } else {
         reference.innerHTML = `<i class="fas fa-chevron-left"></i>${insertedIcon}<i class="fas fa-chevron-right"></i>`
     }
     // whether sup
