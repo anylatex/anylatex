@@ -97,13 +97,13 @@ class Store {
         let documentDir = path.join(this.dataPath, documentID)
         let documentStatFile = path.join(documentDir, 'stat.json')
         fs.mkdirSync(documentDir)
-        let stat = {id: documentID, name: name, createTime: Date.now().toString()}
+        let stat = { id: documentID, name: name, createTime: Date.now().toString() }
         fs.writeFileSync(documentStatFile, JSON.stringify(stat))
     }
 
     updateDocument(updateOptions) {
         let { id, htmlContent, name, templateName, args,
-                partArguments, image, pdf, splitSizes, pinTree } = updateOptions
+            partArguments, image, pdf, splitSizes, pinTree } = updateOptions
         if (!id) {
             return
         }
