@@ -9,7 +9,7 @@ const Split = require('split.js')
 const store = remote.getGlobal('store')
 
 const apiBase = store.getConfig('apiBase')
-const agent = superagent.agent().timeout({response: 20000})
+const agent = superagent.agent().timeout({ response: 20000 })
 
 /* Setup current document's name and id */
 const documentID = remote.getGlobal('currentDocumentID')
@@ -18,52 +18,52 @@ document.title = 'Editor - ' + documentName
 
 /* Setup custom scrollbars */
 var editorScrollBar
-$(function() {  
+$(function () {
     editorScrollBar = $(".editor").niceScroll({
         grabcursorenabled: false
     })
 })
 
-/* Split panels, update tree's pinned status */
-;(function(){
-    const { stat } = store.getOneDocumentData(documentID)
-    var pinTree = stat['pinTree']
-    // tree is pinned by default in html.
-    // so, here will only need to detect if tree is unpinned
-    if (pinTree === false) {
-        var pinTreeButton = $('#pin-tree-panel')
-        var treePanel = $('#tree-panel')
-        pinTreeButton.removeClass('pinned')
-        // change the icon's style
-        $('#pin-icon').removeClass('pinned')
-        // unpin the panel
-        treePanel.removeClass('pinned')
-        // hide the tree
-        if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
-    }
-    var storedSizes = stat['splitSizes']
-    var sizes
-    if (storedSizes) {
-        sizes = JSON.parse(storedSizes)
-    } else {
-        // TODO: why total is not 100?
-        sizes = [40, 40]
-    }
-    Split(['#content-panel', '#pdf-panel'], {
-        elementStyle: function (dimension, size, gutterSize) { 
-            return {'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)'}
-        },
-        sizes: sizes,
-        minSize: [650, 350],
-        gutterSize: 3,
-        onDrag: () => {
-            editorScrollBar.resize()
-        },
-        onDragEnd: endSizes => {
-            store.updateDocument({ id: documentID, splitSizes: endSizes })
+    /* Split panels, update tree's pinned status */
+    ; (function () {
+        const { stat } = store.getOneDocumentData(documentID)
+        var pinTree = stat['pinTree']
+        // tree is pinned by default in html.
+        // so, here will only need to detect if tree is unpinned
+        if (pinTree === false) {
+            var pinTreeButton = $('#pin-tree-panel')
+            var treePanel = $('#tree-panel')
+            pinTreeButton.removeClass('pinned')
+            // change the icon's style
+            $('#pin-icon').removeClass('pinned')
+            // unpin the panel
+            treePanel.removeClass('pinned')
+            // hide the tree
+            if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
         }
-    })
-}())
+        var storedSizes = stat['splitSizes']
+        var sizes
+        if (storedSizes) {
+            sizes = JSON.parse(storedSizes)
+        } else {
+            // TODO: why total is not 100?
+            sizes = [40, 40]
+        }
+        Split(['#content-panel', '#pdf-panel'], {
+            elementStyle: function (dimension, size, gutterSize) {
+                return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }
+            },
+            sizes: sizes,
+            minSize: [650, 350],
+            gutterSize: 3,
+            onDrag: () => {
+                editorScrollBar.resize()
+            },
+            onDragEnd: endSizes => {
+                store.updateDocument({ id: documentID, splitSizes: endSizes })
+            }
+        })
+    }())
 
 /* Tool Functions */
 var editorRange = ''
@@ -87,7 +87,7 @@ function insertElementAtCaret(html) {
     var el = document.createElement("div");
     el.innerHTML = html;
     var frag = document.createDocumentFragment(), node;
-    while ( (node = el.firstChild) ) {
+    while ((node = el.firstChild)) {
         frag.appendChild(node);
     }
     range.insertNode(frag);
@@ -119,57 +119,57 @@ function setupTemplatesDropdown() {
 
 /* Load the document's content */
 var compiledHtml = ''
-;(function(){
-    let { documentContent, stat, pdfExists } = store.getOneDocumentData(documentID)
-    // recover document's content
-    if (documentContent) {
-        document.getElementById('editor').innerHTML = documentContent
-        // enable popovers
-        $(function () {
-            $('[data-toggle="popover"]').popover()
-        })
-    }
-    // recover template setting and arguments' content
-    let { template, args, partArguments } = stat
-    if (!template) {
-        template = defaultTemplateName
-    }
-    document.getElementById('current-template').value = template
-    document.getElementById('dropdown-button').innerText = `Templates(${template})`
-    setTemplateHeadings(template)
-    setTemplateArguments(template)
-    if (templateArgs[template]['partArgs']) {
-        const templatePartArgNames = Object.keys(templateArgs[template]['partArgs'])
-        for (const argName of Object.keys(partArguments)) {
-            if (templatePartArgNames.indexOf(argName) < 0) continue
-            const argValue = partArguments[argName]
-            document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
+    ; (function () {
+        let { documentContent, stat, pdfExists } = store.getOneDocumentData(documentID)
+        // recover document's content
+        if (documentContent) {
+            document.getElementById('editor').innerHTML = documentContent
+            // enable popovers
+            $(function () {
+                $('[data-toggle="popover"]').popover()
+            })
         }
-    }
-    if (templateArgs[template]['args']) {
-        let argNames = Object.keys(args)
-        let templateArgNames = Object.keys(templateArgs[template]['args'])
-        for (const argName of argNames) {
-            if (templateArgNames.indexOf(argName) < 0) continue
-            const value = args[argName]
-            let argElement = document.getElementById(argName)
-            argElement.value = value
+        // recover template setting and arguments' content
+        let { template, args, partArguments } = stat
+        if (!template) {
+            template = defaultTemplateName
         }
-    }
+        document.getElementById('current-template').value = template
+        document.getElementById('dropdown-button').innerText = `Templates(${template})`
+        setTemplateHeadings(template)
+        setTemplateArguments(template)
+        if (templateArgs[template]['partArgs']) {
+            const templatePartArgNames = Object.keys(templateArgs[template]['partArgs'])
+            for (const argName of Object.keys(partArguments)) {
+                if (templatePartArgNames.indexOf(argName) < 0) continue
+                const argValue = partArguments[argName]
+                document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
+            }
+        }
+        if (templateArgs[template]['args']) {
+            let argNames = Object.keys(args)
+            let templateArgNames = Object.keys(templateArgs[template]['args'])
+            for (const argName of argNames) {
+                if (templateArgNames.indexOf(argName) < 0) continue
+                const value = args[argName]
+                let argElement = document.getElementById(argName)
+                argElement.value = value
+            }
+        }
 
-    // generate outline tree
-    generateOutline()
+        // generate outline tree
+        generateOutline()
 
-    // Load compiled PDF
-    if (pdfExists != false) {
-        // TODO: check if content in editor corresponding to the existed pdf
-        compiledHtml = document.getElementById('editor').innerHTML
-        ipcRenderer.send('alert', 'load existed pdf: ' + pdfExists)
-        ipcRenderer.send('set-variable', {name: 'isCompileFinish', value: true})
-        ipcRenderer.send('set-variable', {name: 'pdfPath', value: pdfExists})
-    }
+        // Load compiled PDF
+        if (pdfExists != false) {
+            // TODO: check if content in editor corresponding to the existed pdf
+            compiledHtml = document.getElementById('editor').innerHTML
+            ipcRenderer.send('alert', 'load existed pdf: ' + pdfExists)
+            ipcRenderer.send('set-variable', { name: 'isCompileFinish', value: true })
+            ipcRenderer.send('set-variable', { name: 'pdfPath', value: pdfExists })
+        }
 
-})()
+    })()
 
 // cancel loading animation
 setTimeout(() => {
@@ -202,7 +202,7 @@ $('#reference-editor').on('input', () => {
             }
             result = re.exec(bibtexText)
         }
-    } catch(err) {}
+    } catch (err) { }
     document.getElementById('extracted-labels').innerText = extractedLabels.join(', ')
 })
 
@@ -251,10 +251,10 @@ $('#choose-image').on('change', () => {
     reads.readAsDataURL(file)
     reads.onload = function (e) {
         document.getElementById('show-choose-image').src = this.result
-    } 
+    }
 })
 
-function decodeImageFromBase64(source, binaryData=true, hash=true) {
+function decodeImageFromBase64(source, binaryData = true, hash = true) {
     let matches = source.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
     let image = {}
     image.type = matches[1].split('/')[1]
@@ -270,7 +270,7 @@ function decodeImageFromBase64(source, binaryData=true, hash=true) {
 }
 
 // clear `pending` status
-(function(){
+(function () {
     for (const img of document.getElementsByClassName('inserted-image')) {
         if (img.getAttribute('upload') == 'pending') {
             img.setAttribute('upload', 'no')
@@ -342,7 +342,7 @@ function checkAndUploadImage(imgEl, resolve, reject) {
                     let errorInfo = `Upload image ${imgEl.getAttribute('id')} faild:\n\t` + err.toString()
                     imgEl.setAttribute('upload', 'false')
                     cb(true, undefined, errorInfo)
-                })           
+                })
         }
     ], (err, res, info) => {
         save(null, true)
@@ -554,10 +554,10 @@ function tableConfirm(event) {
     const tablePopID = Math.random().toString(36).substr(2, 9)
     const tableID = Math.random().toString(36).substr(2, 9)
     var tableAttributes = `id=${tableID} ` + `frame=${frame} ` + `rules=${rules} `
-                            + `row=${tableRowNumber} ` + `col=${tableColNumber} `
-                            + 'data-toggle=popover ' + 'title=Caption '
-                            + `data-content='${tableCaption}' ` + 'data-trigger=hover '
-                            + `data-placement=top ` + `popid=${tablePopID} `
+        + `row=${tableRowNumber} ` + `col=${tableColNumber} `
+        + 'data-toggle=popover ' + 'title=Caption '
+        + `data-content='${tableCaption}' ` + 'data-trigger=hover '
+        + `data-placement=top ` + `popid=${tablePopID} `
     if (tableCaption != 'No Caption') tableAttributes += `caption=${tableCaption}`
     let html = [`<table style="margin: 0px auto;" ${tableAttributes}`]
     let colInRow = ''
@@ -567,7 +567,7 @@ function tableConfirm(event) {
         colInRow += '<td></td>'
     }
     html.push('</tr>')
-    for (let i = 0; i < tableRowNumber -1; i++) {
+    for (let i = 0; i < tableRowNumber - 1; i++) {
         html.push(`<tr>${colInRow}</tr>`)
     }
     html.push('</table>')
@@ -575,7 +575,7 @@ function tableConfirm(event) {
     // insert the table and enable popover
     const htmlString = html.join('\n')
     insertElementAtCaret(htmlString)
-    $(function() {
+    $(function () {
         $(`[popid='${tablePopID}']`).popover()
     })
     ipcRenderer.send('alert', 'inserted a table')
@@ -718,7 +718,7 @@ function toolbarHandler(event) {
     if (!command) {
         return
     }
-    ipcRenderer.sendSync("alert", "click: "+command)
+    ipcRenderer.sendSync("alert", "click: " + command)
     /* special commands */
     if (command == 'return') {
         save(null, true)
@@ -766,7 +766,7 @@ document.addEventListener('selectionchange', editorSelectionHandler)
 $('#editor').bind('keyup click focus', editorCursorChange)
 // ctrl+s, force saving and recompiling
 document.addEventListener('keydown', event => {
-    if( event.ctrlKey  == true && event.key == 's' ) {
+    if (event.ctrlKey == true && event.key == 's') {
         save(null, true)
         if (compiledHtml != editor.innerHTML) {
             compile()
@@ -784,7 +784,7 @@ for (const active of document.getElementsByClassName('context-menu-active')) {
 
 $.contextMenu({
     selector: 'img, table, equation, h1, h2, h3, h4, h5, h6',
-    callback: function(key, options) {
+    callback: function (key, options) {
         var type
         if (key === 'reference') {
             type = 'element'
@@ -865,8 +865,8 @@ $.contextMenu({
         $(this).attr('refs', refEleIDs)
     },
     items: {
-        "reference": {name: "Make Reference of This", icon: "edit"},
-        "pageReference": {name: "Make Reference of This Page", icon: "edit"}
+        "reference": { name: "Make Reference of This", icon: "edit" },
+        "pageReference": { name: "Make Reference of This Page", icon: "edit" }
     }
 })
 
@@ -885,7 +885,7 @@ function getReferenceHTMLElement(referenceData, type) {
     reference.setAttribute('id', id)
     // enable popover
     $(function () {
-        $('#'+id).popover()
+        $('#' + id).popover()
     })
     // reference icon
     const insertedIcon = icon || '*'
@@ -915,7 +915,7 @@ function getReferenceHTMLElement(referenceData, type) {
     return reference
 }
 
-function save(event, force=false) {
+function save(event, force = false) {
     if (Date.now() - lastSaveTime < 2000 && !force) {
         return
     }
@@ -946,7 +946,7 @@ function save(event, force=false) {
     lastSaveHtml = editor.innerHTML
 }
 
-function savePart(event, force=false) {
+function savePart(event, force = false) {
     if (Date.now() - lastPartSaveTime < 2000 && !force) {
         return
     }
@@ -1056,7 +1056,7 @@ function editorKeyHandler(event) {
         }
     }
     // monitor stop keys
-    for(let i = 0; i < controllingCommands.length; i++) {
+    for (let i = 0; i < controllingCommands.length; i++) {
         let command = controllingCommands[i]
         let stopKeys = commandEffectsCancelKeys[command]
         if (!stopKeys) {
@@ -1073,9 +1073,9 @@ function editorKeyHandler(event) {
     var shortcutCommand = ''
     if (event.ctrlKey) {
         key = 'ctrl+' + key
-        switch(key) {
+        switch (key) {
             case 'ctrl+b':
-                shortcutCommand = 'bold'      
+                shortcutCommand = 'bold'
                 break
             case 'ctrl+i':
                 shortcutCommand = 'italic'
@@ -1093,7 +1093,7 @@ function editorKeyHandler(event) {
             button.classList.remove('active')
         } else {
             // new command
-            button.classList.add('active') 
+            button.classList.add('active')
         }
     }
     lastPressedKey = key
@@ -1101,13 +1101,13 @@ function editorKeyHandler(event) {
 
 function editorCursorChange() {
     let sel = window.getSelection()
-    if (sel.getRangeAt && sel.rangeCount){
+    if (sel.getRangeAt && sel.rangeCount) {
         editorRange = sel.getRangeAt(0)
     }
 }
 
 function editorSelectionHandler() {
-    for(let i = 0; i < controllingCommands.length; i++) {
+    for (let i = 0; i < controllingCommands.length; i++) {
         let command = controllingCommands[i]
         let button = document.querySelector(`[command="${command}"]`)
         if (document.queryCommandState(command)) {
@@ -1195,7 +1195,7 @@ function setTemplateHeadings(templateName) {
     for (let i = 0; i < headings.length; i++) {
         let newHeading = document.createElement('a')
         newHeading.setAttribute('command', 'formatBlock')
-        newHeading.setAttribute('value', 'H'+(i+1).toString())
+        newHeading.setAttribute('value', 'H' + (i + 1).toString())
         newHeading.classList.add('dropdown-item')
         newHeading.setAttribute('href', '#')
         newHeading.innerText = headings[i]
@@ -1204,7 +1204,7 @@ function setTemplateHeadings(templateName) {
 }
 
 // set template's arguments
-function setTemplateArguments(templateName){
+function setTemplateArguments(templateName) {
     let templateArgsDivId = 'arguments-modal-body'
     let argsDiv = document.getElementById(templateArgsDivId)
     if (argsDiv) {
@@ -1240,13 +1240,13 @@ function setTemplateArguments(templateName){
         inputPrepend.classList.add('input-group-prepend')
         let prependSpan = document.createElement('span')
         prependSpan.classList.add('input-group-text')
-        prependSpan.setAttribute('id', argName+'prepend')
+        prependSpan.setAttribute('id', argName + 'prepend')
         prependSpan.innerText = help
         inputPrepend.appendChild(prependSpan)
         let input = document.createElement('input')
         input.setAttribute('type', 'text')
         input.classList.add('form-control')
-        input.setAttribute('aria-describedby', argName+'prepend')
+        input.setAttribute('aria-describedby', argName + 'prepend')
         input.setAttribute('id', argName)
 
         inputDiv.appendChild(inputPrepend)
@@ -1311,9 +1311,9 @@ function templateDropdownHandler(event) {
         // select the same as old
         return
     }
-    ipcRenderer.send('alert', 'set template:'+templateName)
+    ipcRenderer.send('alert', 'set template:' + templateName)
     document.getElementById('current-template').value = templateName
-    document.getElementById('dropdown-button').innerText = `Templates(${templateName})` 
+    document.getElementById('dropdown-button').innerText = `Templates(${templateName})`
 
     // headings
     setTemplateHeadings(templateName)
@@ -1368,7 +1368,7 @@ var isCompiling = false
 function compile() {
     if (isCompiling) return
     isCompiling = true
-    ipcRenderer.sendSync('set-variable', {name: 'isCompileFinish', value: false})
+    ipcRenderer.sendSync('set-variable', { name: 'isCompileFinish', value: false })
     ipcRenderer.send('alert', 'click: compile')
     // convert args if exist
     var templateName = document.getElementById('current-template').value
@@ -1458,9 +1458,9 @@ function compile() {
         if (err) {
             // a image failed to upload, alert user and comtinue the compiling task
             const errInfo = err + '\nSome images will not included in the pdf.'
-            ipcRenderer.send('set-variable', {name: 'compileHint', value: errInfo})
+            ipcRenderer.send('set-variable', { name: 'compileHint', value: errInfo })
             ipcRenderer.send('alert', errInfo)
-        } else  {
+        } else {
             ipcRenderer.send('alert', 'All images have been uploaded')
         }
         // sending the compiling task
@@ -1488,14 +1488,14 @@ function sendCompileTask(compileTask) {
         'template': templateName,
         'images': JSON.stringify(images)
     }
-    ipcRenderer.send('alert', 'post task data:'+ args + partArgs)
+    ipcRenderer.send('alert', 'post task data:' + args + partArgs)
     async.waterfall([
         (callback) => {
             // creating a task
-            ipcRenderer.send('set-variable', {name: 'compileHint', value: 'Creating compiling task...'})
+            ipcRenderer.send('set-variable', { name: 'compileHint', value: 'Creating compiling task...' })
             agent
                 .post(apiBase + '/tasks')
-                .timeout({response: 10000})
+                .timeout({ response: 10000 })
                 .send(createTaskBody)
                 .ok(res => res.status == '202')
                 .retry(5)
@@ -1512,7 +1512,7 @@ function sendCompileTask(compileTask) {
         (task, callback) => {
             // querying the task's status
             // waiting for task finished
-            ipcRenderer.send('set-variable', {name: 'compileHint', value: 'Waiting for compiling task...'})
+            ipcRenderer.send('set-variable', { name: 'compileHint', value: 'Waiting for compiling task...' })
             async.retry({ times: 120, interval: 100 }, (cb) => {
                 agent.get(apiBase + `/tasks/${task.task_id}`).end((err, res) => {
                     if (res && res.status == '200') {
@@ -1534,7 +1534,7 @@ function sendCompileTask(compileTask) {
         },
         (task, callback) => {
             // downloading the pdf
-            ipcRenderer.send('set-variable', {name: 'compileHint', value: 'Downloading the pdf...'})
+            ipcRenderer.send('set-variable', { name: 'compileHint', value: 'Downloading the pdf...' })
             agent.get(apiBase + `/pdfs/${task.pdf_id}`).buffer(true)
                 .parse(superagent.parse['application/octet-stream'])
                 .ok(res => res.status == '200')
@@ -1544,8 +1544,8 @@ function sendCompileTask(compileTask) {
                     const pdfName = `${documentID}.pdf`
                     const pdfPath = path.join(store.dataPath, documentID, pdfName)
                     store.updateDocument({ id: documentID, pdf: { name: pdfName, data: res.body } })
-                    ipcRenderer.sendSync('set-variable', {name: 'pdfPath', value: pdfPath})
-                    ipcRenderer.sendSync('set-variable', {name: 'isCompileFinish', value: true})
+                    ipcRenderer.sendSync('set-variable', { name: 'pdfPath', value: pdfPath })
+                    ipcRenderer.sendSync('set-variable', { name: 'isCompileFinish', value: true })
                     isCompiling = false
                     compiledHtml = html
                 })
@@ -1556,7 +1556,7 @@ function sendCompileTask(compileTask) {
         (err, res, info) => {
             ipcRenderer.send('alert', `ERROR when ${info}: ${err}`)
             alert(`error when ${info}: ${err}`)
-            ipcRenderer.sendSync('set-variable', {name: 'isCompileFinish', value: true})
+            ipcRenderer.sendSync('set-variable', { name: 'isCompileFinish', value: true })
             isCompiling = false
         }
     )
@@ -1580,7 +1580,7 @@ function generateOutline() {
         let headerName = headers[i].tagName
         let content = headers[i].innerHTML
         let md5sum = crypto.createHash('md5')
-        md5sum.update(headerName+content+i.toString())
+        md5sum.update(headerName + content + i.toString())
         let hashId = md5sum.digest('hex')
         headers[i].setAttribute('id', hashId)
         if (!lastHeader.id) {
@@ -1593,7 +1593,7 @@ function generateOutline() {
             rootHeaders.push(hashId)
         } else {
             let currentHeaderValue = headerValues[headerName]
-            ipcRenderer.send('alert', 'current value:'+currentHeaderValue+' last value:'+lastHeader.value)
+            ipcRenderer.send('alert', 'current value:' + currentHeaderValue + ' last value:' + lastHeader.value)
             if (currentHeaderValue < lastHeader.value) {
                 // belong to last node
                 childrenList = getChildrenList[lastHeader.id]
@@ -1647,7 +1647,7 @@ function generateOutline() {
 
     let createElement = function (hasChildren, hashId) {
         var element = document.createElement('li')
-        var  elementA = document.createElement('a')
+        var elementA = document.createElement('a')
         elementA.setAttribute('class', 'anchor-link')
         elementA.setAttribute('link', hashId)
         elementA.setAttribute('href', '#')
@@ -1677,7 +1677,7 @@ function generateOutline() {
                 getChildrenList[childrenId],
                 childrenId
             )
-            document.querySelector("ul[id='anchor"+parentId+"']").appendChild(children)
+            document.querySelector("ul[id='anchor" + parentId + "']").appendChild(children)
             makeChildrenElements(getChildrenList[childrenId], childrenId)
         }
     }
@@ -1716,13 +1716,13 @@ $(window).on('mousemove', event => {
 })
 
 // move the panel to the visible area when it is pinned
-$(function() {
-    var $treePanel = $("#tree-panel"), 
-        $window    = $(window),
-        offset     = $treePanel.offset(),
+$(function () {
+    var $treePanel = $("#tree-panel"),
+        $window = $(window),
+        offset = $treePanel.offset(),
         topPadding = 50
 
-    $window.scroll(function() {
+    $window.scroll(function () {
         if ($window.scrollTop() > offset.top) {
             $treePanel.stop().animate({
                 marginTop: $window.scrollTop() - offset.top + topPadding
@@ -1754,7 +1754,7 @@ pinTreeButton.on('click', event => {
         treePanel.addClass('pinned')
         pinTree = true
     }
-    store.updateDocument({ id: documentID, pinTree: pinTree})
+    store.updateDocument({ id: documentID, pinTree: pinTree })
 })
 
 function treeHandler(event) {
@@ -1768,7 +1768,7 @@ function treeHandler(event) {
         } else {
             var targetId = target.getAttribute('link')
             var selectedElement = document.querySelector("[id='" + targetId + "']")
-            selectedElement.scrollIntoView(true, {behavior: "smooth"})
+            selectedElement.scrollIntoView(true, { behavior: "smooth" })
         }
     }
 }

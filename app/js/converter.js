@@ -52,7 +52,7 @@ class Converter {
         return parsedInnerLatex
     }
 
-    _convert_elements(html, parentNode='') {
+    _convert_elements(html, parentNode = '') {
         var htmlDom = this._getDOM(html)
         var bodyDom = this._getParsedDomBodyElements(htmlDom)
         if (bodyDom.length == 0) {
@@ -128,8 +128,8 @@ class Converter {
                         parsedInnerLatex = `\\includegraphics[width=${linewidth}\\linewidth]{${imgID}.${imgType}}\n`
                     } else {
                         parsedInnerLatex = '\\begin{figure}[hbt]\n'
-                                            + '\\centering\n'
-                                            + `\\includegraphics[width=${linewidth}\\linewidth]{${imgID}.${imgType}}\n`
+                            + '\\centering\n'
+                            + `\\includegraphics[width=${linewidth}\\linewidth]{${imgID}.${imgType}}\n`
                         if (caption) {
                             parsedInnerLatex += `\\caption{${caption}}\n`
                         }
@@ -199,10 +199,10 @@ class Converter {
                     parsedInnerLatex = '\\begin{table}[hbt]\n' + '\\centering'
                     if (tableCaption) parsedInnerLatex += `\\caption{${tableCaption}}\n`
                     parsedInnerLatex += `\\begin{tabular}{${rowFormat}}\n`
-                                        + parsedRows
-                                        + '\\end{tabular}\n'
-                                        + `\\label{${element.id}}\n`
-                                        + '\\end{table}'
+                        + parsedRows
+                        + '\\end{tabular}\n'
+                        + `\\label{${element.id}}\n`
+                        + '\\end{table}'
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
                 // Converting equations
@@ -213,13 +213,13 @@ class Converter {
                         parsedInnerLatex = `\$${equationLatex}\$`
                     } else if (equationStyle === 'display-numbered') {
                         parsedInnerLatex = '\n\\begin{equation}\n'
-                                            + equationLatex + '\n'
-                                            + `\\label{${element.id}}\n`
-                                            + '\\end{equation}\n'
+                            + equationLatex + '\n'
+                            + `\\label{${element.id}}\n`
+                            + '\\end{equation}\n'
                     } else if (equationStyle === 'display-unnumbered') {
                         parsedInnerLatex = '\n\\begin{displaymath}\n'
-                                            + equationLatex + '\n'
-                                            + '\\end{displaymath}\n'
+                            + equationLatex + '\n'
+                            + '\\end{displaymath}\n'
                     } else {
                         console.log('unknown equation style: ', equationStyle)
                         parsedInnerLatex = ''

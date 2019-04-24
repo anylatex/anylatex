@@ -76,8 +76,7 @@
       <button id="arguments-modal-button" class="btn btn-light font-weight-bold d-none modal-open-button" type="button"
         data-toggle="modal" data-target="#arguments-modal">TemplateArguments</button>
       <button id="compile" class="btn btn-light" type="button"><i class="fas fa-sync"></i></button>
-      <button id="save-button" title="saved" class="btn font-weight-bold"
-        style="white-space: nowrap; cursor: default">
+      <button id="save-button" title="saved" class="btn font-weight-bold" style="white-space: nowrap; cursor: default">
         <span id="save-loader" class="d-none spinner-border" role="status" aria-hidden="true"
           style="width: 1.5rem; height: 1.5rem;"></span>
         <span id="save-hint">&#x2714</span>
@@ -114,7 +113,8 @@
         <div class="h-100 w-100">
           <div class="row h-100 mt-4 no-gutters">
             <div class="col h-100">
-              <div id="part-args-editor" class="row h-25 mt-4 align-items-center justify-content-center no-gutters d-none">
+              <div id="part-args-editor"
+                class="row h-25 mt-4 align-items-center justify-content-center no-gutters d-none">
                 <div class="col h-100">
                   <div id="part-args-name" class="font-weight-bold mb-4"></div>
                   <div id="part-editor" class="editor w-100" contenteditable></div>
@@ -147,7 +147,8 @@
         <div class="modal-body" id="arguments-modal-body">
         </div>
         <div class="modal-footer">
-          <button id="arguments-confirm" type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+          <button id="arguments-confirm" type="button" class="btn btn-secondary modal-dismiss-button"
+            data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -190,8 +191,7 @@
     </div>
   </div>
   <!-- Image Inserting Modal -->
-  <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="imageModal"
-    aria-hidden="true">
+  <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="imageModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -205,22 +205,22 @@
               <div class="input-group-prepend">
                 <span class="input-group-text" id="input-image-name-label">Caption</span>
               </div>
-              <input id="image-caption" type="text" class="form-control" placeholder="Image's caption" aria-label="caption"
-                aria-describedby="input-image-name-label">
+              <input id="image-caption" type="text" class="form-control" placeholder="Image's caption"
+                aria-label="caption" aria-describedby="input-image-name-label">
             </div>
           </div>
           <img class="img-fluid mt-3" id="show-choose-image" />
         </div>
         <div class="modal-footer">
-          <button id="image-confirm" type="button" class="btn btn-primary modal-dismiss-button" data-dismiss="modal">Confirm</button>
+          <button id="image-confirm" type="button" class="btn btn-primary modal-dismiss-button"
+            data-dismiss="modal">Confirm</button>
           <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
   <!-- Table Inserting Modal -->
-  <div class="modal fade" id="table-modal" tabindex="-1" role="dialog" aria-labelledby="tableModal"
-    aria-hidden="true">
+  <div class="modal fade" id="table-modal" tabindex="-1" role="dialog" aria-labelledby="tableModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -241,20 +241,22 @@
           <div class="row pl-5 pr-5 mb-2 w-100 align-items-center justify-content-center">
             <div class="col-6">
               <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text font-weight-bold" id="table-row-label">Row</span>
-                  </div>
-                  <input id="table-row-number" type="text" class="form-control" placeholder="3" aria-describedby="table-row-label">
+                <div class="input-group-prepend">
+                  <span class="input-group-text font-weight-bold" id="table-row-label">Row</span>
                 </div>
+                <input id="table-row-number" type="text" class="form-control" placeholder="3"
+                  aria-describedby="table-row-label">
               </div>
+            </div>
             <div class="col-6">
               <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text font-weight-bold" id="table-col-label">Col</span>
-                  </div>
-                  <input id="table-col-number" type="text" class="form-control" placeholder="3" aria-describedby="table-col-label">
+                <div class="input-group-prepend">
+                  <span class="input-group-text font-weight-bold" id="table-col-label">Col</span>
                 </div>
+                <input id="table-col-number" type="text" class="form-control" placeholder="3"
+                  aria-describedby="table-col-label">
               </div>
+            </div>
           </div>
           <div class="row p-2 w-100 h-75 align-items-center justify-content-center">
             <div class="col-auto m-1 p-2 table-container block-container block-highlight">
@@ -284,14 +286,16 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button id="table-confirm" type="button" class="btn btn-primary modal-dismiss-button" data-dismiss="modal">Confirm</button>
+          <button id="table-confirm" type="button" class="btn btn-primary modal-dismiss-button"
+            data-dismiss="modal">Confirm</button>
           <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
   <!-- Equation Inserting Modal -->
-  <div class="modal fade" id="equation-modal" tabindex="-1" role="dialog" aria-labelledby="equationModal" aria-hidden="true">
+  <div class="modal fade" id="equation-modal" tabindex="-1" role="dialog" aria-labelledby="equationModal"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -453,8 +457,9 @@
           </div>
 
           <div class="w-100 mt-4">
-            <button class="btn btn-outline-dark" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                Click to see some examples
+            <button class="btn btn-outline-dark" type="button" data-toggle="collapse" data-target="#collapseExample"
+              aria-expanded="false" aria-controls="collapseExample">
+              Click to see some examples
             </button>
             <div class="collapse" id="collapseExample">
               <div class="card card-body">
@@ -466,70 +471,70 @@
                   <tr>
                     <td class="asciimath-example" id="ex1">f'(x)=x^2</td>
                     <td id="render-ex1"></td>
-                  </div>
-                  <tr>
-                    <td class="asciimath-example" id="ex2">sqrt sqrt root3x</td>
-                    <td id="render-ex2"></td>
-                  </tr>
-                  <tr>
-                    <td class="asciimath-example" id="ex3">(a/b)/c</td>
-                    <td id="render-ex3"></td>
-                  </tr>
-                  <tr>
-                    <td class="asciimath-example" id="ex4">(a,b]={x in RR | a < x <= b}</td>
-                    <td id="render-ex4"></td>
-                  </tr>
-                  <tr>
-                    <td class="asciimath-example" id="ex5">x^2+y_1+z_12^34</td>
-                    <td id="render-ex5"></td>
-                  </tr>
-                  <tr>
-                    <td class="asciimath-example" id="ex6">stackrel"def"= or \stackrel{\Delta}{=}" "("or ":=)</td>
-                    <td id="render-ex6"></td>
-                  </tr>
-                  <tr>
-                    <td class="asciimath-example" id="ex7"><< a,b >> and {:(x,y),(u,v):}</td>
-                    <td id="render-ex7"></td>
-                  </div>
-                  <tr>
-                    <td class="asciimath-example" id="ex8">{::}_(\ 92)^238U</td>
-                    <td id="render-ex8"></td>
-                  </tr>
-                  <tr>
-                    <td class="asciimath-example" id="ex9">{(x^2 + x, if x!=0),(text{undefined},if x=0):}</td>
-                    <td id="render-ex9"></td>
-                  </tr>
-                  <tr>
-                    <td class="asciimath-example" id="ex10">d/dxf(x) = lim_(h->0)(f(x+h)-f(x))/h</td>
-                    <td id="render-ex10"></td>
-                  </tr>
-                </table>
               </div>
+              <tr>
+                <td class="asciimath-example" id="ex2">sqrt sqrt root3x</td>
+                <td id="render-ex2"></td>
+              </tr>
+              <tr>
+                <td class="asciimath-example" id="ex3">(a/b)/c</td>
+                <td id="render-ex3"></td>
+              </tr>
+              <tr>
+                <td class="asciimath-example" id="ex4">(a,b]={x in RR | a < x <=b}</td> <td id="render-ex4">
+                </td>
+              </tr>
+              <tr>
+                <td class="asciimath-example" id="ex5">x^2+y_1+z_12^34</td>
+                <td id="render-ex5"></td>
+              </tr>
+              <tr>
+                <td class="asciimath-example" id="ex6">stackrel"def"= or \stackrel{\Delta}{=}" "("or ":=)</td>
+                <td id="render-ex6"></td>
+              </tr>
+              <tr>
+                <td class="asciimath-example" id="ex7">
+                  << a,b>> and {:(x,y),(u,v):}
+                </td>
+                <td id="render-ex7"></td>
             </div>
+            <tr>
+              <td class="asciimath-example" id="ex8">{::}_(\ 92)^238U</td>
+              <td id="render-ex8"></td>
+            </tr>
+            <tr>
+              <td class="asciimath-example" id="ex9">{(x^2 + x, if x!=0),(text{undefined},if x=0):}</td>
+              <td id="render-ex9"></td>
+            </tr>
+            <tr>
+              <td class="asciimath-example" id="ex10">d/dxf(x) = lim_(h->0)(f(x+h)-f(x))/h</td>
+              <td id="render-ex10"></td>
+            </tr>
+            </table>
           </div>
-          <div class="row mt-4 w-100 h-75 justify-content-center">
-            <div class="col-auto p-2 m-1 block-container equation-container" eq-style="inline">
-              <p><b>Inline Mode</b></p>
-              <p>Equation is <span id="example-inline-equation">f(x) = x^2</span>.</p>
-            </div>
-            <div class="col-auto p-2 m-1 block-container equation-container block-highlight" eq-style="display-numbered">
-              <p><b>Display Mode - Numbered</b></p>
-              <p>Equation is:</p>
-              <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-numbered-equation">f(x) = x^2</span>&emsp;&emsp;(1)</p>
-            </div>
-            <div class="col-auto p-2 m-1 block-container equation-container" eq-style="display-unnumbered">
-              <p><b>Display Mode - Unnumbered</b></p>
-              <p>Equation is:</p>
-              <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-unnumbered-equation">f(x) = x^2</span></p>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button"
-            data-dismiss="modal">Confirm</button>
-          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
         </div>
       </div>
+      <div class="row mt-4 w-100 h-75 justify-content-center">
+        <div class="col-auto p-2 m-1 block-container equation-container" eq-style="inline">
+          <p><b>Inline Mode</b></p>
+          <p>Equation is <span id="example-inline-equation">f(x) = x^2</span>.</p>
+        </div>
+        <div class="col-auto p-2 m-1 block-container equation-container block-highlight" eq-style="display-numbered">
+          <p><b>Display Mode - Numbered</b></p>
+          <p>Equation is:</p>
+          <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-numbered-equation">f(x) = x^2</span>&emsp;&emsp;(1)</p>
+        </div>
+        <div class="col-auto p-2 m-1 block-container equation-container" eq-style="display-unnumbered">
+          <p><b>Display Mode - Unnumbered</b></p>
+          <p>Equation is:</p>
+          <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-unnumbered-equation">f(x) = x^2</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button"
+        data-dismiss="modal">Confirm</button>
+      <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
     </div>
   </div>
 

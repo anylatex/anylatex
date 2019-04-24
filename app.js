@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const url = require('url')
 const superagent = require('superagent')
@@ -39,37 +39,37 @@ app.once('ready', () => {
         global.userID = store.getConfig('currentUserID')
     }
 
-  // Create a new window
-  window = new BrowserWindow({
-    // Set the default background color of the window to match the CSS
-    // background color of the page, this prevents any white flickering
-    backgroundColor: "#D6D8DC",
-    // Don't show the window until it's ready, this prevents any white flickering
-    show: false,
-    webPreferences: {
-        webviewTag: true,
-        nodeIntegration: true
-    }
-  })
+    // Create a new window
+    window = new BrowserWindow({
+        // Set the default background color of the window to match the CSS
+        // background color of the page, this prevents any white flickering
+        backgroundColor: "#D6D8DC",
+        // Don't show the window until it's ready, this prevents any white flickering
+        show: false,
+        webPreferences: {
+            webviewTag: true,
+            nodeIntegration: true
+        }
+    })
 
-  window.maximize()
-  window.setResizable(true)
-  //window.on('unmaximize', () => window.maximize())
+    window.maximize()
+    window.setResizable(true)
+    //window.on('unmaximize', () => window.maximize())
 
-  // Load a URL in the window to the local index.html path
-  window.loadURL(url.format({
-    pathname: path.join(__dirname, 'app/documents.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
+    // Load a URL in the window to the local index.html path
+    window.loadURL(url.format({
+        pathname: path.join(__dirname, 'app/documents.html'),
+        protocol: 'file:',
+        slashes: true
+    }))
 
-  // Show window when page is ready
-  //window.once('ready-to-show', () => {
-  //  window.show()
-  //})
-  window.webContents.on('did-finish-load', function() {
-    window.show();
-});
+    // Show window when page is ready
+    //window.once('ready-to-show', () => {
+    //  window.show()
+    //})
+    window.webContents.on('did-finish-load', function () {
+        window.show();
+    });
 })
 
 // terminate all processes after closing the window
