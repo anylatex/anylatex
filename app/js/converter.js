@@ -229,6 +229,27 @@ class Converter {
                 case 'EQUATION-EXTRA':
                     latex = latex.replace(outerHTML, '')
                     break
+                // Converting quotes
+                case 'QUOTE':
+                    var quoteStyle = element.getAttribute('qt-style')
+                    if (quoteStyle === 'quote') {
+                        parsedInnerLatex = '\n\\begin{quote}\n'
+                            + `${this._convert_elements(element.innerHTML)}\n`
+                            + '\\end{quote}\n'
+                    } else if (quoteStyle === 'quotation') {
+                        parsedInnerLatex = '\n\\begin{quotation}\n'
+                            + `${this._convert_elements(element.innerHTML)}\n`
+                            + '\\end{quotation}\n'
+                    } else {
+                        parsedInnerLatex = '\n\\begin{verse}\n'
+                            + `${this._convert_elements(element.innerHTML)}\n`
+                            + '\\end{verse}\n'
+                    }
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'QUOTE-EXTRA':
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
                 // Converting others
                 case 'DIV':
                     parsedInnerLatex = `\n\n${this._convert_elements(element.innerHTML, parentNode)}\n\n`

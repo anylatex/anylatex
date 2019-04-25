@@ -56,6 +56,9 @@
       <button id="open-equation-selector" class="btn btn-light modal-open-button" type="button" data-toggle="modal"
         data-target="#equation-modal" tab-index="-1" role="dialog" aria-labelledby="equationModal"><i
           class="fas fa-square-root-alt"></i></button>
+      <button id="open-quote-selector" class="btn btn-light modal-open-button" type="button" data-toggle="modal"
+        data-target="#quote-modal" tab-index="-1" role="dialog" aria-labelledby="quoteModal"><i
+          class="fas fa-quote-left"></i></button>
       <div class="btn-group" role="group">
         <button type="button" class="btn btn-light dropdown-toggle font-weight-bolder" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
@@ -445,7 +448,24 @@
             </div>
             <div class="row mt-2 text-muted">Full symbol list at http://asciimath.org/</div>
           </div>
-
+          <div class="row mt-4 w-100 h-75 justify-content-center">
+            <div class="col-auto p-2 m-1 block-container equation-container" eq-style="inline">
+              <p><b>Inline Mode</b></p>
+              <p>Equation is <span id="example-inline-equation">f(x) = x^2</span>.</p>
+            </div>
+            <div class="col-auto p-2 m-1 block-container equation-container block-highlight"
+              eq-style="display-numbered">
+              <p><b>Display Mode - Numbered</b></p>
+              <p>Equation is:</p>
+              <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-numbered-equation">f(x) = x^2</span>&emsp;&emsp;(1)
+              </p>
+            </div>
+            <div class="col-auto p-2 m-1 block-container equation-container" eq-style="display-unnumbered">
+              <p><b>Display Mode - Unnumbered</b></p>
+              <p>Equation is:</p>
+              <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-unnumbered-equation">f(x) = x^2</span></p>
+            </div>
+          </div>
           <div class="mt-2 ml-3">
             <div class="row">
               <strong>Type math below:&nbsp;</strong>
@@ -471,70 +491,105 @@
                   <tr>
                     <td class="asciimath-example" id="ex1">f'(x)=x^2</td>
                     <td id="render-ex1"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex2">sqrt sqrt root3x</td>
+                    <td id="render-ex2"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex3">(a/b)/c</td>
+                    <td id="render-ex3"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex4">(a,b]={x in RR | a < x <=b}</td> <td id="render-ex4">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex5">x^2+y_1+z_12^34</td>
+                    <td id="render-ex5"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex6">stackrel"def"= or \stackrel{\Delta}{=}" "("or ":=)</td>
+                    <td id="render-ex6"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex7">
+                      << a,b>> and {:(x,y),(u,v):}
+                    </td>
+                    <td id="render-ex7"></td>
+                  <tr>
+                    <td class="asciimath-example" id="ex8">{::}_(\ 92)^238U</td>
+                    <td id="render-ex8"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex9">{(x^2 + x, if x!=0),(text{undefined},if x=0):}</td>
+                    <td id="render-ex9"></td>
+                  </tr>
+                  <tr>
+                    <td class="asciimath-example" id="ex10">d/dxf(x) = lim_(h->0)(f(x+h)-f(x))/h</td>
+                    <td id="render-ex10"></td>
+                  </tr>
+                </table>
               </div>
-              <tr>
-                <td class="asciimath-example" id="ex2">sqrt sqrt root3x</td>
-                <td id="render-ex2"></td>
-              </tr>
-              <tr>
-                <td class="asciimath-example" id="ex3">(a/b)/c</td>
-                <td id="render-ex3"></td>
-              </tr>
-              <tr>
-                <td class="asciimath-example" id="ex4">(a,b]={x in RR | a < x <=b}</td> <td id="render-ex4">
-                </td>
-              </tr>
-              <tr>
-                <td class="asciimath-example" id="ex5">x^2+y_1+z_12^34</td>
-                <td id="render-ex5"></td>
-              </tr>
-              <tr>
-                <td class="asciimath-example" id="ex6">stackrel"def"= or \stackrel{\Delta}{=}" "("or ":=)</td>
-                <td id="render-ex6"></td>
-              </tr>
-              <tr>
-                <td class="asciimath-example" id="ex7">
-                  << a,b>> and {:(x,y),(u,v):}
-                </td>
-                <td id="render-ex7"></td>
             </div>
-            <tr>
-              <td class="asciimath-example" id="ex8">{::}_(\ 92)^238U</td>
-              <td id="render-ex8"></td>
-            </tr>
-            <tr>
-              <td class="asciimath-example" id="ex9">{(x^2 + x, if x!=0),(text{undefined},if x=0):}</td>
-              <td id="render-ex9"></td>
-            </tr>
-            <tr>
-              <td class="asciimath-example" id="ex10">d/dxf(x) = lim_(h->0)(f(x+h)-f(x))/h</td>
-              <td id="render-ex10"></td>
-            </tr>
-            </table>
           </div>
         </div>
-      </div>
-      <div class="row mt-4 w-100 h-75 justify-content-center">
-        <div class="col-auto p-2 m-1 block-container equation-container" eq-style="inline">
-          <p><b>Inline Mode</b></p>
-          <p>Equation is <span id="example-inline-equation">f(x) = x^2</span>.</p>
-        </div>
-        <div class="col-auto p-2 m-1 block-container equation-container block-highlight" eq-style="display-numbered">
-          <p><b>Display Mode - Numbered</b></p>
-          <p>Equation is:</p>
-          <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-numbered-equation">f(x) = x^2</span>&emsp;&emsp;(1)</p>
-        </div>
-        <div class="col-auto p-2 m-1 block-container equation-container" eq-style="display-unnumbered">
-          <p><b>Display Mode - Unnumbered</b></p>
-          <p>Equation is:</p>
-          <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-unnumbered-equation">f(x) = x^2</span></p>
+        <div class="modal-footer">
+          <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button"
+            data-dismiss="modal">Confirm</button>
+          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button"
-        data-dismiss="modal">Confirm</button>
-      <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+  </div>
+  <!-- Quoting Modal -->
+  <div class="modal fade" id="quote-modal" tabindex="-1" role="dialog" aria-labelledby="quoteModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Quoting</h5>
+        </div>
+        <div class="modal-body p-2 row">
+          <div class="col-auto mt-1 h-100">
+            <div class="p-3 m-1 block-container quote-container" qt-style="quote">
+              <p id="quote-name"><b>Quote</b></p>
+              <p>A typographical rule of thumb for the<br>
+                 line length is:</p>
+              <p class="mt-2 mb-2">&emsp;&emsp;On average, no line should be<br>
+              &emsp;&emsp;longer than 66 characters.</p>
+            </div>
+            <div class="p-3 m-1 block-container quote-container block-highlight"
+              qt-style="quotation">
+              <p id="quotation-name"><b>Quotation</b></p>
+              <p>Rabindranath Tagore's short poem:</p>
+              <p class="mt-3">
+                  &emsp;&emsp;Beauty is truth’s smile when she beholds<br>
+                  &emsp;her own face in a perfect mirror.<br>
+                  &emsp;&emsp;Beauty is truth’s smile when she beholds<br>
+                  &emsp;her own face in a perfect mirror.
+              </p>
+            </div>
+            <div class="p-3 m-1 block-container quote-container" qt-style="verse">
+              <p id="verse-name"><b>Verse</b></p>
+              <p>Rabindranath Tagore’s short poem:</p>
+              <p class="mt-3">
+                &emsp;&emsp;Beauty is truth’s smile when she<br>
+                &emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;beholds her own face in a<br>
+                &emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;perfect mirror.
+              </p>
+            </div>
+          </div>
+          <div class="col-4 mt-2 align-self-center">
+              <p><strong>Input:</strong></p>
+              <textarea id="quote-text" style="width: 25vw; height: 40vh;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer row justify-content-center">
+          <button id="quote-confirm" type="button" class="col-2 btn btn-primary modal-dismiss-button"
+            data-dismiss="modal">Confirm</button>
+          <button type="button" class="col-2 ml-2 btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 
