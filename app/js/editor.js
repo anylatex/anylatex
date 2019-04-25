@@ -691,6 +691,69 @@ function equationConfirm(event) {
     katex.render(latexSpan.innerText, document.getElementById(equationID))
 }
 
+/* Insert quote modal */
+
+for (const quote of document.getElementsByClassName('quote-container')) {
+    quote.addEventListener('click', quoteClick)
+}
+document.getElementById('quote-confirm').addEventListener('click', quoteConfirm)
+
+$('#open-quote-selector').on('click', () => {
+    // clear
+    document.getElementById('quote-text').value = ''
+})
+
+function quoteClick(event) {
+    const target = event.target
+    if (target.classList.contains('block-highlight')) {
+        target.classList.remove('block-highlight')
+    } else {
+        // remove other quote' hightlight style
+        const equations = document.getElementsByClassName('quote-container')
+        for (const eq of equations) {
+            if (eq === target) continue
+            if (eq.classList.contains('block-highlight')) {
+                eq.classList.remove('block-highlight')
+            }
+        }
+        target.classList.add('block-highlight')
+    }
+}
+
+function quoteConfirm(event) {
+    const quoteStyleBlock = document.querySelectorAll('.block-highlight.quote-container')[0]
+    if (!quoteStyleBlock) {
+        alert('No quote style selected.')
+        return
+    }
+    const quoteStyle = quoteStyleBlock.getAttribute('qt-style')
+    const quoteExtra = document.createElement('quote-extra')
+    const quote = document.createElement('quote')
+    quoteExtra.innerText = document.getElementById(quoteStyle + '-name').innerText
+    quoteExtra.appendChild(document.createElement('p'))
+    quoteExtra.classList.add('text-muted')
+    quote.setAttribute('qt-style', quoteStyle)
+    quote.classList.add('col-10')
+    quote.classList.add('p-2')
+    quote.setAttribute('contenteditable', false)
+    quote.style.backgroundColor = 'rgb(247, 247, 247)'
+    quote.appendChild(quoteExtra)
+    const quoteText = document.getElementById('quote-text').value
+    for (const paragraph of quoteText.split('\n')) {
+        if (!paragraph) continue
+        const p = document.createElement('p')
+        p.innerText = paragraph
+        quote.appendChild(p)
+    }
+    const div = document.createElement('div')
+    div.classList.add('mt-2')
+    div.classList.add('mb-2')
+    div.classList.add('row')
+    div.classList.add('justify-content-center')
+    div.appendChild(quote)
+    insertElementAtCaret(div.outerHTML)
+}
+
 /* Toolbar and Editor's handlers */
 
 // current format relating status
