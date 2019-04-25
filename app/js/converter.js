@@ -253,6 +253,18 @@ class Converter {
                 // Converting others
                 case 'DIV':
                     parsedInnerLatex = `\n\n${this._convert_elements(element.innerHTML, parentNode)}\n\n`
+                    parsedInnerLatex = this._convert_elements(element.innerHTML, parentNode)
+                    var align = element.style.textAlign
+                    // NOTE: align style of texts in table columns and rows, equations and images have no effect
+                    if (align === 'center') {
+                        parsedInnerLatex = `\n\n\\begin{center}\n${parsedInnerLatex}\n\\end{center}\n\n`
+                    } else if (align === 'right') {
+                        parsedInnerLatex = `\n\n\\begin{flushright}\n${parsedInnerLatex}\n\\end{flushright}\n\n`
+                    } else if (align === 'left') {
+                        parsedInnerLatex = `\n\n\\begin{flushleft}\n${parsedInnerLatex}\n\\end{flushleft}\n\n`
+                    } else {
+                        parsedInnerLatex = `\n\n${parsedInnerLatex}\n\n`
+                    }
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     // latex += this._convert_elements(element.innerHTML) + '\n'
                     break
