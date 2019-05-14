@@ -24,46 +24,46 @@ $(function () {
     })
 })
 
-    /* Split panels, update tree's pinned status */
-    ; (function () {
-        const { stat } = store.getOneDocumentData(documentID)
-        var pinTree = stat['pinTree']
-        // tree is pinned by default in html.
-        // so, here will only need to detect if tree is unpinned
-        if (pinTree === false) {
-            var pinTreeButton = $('#pin-tree-panel')
-            var treePanel = $('#tree-panel')
-            pinTreeButton.removeClass('pinned')
-            // change the icon's style
-            $('#pin-icon').removeClass('pinned')
-            // unpin the panel
-            treePanel.removeClass('pinned')
-            // hide the tree
-            if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
+/* Split panels, update tree's pinned status */
+;(function () {
+    const { stat } = store.getOneDocumentData(documentID)
+    var pinTree = stat['pinTree']
+    // tree is pinned by default in html.
+    // so, here will only need to detect if tree is unpinned
+    if (pinTree === false) {
+        var pinTreeButton = $('#pin-tree-panel')
+        var treePanel = $('#tree-panel')
+        pinTreeButton.removeClass('pinned')
+        // change the icon's style
+        $('#pin-icon').removeClass('pinned')
+        // unpin the panel
+        treePanel.removeClass('pinned')
+        // hide the tree
+        if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
+    }
+    var storedSizes = stat['splitSizes']
+    var sizes
+    if (storedSizes) {
+        sizes = JSON.parse(storedSizes)
+    } else {
+        // TODO: why total is not 100?
+        sizes = [40, 40]
+    }
+    Split(['#content-panel', '#pdf-panel'], {
+        elementStyle: function (dimension, size, gutterSize) {
+            return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }
+        },
+        sizes: sizes,
+        minSize: [650, 350],
+        gutterSize: 3,
+        onDrag: () => {
+            editorScrollBar.resize()
+        },
+        onDragEnd: endSizes => {
+            store.updateDocument({ id: documentID, splitSizes: endSizes })
         }
-        var storedSizes = stat['splitSizes']
-        var sizes
-        if (storedSizes) {
-            sizes = JSON.parse(storedSizes)
-        } else {
-            // TODO: why total is not 100?
-            sizes = [40, 40]
-        }
-        Split(['#content-panel', '#pdf-panel'], {
-            elementStyle: function (dimension, size, gutterSize) {
-                return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }
-            },
-            sizes: sizes,
-            minSize: [650, 350],
-            gutterSize: 3,
-            onDrag: () => {
-                editorScrollBar.resize()
-            },
-            onDragEnd: endSizes => {
-                store.updateDocument({ id: documentID, splitSizes: endSizes })
-            }
-        })
-    }())
+    })
+}())
 
 /* Tool Functions */
 var editorRange = ''

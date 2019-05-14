@@ -257,7 +257,9 @@ class Converter {
                     var align = element.style.textAlign
                     // NOTE: align style of texts in table columns and rows, equations and images have no effect
                     if (align === 'center') {
-                        parsedInnerLatex = `\n\n\\begin{center}\n${parsedInnerLatex}\n\\end{center}\n\n`
+                        // TODO: center environment ouside centering image will cause large space after image
+                        if (parsedInnerLatex.indexOf('\\centering') < 0)
+                            parsedInnerLatex = `\n\n\\begin{center}\n${parsedInnerLatex}\n\\end{center}\n\n`
                     } else if (align === 'right') {
                         parsedInnerLatex = `\n\n\\begin{flushright}\n${parsedInnerLatex}\n\\end{flushright}\n\n`
                     } else if (align === 'left') {
