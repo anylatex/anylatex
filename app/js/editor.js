@@ -24,46 +24,62 @@ $(function () {
     })
 })
 
-/* Split panels, update tree's pinned status */
-;(function () {
-    const { stat } = store.getOneDocumentData(documentID)
-    var pinTree = stat['pinTree']
-    // tree is pinned by default in html.
-    // so, here will only need to detect if tree is unpinned
-    if (pinTree === false) {
-        var pinTreeButton = $('#pin-tree-panel')
-        var treePanel = $('#tree-panel')
-        pinTreeButton.removeClass('pinned')
-        // change the icon's style
-        $('#pin-icon').removeClass('pinned')
-        // unpin the panel
-        treePanel.removeClass('pinned')
-        // hide the tree
-        if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
-    }
-    var storedSizes = stat['splitSizes']
-    var sizes
-    if (storedSizes) {
-        sizes = JSON.parse(storedSizes)
-    } else {
-        // TODO: why total is not 100?
-        sizes = [40, 40]
-    }
-    Split(['#content-panel', '#pdf-panel'], {
-        elementStyle: function (dimension, size, gutterSize) {
-            return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }
-        },
-        sizes: sizes,
-        minSize: [650, 350],
-        gutterSize: 3,
-        onDrag: () => {
-            editorScrollBar.resize()
-        },
-        onDragEnd: endSizes => {
-            store.updateDocument({ id: documentID, splitSizes: endSizes })
+    /* Split panels, update tree's pinned status */
+    ; (function () {
+        const { stat } = store.getOneDocumentData(documentID)
+        var pinTree = stat['pinTree']
+        // tree is pinned by default in html.
+        // so, here will only need to detect if tree is unpinned
+        if (pinTree === false) {
+            var pinTreeButton = $('#pin-tree-panel')
+            var treePanel = $('#tree-panel')
+            pinTreeButton.removeClass('pinned')
+            // change the icon's style
+            $('#pin-icon').removeClass('pinned')
+            // unpin the panel
+            treePanel.removeClass('pinned')
+            // hide the tree
+            if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
         }
-    })
-}())
+        var storedSizes = stat['splitSizes']
+        var sizes
+        if (storedSizes) {
+            sizes = JSON.parse(storedSizes)
+        } else {
+            // TODO: why total is not 100?
+            sizes = [40, 40]
+        }
+        Split(['#content-panel', '#pdf-panel'], {
+            elementStyle: function (dimension, size, gutterSize) {
+                return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }
+            },
+            sizes: sizes,
+            minSize: [650, 350],
+            gutterSize: 3,
+            onDrag: () => {
+                editorScrollBar.resize()
+            },
+            onDragEnd: endSizes => {
+                store.updateDocument({ id: documentID, splitSizes: endSizes })
+            }
+        })
+    }())
+
+// setup HTML language
+function setupHTMLLanguage(languageMap) {
+    for (const languageEl of document.getElementsByClassName('language')) {
+        const languageTag = languageEl.getAttribute('language-tag')
+        const result = languageMap[languageTag]
+        if (!result) {
+            console.log('no corresponding translation of ' + languageTag
+                + ' to ' + remote.getGlobal('currentLanguage'))
+        } else {
+            languageEl.innerText = result
+        }
+    }
+}
+var languageMap = remote.getGlobal('currentLanguageMap')
+setupHTMLLanguage(languageMap)
 
 /* Tool Functions */
 var editorRange = ''
@@ -135,7 +151,7 @@ var compiledHtml = ''
             template = defaultTemplateName
         }
         document.getElementById('current-template').value = template
-        document.getElementById('dropdown-button').innerText = `Templates(${template})`
+        document.getElementById('dropdown-button').innerText = `${languageMap['Templates']}(${template})`
         setTemplateHeadings(template)
         setTemplateArguments(template)
         if (templateArgs[template]['partArgs']) {
@@ -211,7 +227,7 @@ $('#reference-modal').on('hidden.bs.modal', () => {
     let labelEl = document.getElementById('extracted-labels')
     let labelText = labelEl.innerText
     if (!labelText) {
-        alert('No labels extracted. No reference will be inserted.')
+        alert(languageMap['No Label Extracted Alert'])
         document.getElementById('reference-editor').innerHTML = ''
         labelEl.innerHTML = ''
         return
@@ -409,7 +425,7 @@ interact('div.image-container')
             return
         }
         target.setAttribute('linewidth', curLineWidth)
-        document.getElementById(target.getAttribute('popid') + 'size').innerText = `Image Width = ${curLineWidth} line width`
+        document.getElementById(target.getAttribute('popid') + 'size').innerText = `${languageMap['Image Width']} = ${curLineWidth} ${languageMap['line width']}`
         // update the element's style
         target.style.width = event.rect.width + 'px'
         target.style.height = event.rect.height + 'px'
@@ -423,7 +439,7 @@ interact('div.image-container')
         // hide image's size text
         document.getElementById(target.getAttribute('popid') + 'size').classList.add('d-none')
         // enable the popover
-        target.setAttribute('data-content', target.getAttribute('caption') + ' | ' + target.getAttribute('linewidth') + ' line width')
+        target.setAttribute('data-content', target.getAttribute('caption') + ' | ' + target.getAttribute('linewidth') + ` ${languageMap['line width']}`)
         $(`[popid='${target.getAttribute('popid')}'`).popover('enable')
         document.getElementById('editor').classList.remove('disable-select')
         document.getElementById('editor').setAttribute('contenteditable', 'true')
@@ -460,7 +476,7 @@ $('#image-confirm').on('click', () => {
         img.setAttribute('caption', captionText)
     } else {
         img.setAttribute('caption', '')
-        captionText = 'No Caption'
+        captionText = languageMap['No Caption']
     }
     // set up initial width ratio
     var defaultLinewidth = 0.6
@@ -528,7 +544,7 @@ function tableClick(event) {
 function tableConfirm(event) {
     const selectedContainer = document.querySelectorAll('.block-highlight.table-container')[0]
     if (!selectedContainer) {
-        alert('No table style selected.')
+        alert(languageMap['No table style selected.'])
         return
     }
     const selectedTable = selectedContainer.getElementsByTagName('table')[0]
@@ -547,10 +563,10 @@ function tableConfirm(event) {
         frame = 'hsides'
         rules = 'all'
     } else {
-        alert('Unknow table style: ' + tableStyle)
+        alert(`${languageMap['Unknow table style:']} ` + tableStyle)
         return
     }
-    const tableCaption = document.getElementById('table-caption').value || 'No Caption'
+    const tableCaption = document.getElementById('table-caption').value || languageMap['No Caption']
     const tablePopID = Math.random().toString(36).substr(2, 9)
     const tableID = Math.random().toString(36).substr(2, 9)
     var tableAttributes = `id=${tableID} ` + `frame=${frame} ` + `rules=${rules} `
@@ -558,7 +574,7 @@ function tableConfirm(event) {
         + 'data-toggle=popover ' + 'title=Caption '
         + `data-content='${tableCaption}' ` + 'data-trigger=hover '
         + `data-placement=top ` + `popid=${tablePopID} `
-    if (tableCaption != 'No Caption') tableAttributes += `caption=${tableCaption}`
+    if (tableCaption != languageMap['No Caption']) tableAttributes += `caption=${tableCaption}`
     let html = [`<table style="margin: 0px auto;" ${tableAttributes}`]
     let colInRow = ''
     html.push('<tr>')
@@ -864,7 +880,7 @@ $.contextMenu({
         if (tagName === 'IMG') {
             const caption = $(this).attr('caption')
             if (!caption) {
-                alert('Can not make reference of images with no captions.')
+                alert(languageMap['Can not make reference of images with no captions.'])
                 return
             }
             referenceData = {
@@ -877,7 +893,7 @@ $.contextMenu({
         } else if (tagName === 'TABLE') {
             const caption = $(this).attr('caption')
             if (!caption) {
-                alert('Can not make reference of tables with no captions.')
+                alert(languageMap['Can not make reference of tables with no captions.'])
                 return
             }
             referenceData = {
@@ -890,7 +906,7 @@ $.contextMenu({
         } else if (tagName === 'EQUATION') {
             const displayStyle = $(this).attr('eq-style')
             if (displayStyle != 'display-numbered') {
-                alert('Can not make reference of unnumbered equations.')
+                alert(languageMap['Can not make reference of unnumbered equations.'])
                 return
             }
             referenceData = {
@@ -928,8 +944,8 @@ $.contextMenu({
         $(this).attr('refs', refEleIDs)
     },
     items: {
-        "reference": { name: "Make Reference of This", icon: "edit" },
-        "pageReference": { name: "Make Reference of This Page", icon: "edit" }
+        "reference": { name: languageMap["Make Reference of This"], icon: "edit" },
+        "pageReference": { name: languageMap["Make Reference of This Page"], icon: "edit" }
     }
 })
 
@@ -1477,7 +1493,7 @@ function compile() {
     var html = editor.innerHTML
     var latex = converter.convert(html)
     if (!latex && Object.keys(args).length == 0 && Object.keys(partArgs).length == 0) {
-        alert("No contents. Please write something before compiling.")
+        alert(languageMap["No contents. Please write something before compiling."])
         return
     }
     ipcRenderer.send("alert", "latex:" + latex)
@@ -1519,7 +1535,7 @@ function compile() {
         )
     }, err => {
         if (err) {
-            // a image failed to upload, alert user and comtinue the compiling task
+            // a image failed to upload, TODO: alert user and comtinue the compiling task
             const errInfo = err + '\nSome images will not included in the pdf.'
             ipcRenderer.send('set-variable', { name: 'compileHint', value: errInfo })
             ipcRenderer.send('alert', errInfo)
@@ -1555,7 +1571,7 @@ function sendCompileTask(compileTask) {
     async.waterfall([
         (callback) => {
             // creating a task
-            ipcRenderer.send('set-variable', { name: 'compileHint', value: 'Creating compiling task...' })
+            ipcRenderer.send('set-variable', { name: 'compileHint', value: languageMap['Creating compiling task'] + '...' })
             agent
                 .post(apiBase + '/tasks')
                 .timeout({ response: 10000 })
@@ -1575,7 +1591,7 @@ function sendCompileTask(compileTask) {
         (task, callback) => {
             // querying the task's status
             // waiting for task finished
-            ipcRenderer.send('set-variable', { name: 'compileHint', value: 'Waiting for compiling task...' })
+            ipcRenderer.send('set-variable', { name: 'compileHint', value: languageMap['Waiting for compiling task'] + '...' })
             async.retry({ times: 120, interval: 100 }, (cb) => {
                 agent.get(apiBase + `/tasks/${task.task_id}`).end((err, res) => {
                     if (res && res.status == '200') {
@@ -1597,7 +1613,7 @@ function sendCompileTask(compileTask) {
         },
         (task, callback) => {
             // downloading the pdf
-            ipcRenderer.send('set-variable', { name: 'compileHint', value: 'Downloading the pdf...' })
+            ipcRenderer.send('set-variable', { name: 'compileHint', value: languageMap['Downloading the pdf'] + '...' })
             agent.get(apiBase + `/pdfs/${task.pdf_id}`).buffer(true)
                 .parse(superagent.parse['application/octet-stream'])
                 .ok(res => res.status == '200')

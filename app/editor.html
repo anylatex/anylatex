@@ -60,24 +60,25 @@
         data-target="#quote-modal" tab-index="-1" role="dialog" aria-labelledby="quoteModal"><i
           class="fas fa-quote-left"></i></button>
       <div class="btn-group" role="group">
-        <button type="button" class="btn btn-light dropdown-toggle font-weight-bolder" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
+        <button type="button" class="btn btn-light dropdown-toggle font-weight-bolder language" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false" language-tag="Sections">
           Sections
         </button>
         <div id="headings-dropdown" class="dropdown-menu">
         </div>
       </div>
       <div class="btn-group" role="group">
-        <button id="dropdown-button" type="button" class="btn btn-light dropdown-toggle font-weight-bolder"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button id="dropdown-button" type="button" class="btn btn-light dropdown-toggle font-weight-bolder language"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" language-tag="Templates">
           Templates
         </button>
         <div class="dropdown-menu" id="templates-dropdown">
           <input type="hidden" value="" id="current-template" />
         </div>
       </div>
-      <button id="arguments-modal-button" class="btn btn-light font-weight-bold d-none modal-open-button" type="button"
-        data-toggle="modal" data-target="#arguments-modal">TemplateArguments</button>
+      <button id="arguments-modal-button" class="btn btn-light font-weight-bold d-none modal-open-button language"
+        type="button" data-toggle="modal" data-target="#arguments-modal"
+        language-tag="TemplateArguments">TemplateArguments</button>
       <button id="compile" class="btn btn-light" type="button"><i class="fas fa-sync"></i></button>
       <button id="save-button" title="saved" class="btn font-weight-bold" style="white-space: nowrap; cursor: default">
         <span id="save-loader" class="d-none spinner-border" role="status" aria-hidden="true"
@@ -98,8 +99,9 @@
             <button id="pin-tree-panel" class="btn btn-light pinned"><i id="pin-icon"
                 class="pinned fas fa-thumbtack"></i></button>
           </div>
-          <p class="font-weight-bold">目录</p>
-          <a id="refresh-link" class="ml-1 mb-5" href="#" style="color: black; font-size: 0.8rem">刷新</a>
+          <p class="font-weight-bold language" language-tag="Contents">Contents</p>
+          <a id="refresh-link" class="ml-1 mb-5 language" href="#" style="color: black; font-size: 0.8rem"
+            language-tag="Refresh">Refresh</a>
           <div class="w-75">
             <hr class="mt-2 mb-2">
           </div>
@@ -122,7 +124,8 @@
                 <div class="col h-100">
                   <div id="part-args-name" class="font-weight-bold mb-4"></div>
                   <div id="part-editor" class="editor w-100" contenteditable></div>
-                  <button class="btn btn-primary mt-2" id="part-args-confirm">Confirm</button>
+                  <button class="btn btn-primary mt-2 language" id="part-args-confirm"
+                    language-tag="Confirm">Confirm</button>
                 </div>
               </div>
               <div id="editor" class="editor" contenteditable></div>
@@ -151,8 +154,8 @@
         <div class="modal-body" id="arguments-modal-body">
         </div>
         <div class="modal-footer">
-          <button id="arguments-confirm" type="button" class="btn btn-secondary modal-dismiss-button"
-            data-dismiss="modal">Close</button>
+          <button id="arguments-confirm" type="button" class="btn btn-secondary modal-dismiss-button language"
+            data-dismiss="modal" language-tag="Close">Close</button>
         </div>
       </div>
     </div>
@@ -163,33 +166,35 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Choose</h5>
+          <h5 class="modal-title language" language-tag="Choose">Choose</h5>
         </div>
         <div class="modal-body" id="scripts-modal-body">
           <div class="form-check">
             <input class="form-check-input" type="radio" name="radio1" id="reference-sup-check" checked>
             <label class="form-check-label" for="radio1">
-              Texts<sup>[*]</sup>
+              <span class="language" language-tag="Example Reference Texts">Texts</span><sup>[*]</sup>
             </label>
           </div>
           <div class="form-check">
             <input class="form-check-input" type="radio" name="radio1" id="reference-normal-check">
             <label class="form-check-label" for="radio1">
-              Texts[*]
+              <span class="language" language-tag="Example Reference Texts">Texts</span>[*]
             </label>
           </div>
           <div class="mt-4">
-            <p class="font-weight-bold">Input reference with bibtex's style:</p>
+            <p class="font-weight-bold language" language-tag="Input with Bibtex Hint">Input reference with bibtex's
+              style:</p>
             <div id="reference-editor" class="reference-editor" contenteditable='plaintext-only'></div>
             <p class="mt-3">
-              <b>Extracted Labels:</b><br>
+              <b class="language" language-tag="Extracted Labels">Extracted Labels:</b><br>
               <span id="extracted-labels"></span>
             </p>
             <input id="reference-value" type="hidden" />
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary modal-dismiss-button language" data-dismiss="modal"
+            language-tag="Close">Close</button>
         </div>
       </div>
     </div>
@@ -199,15 +204,17 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Choose images:</h5>
+          <h5 class="modal-title language" language-tag="Choose Images">Choose images:</h5>
         </div>
         <div class="modal-body">
           <div class="custom-file">
             <input type="file" class="custom-file-input" id="choose-image" accept="image/png, image/jpeg, image/bmp">
-            <label id="choose-image-name" class="custom-file-label" for="customFile">Choose file</label>
+            <label id="choose-image-name" class="custom-file-label language" for="customFile"
+              language-tag="Choose File">Choose file</label>
             <div class="input-group mt-2">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="input-image-name-label">Caption</span>
+                <span class="input-group-text language" id="input-image-name-label"
+                  language-tag="Caption">Caption</span>
               </div>
               <input id="image-caption" type="text" class="form-control" placeholder="Image's caption"
                 aria-label="caption" aria-describedby="input-image-name-label">
@@ -216,9 +223,10 @@
           <img class="img-fluid mt-3" id="show-choose-image" />
         </div>
         <div class="modal-footer">
-          <button id="image-confirm" type="button" class="btn btn-primary modal-dismiss-button"
-            data-dismiss="modal">Confirm</button>
-          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+          <button id="image-confirm" type="button" class="btn btn-primary modal-dismiss-button language"
+            data-dismiss="modal" language-tag="Confirm">Confirm</button>
+          <button type="button" class="btn btn-secondary modal-dismiss-button language" data-dismiss="modal"
+            language-tag="Close">Close</button>
         </div>
       </div>
     </div>
@@ -228,14 +236,15 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Insert tables:</h5>
+          <h5 class="modal-title language" language-tag="Insert Tables">Insert tables:</h5>
         </div>
         <div class="modal-body">
           <div class="row pl-5 pr-5 w-100 mb-3">
             <div class="col-12">
               <div class="input-group">
                 <div class="input-group-prepend">
-                  <span class="input-group-text font-weight-bold" id="table-caption-label">Caption</span>
+                  <span class="input-group-text font-weight-bold language" id="table-caption-label"
+                    language-tag="Caption">Caption</span>
                 </div>
                 <input id="table-caption" type="text" class="form-control" placeholder="caption"
                   aria-describedby="table-caption-label">
@@ -246,7 +255,8 @@
             <div class="col-6">
               <div class="input-group">
                 <div class="input-group-prepend">
-                  <span class="input-group-text font-weight-bold" id="table-row-label">Row</span>
+                  <span class="input-group-text font-weight-bold language" id="table-row-label"
+                    language-tag="Row">Row</span>
                 </div>
                 <input id="table-row-number" type="text" class="form-control" placeholder="3"
                   aria-describedby="table-row-label">
@@ -255,7 +265,8 @@
             <div class="col-6">
               <div class="input-group">
                 <div class="input-group-prepend">
-                  <span class="input-group-text font-weight-bold" id="table-col-label">Col</span>
+                  <span class="input-group-text font-weight-bold language" id="table-col-label"
+                    language-tag="Col">Col</span>
                 </div>
                 <input id="table-col-number" type="text" class="form-control" placeholder="3"
                   aria-describedby="table-col-label">
@@ -290,9 +301,10 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button id="table-confirm" type="button" class="btn btn-primary modal-dismiss-button"
-            data-dismiss="modal">Confirm</button>
-          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+          <button id="table-confirm" type="button" class="btn btn-primary modal-dismiss-button language"
+            data-dismiss="modal" language-tag="Confirm">Confirm</button>
+          <button type="button" class="btn btn-secondary modal-dismiss-button language" data-dismiss="modal"
+            language-tag="Close">Close</button>
         </div>
       </div>
     </div>
@@ -303,11 +315,11 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Insert equations:</h5>
+          <h5 class="modal-title language" language-tag="Insert Equations">Insert equations:</h5>
         </div>
         <div class="modal-body">
           <div id="math-button-panel" class="w-100 p-3">
-            <div class="row">Common letters:</div>
+            <div class="row language" language-tag="Common Letters">Common letters:</div>
             <div class="row">
               <button class="col btn btn-light btn-sm math-buttons m-1" title="alpha"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="beta"></button>
@@ -335,7 +347,7 @@
               <button class="col btn btn-light btn-sm math-buttons m-1" title='fr{AaBbCc}'></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title='sf{AaBbCc}'></button>
             </div>
-            <div class="row mt-1 mb-1">Operation symbols:</div>
+            <div class="row mt-1 mb-1 language" language-tag="Operation symbols">Operation symbols:</div>
             <div class="row">
               <button class="col btn btn-light btn-sm math-buttons m-1" title="+"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="-"></button>
@@ -368,7 +380,7 @@
               <button class="col btn btn-light btn-sm math-buttons m-1" title="sin(x)"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="sin^1(x)"></button>
             </div>
-            <div class="row mt-1 mb-1">Miscellaneous symbols:</div>
+            <div class="row mt-1 mb-1 language" language-tag="Miscellaneous Symbols">Miscellaneous symbols:</div>
             <div class="row">
               <button class="col btn btn-light btn-sm math-buttons m-1" title="2/3"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="2^3"></button>
@@ -396,7 +408,7 @@
               <button class="col btn btn-light btn-sm math-buttons m-1" title="lArr"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="hArr"></button>
             </div>
-            <div class="row mt-1 mb-1">Relation symbols:</div>
+            <div class="row mt-1 mb-1 language" language-tag="Relation Symbols">Relation symbols:</div>
             <div class="row">
               <button class="col btn btn-light btn-sm math-buttons m-1" title="="></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="!="></button>
@@ -417,7 +429,7 @@
               <button class="col btn btn-light btn-sm math-buttons m-1" title="-="></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="~="></button>
             </div>
-            <div class="row mt-1 mb-1">Logical symbols:</div>
+            <div class="row mt-1 mb-1 language" language-tag="Logical Symbols">Logical symbols:</div>
             <div class="row">
               <button class="col btn btn-light btn-sm math-buttons m-1" title="and"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="or"></button>
@@ -432,7 +444,7 @@
               <button class="col btn btn-light btn-sm math-buttons m-1" title="|--"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="|=="></button>
             </div>
-            <div class="row mt-1 mb-1">Accents:</div>
+            <div class="row mt-1 mb-1 language" language-tag="Accents">Accents:</div>
             <div class="row">
               <button class="col btn btn-light btn-sm math-buttons m-1" title="hat x"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="bar x"></button>
@@ -447,30 +459,33 @@
               <button class="col btn btn-light btn-sm math-buttons m-1" title="color(red)(x)"></button>
               <button class="col btn btn-light btn-sm math-buttons m-1" title="cancel(x)"></button>
             </div>
-            <div class="row mt-2 text-muted">Full symbol list at http://asciimath.org/</div>
+            <div class="row mt-2 text-muted"><span class="language" language-tag="Full Symbol List at">Full symbol list
+                at</span> http://asciimath.org/</div>
           </div>
           <div class="row mt-4 w-100 h-75 justify-content-center">
             <div class="col-auto p-2 m-1 block-container equation-container" eq-style="inline">
-              <p><b>Inline Mode</b></p>
-              <p>Equation is <span id="example-inline-equation">f(x) = x^2</span>.</p>
+              <p><b class="language" language-tag="Inline Mode">Inline Mode</b></p>
+              <p><span class="language" language-tag="Equation is">Equation is</span> <span
+                  id="example-inline-equation">f(x) = x^2</span><span class="language" language-tag="full-stop">.</p>
             </div>
             <div class="col-auto p-2 m-1 block-container equation-container block-highlight"
               eq-style="display-numbered">
-              <p><b>Display Mode - Numbered</b></p>
-              <p>Equation is:</p>
+              <p><b class="language" language-tag="Display Mode Numbered">Display Mode - Numbered</b></p>
+              <p class="language" language-tag="Equation is">Equation is:</p>
               <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-numbered-equation">f(x) = x^2</span>&emsp;&emsp;(1)
               </p>
             </div>
             <div class="col-auto p-2 m-1 block-container equation-container" eq-style="display-unnumbered">
-              <p><b>Display Mode - Unnumbered</b></p>
-              <p>Equation is:</p>
+              <p><b class="language" language-tag="Display Mode Unnumbered">Display Mode - Unnumbered</b></p>
+              <p class="language" language-tag="Equation is">Equation is:</p>
               <p>&emsp;&emsp;&emsp;&emsp;<span id="example-display-unnumbered-equation">f(x) = x^2</span></p>
             </div>
           </div>
           <div class="mt-2 ml-3">
             <div class="row">
-              <strong>Type math below:&nbsp;</strong>
-              <span class="text-muted">(starts with "\" to input latex command)</span>
+              <strong><span class="language" language-tag="Type math below">Type math below:</span>&nbsp;</strong>
+              <span class="text-muted language" language-tag="input-latex-equation-hint">(starts with "\" to input latex
+                command)</span>
             </div>
             <div class="row mt-2"><textarea id="math-field" class="w-75"></textarea></div>
             <div class="row mt-3 mb-3" id="rendered-input-equation"></div>
@@ -478,8 +493,9 @@
           </div>
 
           <div class="w-100 mt-4">
-            <button class="btn btn-outline-dark" type="button" data-toggle="collapse" data-target="#collapseExample"
-              aria-expanded="false" aria-controls="collapseExample">
+            <button class="btn btn-outline-dark language" type="button" data-toggle="collapse"
+              data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"
+              language-tag="Click to see some examples">
               Click to see some examples
             </button>
             <div class="collapse" id="collapseExample">
@@ -536,9 +552,10 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button"
-            data-dismiss="modal">Confirm</button>
-          <button type="button" class="btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+          <button id="equation-confirm" type="button" class="btn btn-primary modal-dismiss-button language"
+            data-dismiss="modal" language-tag="Confirm">Confirm</button>
+          <button type="button" class="btn btn-secondary modal-dismiss-button language" data-dismiss="modal"
+            language-tag="Close">Close</button>
         </div>
       </div>
     </div>
@@ -548,26 +565,25 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Quoting</h5>
+          <h5 class="modal-title language" language-tag="Quoting">Quoting</h5>
         </div>
         <div class="modal-body p-2 row">
           <div class="col-auto mt-1 h-100">
             <div class="p-3 m-1 block-container quote-container" qt-style="quote">
               <p id="quote-name"><b>Quote</b></p>
               <p>A typographical rule of thumb for the<br>
-                 line length is:</p>
+                line length is:</p>
               <p class="mt-2 mb-2">&emsp;&emsp;On average, no line should be<br>
-              &emsp;&emsp;longer than 66 characters.</p>
+                &emsp;&emsp;longer than 66 characters.</p>
             </div>
-            <div class="p-3 m-1 block-container quote-container block-highlight"
-              qt-style="quotation">
+            <div class="p-3 m-1 block-container quote-container block-highlight" qt-style="quotation">
               <p id="quotation-name"><b>Quotation</b></p>
               <p>Rabindranath Tagore's short poem:</p>
               <p class="mt-3">
-                  &emsp;&emsp;Beauty is truth’s smile when she beholds<br>
-                  &emsp;her own face in a perfect mirror.<br>
-                  &emsp;&emsp;Beauty is truth’s smile when she beholds<br>
-                  &emsp;her own face in a perfect mirror.
+                &emsp;&emsp;Beauty is truth’s smile when she beholds<br>
+                &emsp;her own face in a perfect mirror.<br>
+                &emsp;&emsp;Beauty is truth’s smile when she beholds<br>
+                &emsp;her own face in a perfect mirror.
               </p>
             </div>
             <div class="p-3 m-1 block-container quote-container" qt-style="verse">
@@ -581,14 +597,15 @@
             </div>
           </div>
           <div class="col-4 mt-2 align-self-center">
-              <p><strong>Input:</strong></p>
-              <textarea id="quote-text" style="width: 25vw; height: 40vh;"></textarea>
+            <p><strong><span class="language" language-tag="Input">Input:</span></strong></p>
+            <textarea id="quote-text" style="width: 25vw; height: 40vh;"></textarea>
           </div>
         </div>
         <div class="modal-footer row justify-content-center">
-          <button id="quote-confirm" type="button" class="col-2 btn btn-primary modal-dismiss-button"
-            data-dismiss="modal">Confirm</button>
-          <button type="button" class="col-2 ml-2 btn btn-secondary modal-dismiss-button" data-dismiss="modal">Close</button>
+          <button id="quote-confirm" type="button" class="col-2 btn btn-primary modal-dismiss-button language"
+            data-dismiss="modal" language-tag="Confirm">Confirm</button>
+          <button type="button" class="col-2 ml-2 btn btn-secondary modal-dismiss-button language" data-dismiss="modal"
+            language-tag="Close">Close</button>
         </div>
       </div>
     </div>

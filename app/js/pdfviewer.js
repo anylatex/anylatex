@@ -150,7 +150,8 @@ setInterval(() => {
             document.getElementById('navbar').classList.remove('d-none')
             loader.classList.remove('d-none')
             spinner.classList.add('d-none')
-            document.getElementById('loader-hint').innerText = 'Press "ctrl+s" or click "compile" button above to compile the PDF'
+            const languageMap = remote.getGlobal('currentLanguageMap')
+            document.getElementById('loader-hint').innerText = languageMap['Compile Hint']
         }
         return
     }
