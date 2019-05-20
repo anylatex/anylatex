@@ -25,6 +25,8 @@ $(function () {
             buttonEl.innerHTML = ''
             nameEl.innerText = name
             nameEl.setAttribute('id', id + 'name')
+            nameEl.classList.remove('language')
+            nameEl.removeAttribute('language-tag')
             newDocButton.attr('id', id + 'panel')
             newDocButton.prependTo(documentsPanel)
             var iframe = document.createElement('iframe')
@@ -39,6 +41,22 @@ $(function () {
 // cancel loading animation
 document.getElementById('page-loader-container').classList.add('d-none')
 
+// setup HTML language
+function setupHTMLLanguage(languageMap) {
+    for (const languageEl of document.getElementsByClassName('language')) {
+        const languageTag = languageEl.getAttribute('language-tag')
+        const result = languageMap[languageTag]
+        if (!result) {
+            console.log('no corresponding translation of ' + languageTag
+                        + ' to ' + remote.getGlobal('currentLanguage'))
+        } else {
+            languageEl.innerText = result
+        }
+    }
+}
+var languageMap = remote.getGlobal('currentLanguageMap')
+setupHTMLLanguage(languageMap)
+
 // register context menus
 $.contextMenu({
     selector: '.document-button',
@@ -47,13 +65,13 @@ $.contextMenu({
         else if (key === 'delete') deleteDocument($(this).get(0))
     },
     items: {
-        "edit": { name: "Edit", icon: "edit" },
-        "delete": { name: "Delete", icon: "delete" },
+        "edit": { name: languageMap['Edit'], icon: "edit" },
+        "delete": { name: languageMap['Delete'], icon: "delete" },
     }
 })
 
 $('#create-document').on('click', () => {
-    const documentName = document.getElementById('new-document-name').value || "unnamed"
+    const documentName = document.getElementById('new-document-name').value || languageMap['unnamed']
     const documentID = Math.random().toString(36).substr(2, 9)
     store.createDocument(documentID, documentName)
     ipcRenderer.send('set-variable', { name: 'currentDocumentID', value: documentID })
@@ -81,3 +99,12 @@ let deleteDocument = (buttonEl) => {
     store.deleteDocument(id)
     document.getElementById(id + 'panel').remove()
 }
+
+$('.switch-language').on('click', event => {
+    const target = event.target
+    const language = target.getAttribute('data')
+    ipcRenderer.sendSync('switch-language', language)
+    languageMap = remote.getGlobal('currentLanguageMap')
+    setupHTMLLanguage(languageMap)
+    alert(languageMap['switch-language-hint'])
+})

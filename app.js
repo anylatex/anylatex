@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
+const fs = require('fs')
 const url = require('url')
 const superagent = require('superagent')
 const Store = require("./app/js/store")
@@ -13,6 +14,17 @@ const store = new Store({
     }
 })
 global.store = store
+
+global.languages = {
+    'en': path.join(__dirname, 'app/assets/en.json'),
+    'zh': path.join(__dirname, 'app/assets/zh.json')
+}
+global.switchLanguage= (language) => {
+    global.currentLanguageMap = JSON.parse(fs.readFileSync(global.languages[language]))
+    global.currentLanguage = language
+    store.setConfig('language', language)
+}
+global.switchLanguage(store.getConfig('language') || 'en')
 
 // Wait until the app is ready
 app.once('ready', () => {
@@ -179,4 +191,10 @@ ipcMain.on("pop-page", (event, arg) => {
             slashes: true
         }))
     }
+})
+
+// switch languages
+ipcMain.on("switch-language", (event, arg) => {
+    global.switchLanguage(arg)
+    event.returnValue = "done"
 })
