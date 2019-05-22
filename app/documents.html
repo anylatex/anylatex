@@ -36,11 +36,14 @@
     </div>
   </div>
 
-  <div class="row justify-content-end mt-2 mb-1 mr-2">
-    <div class="col-auto align-self-end">
+  <div class="row mt-2 mb-1 mr-2">
+    <div class="col-2"></div>
+    <div class="col-8 center-content"><a href="#" class="language" language-tag="Settings" data-toggle="modal"
+        data-target="#settings-modal">Settings</a></div>
+    <div class="col-2 align-self-center">
       <div class="dropup">
         <ul class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="language" language-tag="Languages">Languages</span>
             </button>
             <div class="dropdown-menu switch-language" aria-labelledby="dropdownMenuButton">
@@ -67,6 +70,50 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-primary language" id="create-document" language-tag="Create">Create</button>
           <button type="button" class="btn btn-secondary language" data-dismiss="modal" language-tag="Close">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Model -->
+  <div class="modal fade" id="settings-modal" tabindex="-1" role="dialog" aria-labelledby="settingsModal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title language" language-tag="Settings">Settings</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row m-2">
+            <div class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text language" language-tag="Server Address">Server Address</span>
+              </div>
+              <input id="input-server-address" type="text" class="form-control" placeholder="" />
+            </div>
+          </div>
+          <div class="row m-2">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text language" language-tag="User Data Path"></span>
+              </div>
+              <input id="user-data-path" type="text" class="form-control" readonly style="background-color: white">
+              <div class="input-group-append">
+                <button class="btn btn-secondary language" id="open-data-dir" language-tag="open" data-dismiss="modal">
+                  Open
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary language" data-dismiss="modal"
+            language-tag="Close">Close</button>
+          <button id="save-settings-changes" type="button" class="btn btn-primary language" data-dismiss="modal"
+            language-tag="Save">Save changes</button>
         </div>
       </div>
     </div>

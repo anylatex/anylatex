@@ -57,5 +57,16 @@
     "Waiting for compiling task": "等待编译完成",
     "Creating compiling task": "创建编译任务",
     "Downloading the pdf": "下载 PDF",
-    "Compile Hint": "按下按钮进行编译"
+    "Compile Hint": "按下按钮进行编译",
+    "Settings": "设置",
+    "Import": "导入",
+    "Export": "导出",
+    "Import user data (documents and config)": "导入用户数据（文档与配置）",
+    "Export user data (documents and config)": "导出用户数据（文档与配置）",
+    "Setup server address": "设置服务器地址",
+    "Server Address": "服务器地址",
+    "Save": "保存",
+    "current server address": "当前服务器地址：",
+    "open": "打开",
+    "User Data Path": "用户数据文件夹"
 }

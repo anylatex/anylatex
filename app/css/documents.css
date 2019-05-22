@@ -33,3 +33,12 @@
   -webkit-transform: scale(0.4);
   -webkit-transform-origin: 0 0;
 }
+
+.center-content {
+  text-align:center;
+}
+.center-content a {
+  color: rgb(108, 117, 125);
+  text-decoration: underline;
+  font-weight: bold;
+}

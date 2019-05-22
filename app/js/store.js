@@ -47,6 +47,25 @@ class Store {
         }
     }
 
+    updateUserID(oldUserID, newUserID) {
+        if (!oldUserID) {
+            // TODO: to test
+            this.createNewUser(newUserID)
+            return
+        }
+        this.setConfig('currentUserID', newUserID)
+        if (!this.getConfig('usersID')) {
+            this.setConfig('usersID', [newUserID])
+        } else {
+            let usersID = this.getConfig('usersID')
+            let oldUserIDIndex = usersID.indexOf(oldUserID)
+            usersID[oldUserIDIndex] = newUserID
+        }
+        const newDataPath = path.join(this.appDataPath, newUserID)
+        fs.renameSync(this.dataPath, newDataPath)
+        this.dataPath = newDataPath
+    }
+
     getConfig(key, defaultValue) {
         return this.config[key] || defaultValue
     }
