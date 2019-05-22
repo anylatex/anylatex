@@ -1,6 +1,7 @@
-const { ipcRenderer, remote } = require('electron')
+const { ipcRenderer, remote, shell } = require('electron')
 const store = remote.getGlobal('store')
 const path = require('path')
+const superagent = require('superagent')
 
 
 $(function () {
@@ -107,4 +108,40 @@ $('.switch-language').on('click', event => {
     languageMap = remote.getGlobal('currentLanguageMap')
     setupHTMLLanguage(languageMap)
     alert(languageMap['switch-language-hint'])
+})
+
+$('#settings-modal').on('show.bs.modal', event => {
+    // show current server address
+    const apiBase = store.getConfig('apiBase') 
+    const hint = languageMap['current server address'] + apiBase
+    document.getElementById('input-server-address').setAttribute('placeholder', hint)
+    // show user data path
+    document.getElementById('user-data-path').value = store.dataPath
+})
+
+$('#save-settings-changes').on('click', event => {
+    // TODO: check format
+    const newApiBase = document.getElementById('input-server-address').value.trim()
+    if (newApiBase == store.getConfig('apiBase')) return
+    // create an user at server
+    superagent
+        .post(`${newApiBase}/users`)
+        .ok(res => res.status == '201')
+        .retry(5)
+        .then(res => {
+            const userID = res.body.user_id
+            console.log('new user id:', userID)
+            store.updateUserID(remote.getGlobal('userID'), userID)
+            ipcRenderer.sendSync('set-variable', { name: 'userID', value: userID})
+            store.setConfig('apiBase', newApiBase)
+            store.setConfig('currentUserID', userID)
+        })
+        .catch(err => {
+            console.log(err)
+            alert('error: fail to switch server, create user failed')
+        })
+})
+
+$('#open-data-dir').on('click', event => {
+    shell.openItem(store.dataPath)
 })

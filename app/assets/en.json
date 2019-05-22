@@ -57,5 +57,16 @@
     "Waiting for compiling task": "Waiting for compiling task",
     "Creating compiling task": "Creating compiling task",
     "Downloading the pdf": "Downloading the pdf",
-    "Compile Hint": "Press 'ctrl+s' or click 'compile' button above to compile the PDF"
+    "Compile Hint": "Press 'ctrl+s' or click 'compile' button above to compile the PDF",
+    "Settings": "Settings",
+    "Import": "Import",
+    "Export": "Export",
+    "Import user data (documents and config)": "Import user data (documents and config)",
+    "Export user data (documents and config)": "Export user data (documents and config)",
+    "Setup server address": "Setup server address",
+    "Server Address": "Server Address",
+    "Save": "Save",
+    "current server address": "current address: ",
+    "open": "open",
+    "User Data Path": "User Data Path"
 }
