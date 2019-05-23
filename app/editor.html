@@ -33,13 +33,13 @@
       <button command="bold" value="" class="btn btn-light" type="button"><i class="fas fa-bold"></i></button>
       <button command="italic" value="" class="btn btn-light" type="button"><i class="fas fa-italic"></i></button>
       <button command="underline" value="" class="btn btn-light" type="button"><i class="fas fa-underline"></i></button>
-      <button command="justifyLeft" value="" class="btn btn-light" type="button"><i
+      <button id="jl" command="justifyLeft" value="" class="btn btn-light" type="button"><i
           class="fas fa-align-left"></i></button>
-      <button command="justifyCenter" value="" class="btn btn-light" type="button"><i
+      <button id="jc" command="justifyCenter" value="" class="btn btn-light" type="button"><i
           class="fas fa-align-center"></i></button>
-      <button command="justifyRight" value="" class="btn btn-light" type="button"><i
+      <button id="jr" command="justifyRight" value="" class="btn btn-light" type="button"><i
           class="fas fa-align-right"></i></button>
-      <button command="justifyFull" value="" class="btn btn-light" type="button"><i
+      <button id="jf" command="justifyFull" value="" class="btn btn-light" type="button"><i
           class="fas fa-align-justify"></i></button>
       <button command="insertUnorderedList" value="" class="btn btn-light" type="button"><i
           class="fas fa-list-ul"></i></button>
@@ -73,6 +73,15 @@
           Templates
         </button>
         <div class="dropdown-menu" id="templates-dropdown">
+          <input type="hidden" value="" id="current-template" />
+        </div>
+      </div>
+      <div id="env-dropdown-button" class="btn-group d-none" role="group">
+        <button type="button" class="btn btn-light dropdown-toggle font-weight-bolder language"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" language-tag="Environments">
+          Environments
+        </button>
+        <div class="dropdown-menu" id="env-dropdown">
           <input type="hidden" value="" id="current-template" />
         </div>
       </div>
@@ -122,7 +131,10 @@
               <div id="part-args-editor"
                 class="row h-25 mt-4 align-items-center justify-content-center no-gutters d-none">
                 <div class="col h-100">
-                  <div id="part-args-name" class="font-weight-bold mb-4"></div>
+                  <div class="mb-4">
+                    <span id="part-args-name" class="font-weight-bold mr-2"></span>
+                    <span id="env-name"></span>
+                  </div>
                   <div id="part-editor" class="editor w-100" contenteditable></div>
                   <button class="btn btn-primary mt-2 language" id="part-args-confirm"
                     language-tag="Confirm">Confirm</button>

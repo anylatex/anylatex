@@ -116,14 +116,15 @@ function parseTemplates(jsonBody) {
             global.defaultTemplateName = jsonBody.default
             continue
         }
-        let { headings, args, part_args: partArgs } = jsonBody[templateName]
+        let { headings, args, part_args: partArgs, envs } = jsonBody[templateName]
         if (!headings) {
             headings = ['section', 'subsection', 'subsubsection']
         }
         global.templateArgs[templateName] = {
             headings: headings,
             args: args,
-            partArgs: partArgs
+            partArgs: partArgs,
+            envs: envs
         }
     }
     store.setConfig('templateArgs', global.templateArgs)

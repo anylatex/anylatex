@@ -129,6 +129,11 @@ equation > * {
   border-right: 3px solid black;
 }
 
+.env {
+  border: 2px solid black;
+  min-height: 40px;
+}
+
 .disable-select {
   user-select: none;
 }

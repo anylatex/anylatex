@@ -250,6 +250,17 @@ class Converter {
                 case 'QUOTE-EXTRA':
                     latex = latex.replace(outerHTML, parsedInnerLatex)
                     break
+                // Converting environments
+                case 'ENV':
+                    var env = element.getAttribute('type')
+                    parsedInnerLatex = `\n\\begin{${env}}\n`
+                        + `${this._convert_elements(element.innerHTML)}\n`
+                        + `\n\\end{${env}}\n`
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
+                case 'ENV-EXTRA':
+                    latex = latex.replace(outerHTML, parsedInnerLatex)
+                    break
                 // Converting others
                 case 'DIV':
                     parsedInnerLatex = `\n\n${this._convert_elements(element.innerHTML, parentNode)}\n\n`

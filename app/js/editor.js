@@ -83,6 +83,7 @@ setupHTMLLanguage(languageMap)
 
 /* Tool Functions */
 var editorRange = ''
+var partEditorRange = ''
 // Credit Raab at https://stackoverflow.com/a/11077016
 function insertTextAtCaret(field, text) {
     if (field.selectionStart || field.selectionStart == '0') {
@@ -97,7 +98,13 @@ function insertTextAtCaret(field, text) {
 }
 // Credit: Tim Down at https://stackoverflow.com/a/6691294
 function insertElementAtCaret(html) {
-    const range = editorRange
+    var range
+    var isMainEditor = document.getElementById('part-args-editor').classList.contains('d-none')
+    if (isMainEditor) {
+        range = editorRange
+    } else {
+        range = partEditorRange
+    }
     range.deleteContents();
 
     var el = document.createElement("div");
@@ -107,10 +114,12 @@ function insertElementAtCaret(html) {
         frag.appendChild(node);
     }
     range.insertNode(frag);
-    // force saving
-    save(null, true)
-    // trigger content change event
-    editorContentChangeHandler(null)
+    if (isMainEditor) {
+        // force saving
+        save(null, true)
+        // trigger content change event
+        editorContentChangeHandler(null)
+    }
 }
 
 /* Get Available Templates */
@@ -154,7 +163,7 @@ var compiledHtml = ''
         document.getElementById('dropdown-button').innerText = `${languageMap['Templates']}(${template})`
         setTemplateHeadings(template)
         setTemplateArguments(template)
-        if (templateArgs[template]['partArgs']) {
+        if (templateArgs[template]['partArgs'] && partArguments) {
             const templatePartArgNames = Object.keys(templateArgs[template]['partArgs'])
             for (const argName of Object.keys(partArguments)) {
                 if (templatePartArgNames.indexOf(argName) < 0) continue
@@ -162,7 +171,7 @@ var compiledHtml = ''
                 document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
             }
         }
-        if (templateArgs[template]['args']) {
+        if (templateArgs[template]['args'] && args) {
             let argNames = Object.keys(args)
             let templateArgNames = Object.keys(templateArgs[template]['args'])
             for (const argName of argNames) {
@@ -843,6 +852,7 @@ $('#part-editor').on('blur keyup paste input', savePart)
 editor.addEventListener('mouseover', editorHoverHandler)
 document.addEventListener('selectionchange', editorSelectionHandler)
 $('#editor').bind('keyup click focus', editorCursorChange)
+$('#part-editor').bind('keyup click focus', partEditorCursorChange)
 // ctrl+s, force saving and recompiling
 document.addEventListener('keydown', event => {
     if (event.ctrlKey == true && event.key == 's') {
@@ -1185,6 +1195,13 @@ function editorCursorChange() {
     }
 }
 
+function partEditorCursorChange() {
+    let sel = window.getSelection()
+    if (sel.getRangeAt && sel.rangeCount) {
+        partEditorRange = sel.getRangeAt(0)
+    }
+}
+
 function editorSelectionHandler() {
     for (let i = 0; i < controllingCommands.length; i++) {
         let command = controllingCommands[i]
@@ -1238,6 +1255,8 @@ let templatePartArgConfirmButton = document.getElementById('part-args-confirm')
 templatePartArgConfirmButton.addEventListener('click', confirmPartArg)
 let templateArgsConfirmButton = document.getElementById('arguments-confirm')
 templateArgsConfirmButton.addEventListener('click', saveArgs)
+let templateEnvDropdown = document.getElementById('env-dropdown')
+templateEnvDropdown.addEventListener('click', templateEnvDropdownHandler)
 
 function saveArgs() {
     var templateName = document.getElementById('current-template').value
@@ -1297,40 +1316,51 @@ function setTemplateArguments(templateName) {
     let currentTemplatePartArgs = templateArgs[templateName]['partArgs']
     let partArgsDiv = document.getElementById('part-arguments')
     partArgsDiv.innerHTML = ''
+    const { stat } = store.getOneDocumentData(documentID)
+    const savedArgs = stat['args']
+    const savedPartArguments = stat['partArguments']
     if (!currentTemplateArgs) {
         // no args
         if (!templateModalButton.classList.contains('d-none')) {
             templateModalButton.classList.add('d-none')
         }
-        return
-    }
-    if (templateModalButton.classList.contains('d-none')) {
-        templateModalButton.classList.remove('d-none')
-    }
-    let argNames = Object.keys(currentTemplateArgs)
-    for (let i = 0; i < argNames.length; i++) {
-        let argName = argNames[i]
-        let { help } = currentTemplateArgs[argName]
+    } else {
+        if (templateModalButton.classList.contains('d-none')) {
+            templateModalButton.classList.remove('d-none')
+        }
+        let argNames = Object.keys(currentTemplateArgs)
+        for (let i = 0; i < argNames.length; i++) {
+            let argName = argNames[i]
+            let { help } = currentTemplateArgs[argName]
 
-        let inputDiv = document.createElement('div')
-        inputDiv.classList.add('input-group')
-        inputDiv.classList.add('mb-3')
-        let inputPrepend = document.createElement('div')
-        inputPrepend.classList.add('input-group-prepend')
-        let prependSpan = document.createElement('span')
-        prependSpan.classList.add('input-group-text')
-        prependSpan.setAttribute('id', argName + 'prepend')
-        prependSpan.innerText = help
-        inputPrepend.appendChild(prependSpan)
-        let input = document.createElement('input')
-        input.setAttribute('type', 'text')
-        input.classList.add('form-control')
-        input.setAttribute('aria-describedby', argName + 'prepend')
-        input.setAttribute('id', argName)
+            let inputDiv = document.createElement('div')
+            inputDiv.classList.add('input-group')
+            inputDiv.classList.add('mb-3')
+            let inputPrepend = document.createElement('div')
+            inputPrepend.classList.add('input-group-prepend')
+            let prependSpan = document.createElement('span')
+            prependSpan.classList.add('input-group-text')
+            prependSpan.setAttribute('id', argName + 'prepend')
+            prependSpan.innerText = help
+            inputPrepend.appendChild(prependSpan)
+            let input = document.createElement('input')
+            input.setAttribute('type', 'text')
+            input.classList.add('form-control')
+            input.setAttribute('aria-describedby', argName + 'prepend')
+            input.setAttribute('id', argName)
 
-        inputDiv.appendChild(inputPrepend)
-        inputDiv.appendChild(input)
-        argsDiv.appendChild(inputDiv)
+            inputDiv.appendChild(inputPrepend)
+            inputDiv.appendChild(input)
+            argsDiv.appendChild(inputDiv)
+        }
+        // recover args if exist
+        if (savedArgs) {
+            for (const argName of Object.keys(savedArgs)) {
+                if (argNames.indexOf(argName) < 0) continue
+                const argValue = savedArgs[argName]
+                document.getElementById(argName).value = argValue
+            }
+        }
     }
 
     if (!currentTemplatePartArgs) {
@@ -1338,50 +1368,69 @@ function setTemplateArguments(templateName) {
         if (!partArgsDiv.classList.contains('d-none')) {
             partArgsDiv.classList.add('d-none')
         }
-        return
     } else {
         // remove d-none
         if (partArgsDiv.classList.contains('d-none')) {
             partArgsDiv.classList.remove('d-none')
         }
+        let partArgNames = Object.keys(currentTemplatePartArgs)
+        let partArgsEditorDiv = document.getElementById('part-args-editor')
+        for (let i = 0; i < partArgNames.length; i++) {
+            let argName = partArgNames[i]
+            let { env, help } = currentTemplatePartArgs[argName]
+            let argLink = document.createElement('a')
+            argLink.innerText = argName
+            argLink.classList.add('anchor-link')
+            argLink.classList.add('arguments')
+            argLink.setAttribute('href', '#')
+            argLink.setAttribute('help', help)
+            if (env) {
+                argLink.setAttribute('env', env)
+            }
+            partArgsDiv.appendChild(argLink)
+            partArgsDiv.appendChild(document.createElement('br'))
+            let input = document.createElement('input')
+            input.setAttribute('type', 'hidden')
+            input.setAttribute('name', argName)
+            input.setAttribute('id', argName + '-' + 'value')
+            input.setAttribute('value', '')
+            partArgsEditorDiv.appendChild(input)
+        }
+        // recover arguements if exist
+        if (savedPartArguments) {
+            for (const argName of Object.keys(savedPartArguments)) {
+                if (partArgNames.indexOf(argName) < 0) continue
+                const argValue = savedPartArguments[argName]
+                document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
+            }
+        }
     }
-    let partArgNames = Object.keys(currentTemplatePartArgs)
-    let partArgsEditorDiv = document.getElementById('part-args-editor')
-    for (let i = 0; i < partArgNames.length; i++) {
-        let argName = partArgNames[i]
-        let { help } = currentTemplatePartArgs[argName]
-        let argLink = document.createElement('a')
-        argLink.innerText = argName
-        argLink.classList.add('anchor-link')
-        argLink.classList.add('arguments')
-        argLink.setAttribute('href', '#')
-        argLink.setAttribute('help', help)
-        partArgsDiv.appendChild(argLink)
-        partArgsDiv.appendChild(document.createElement('br'))
-        let input = document.createElement('input')
-        input.setAttribute('type', 'hidden')
-        input.setAttribute('name', argName)
-        input.setAttribute('id', argName + '-' + 'value')
-        input.setAttribute('value', '')
-        partArgsEditorDiv.appendChild(input)
-    }
-    const { stat } = store.getOneDocumentData(documentID)
-    const savedArgs = stat['args']
-    const savedPartArguments = stat['partArguments']
-    // recover args if exist
-    for (const argName of Object.keys(savedArgs)) {
-        if (argNames.indexOf(argName) < 0) continue
-        const argValue = savedArgs[argName]
-        document.getElementById(argName).value = argValue
-    }
-    // recover arguements if exist
-    for (const argName of Object.keys(savedPartArguments)) {
-        if (partArgNames.indexOf(argName) < 0) continue
-        const argValue = savedPartArguments[argName]
-        document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
+
+    // environments
+    let envs = templateArgs[templateName]['envs']
+    let envButton = document.getElementById('env-dropdown-button')
+    if (!envs) {
+        if (!envButton.classList.contains('d-none')) {
+            envButton.classList.add('d-none')
+        }
+    } else {
+        if (envButton.classList.contains('d-none')) {
+            envButton.classList.remove('d-none')
+        }
+        let dropdownElement = document.getElementById('env-dropdown')
+        for (let i = 0; i < envs.length; i++) {
+            let envName = envs[i]
+            let dropdownItem = document.createElement('a')
+            dropdownItem.className = 'dropdown-item'
+            dropdownItem.setAttribute('href', '#')
+            dropdownItem.setAttribute('id', 'dropdown' + envName)
+            dropdownItem.innerText = envName
+            dropdownElement.appendChild(dropdownItem)
+        }
     }
 }
 
+// template dropdown handler
 function templateDropdownHandler(event) {
     var target = event.target
     var templateName = target.getAttribute('id')
@@ -1392,7 +1441,7 @@ function templateDropdownHandler(event) {
     }
     ipcRenderer.send('alert', 'set template:' + templateName)
     document.getElementById('current-template').value = templateName
-    document.getElementById('dropdown-button').innerText = `Templates(${templateName})`
+    document.getElementById('dropdown-button').innerText = `${languageMap['Templates']}(${templateName})`
 
     // headings
     setTemplateHeadings(templateName)
@@ -1404,6 +1453,28 @@ function templateDropdownHandler(event) {
     store.updateDocument({ id: documentID, templateName: templateName })
 }
 
+// template env dropdown handler
+function templateEnvDropdownHandler(event) {
+    let envSpan = document.getElementById('env-name')
+    envSpan.innerText = languageMap['Environments'] + ' - ' + event.target.innerText
+    document.getElementById('part-args-name').innerText = ''
+    let partArgsEditor = document.getElementById('part-editor')
+    partArgsEditor.innerHTML = ''
+    let partArgsEditorDiv = document.getElementById('part-args-editor')
+    let documentEditor = document.getElementById('editor')
+    partArgsEditorDiv.classList.remove('d-none')
+    documentEditor.classList.add('d-none')
+    partArgsEditorDiv.setAttribute('env', event.target.innerText)
+    partArgsEditorDiv.setAttribute('insert', true)
+    partArgsEditorDiv.setAttribute('partArg', false)
+    // disable image button
+    document.getElementById('open-image-selector').disabled = true
+    document.getElementById('jl').disabled = true
+    document.getElementById('jr').disabled = true
+    document.getElementById('jc').disabled = true
+    document.getElementById('jf').disabled = true
+}
+
 // template part arguments' handler
 function templatePartArgsHandler(event) {
     if (event.target.tagName != 'A') {
@@ -1412,22 +1483,59 @@ function templatePartArgsHandler(event) {
     let partArgsEditorDiv = document.getElementById('part-args-editor')
     let partArgsEditor = document.getElementById('part-editor')
     let documentEditor = document.getElementById('editor')
+    let target = event.target
     partArgsEditorDiv.classList.remove('d-none')
     documentEditor.classList.add('d-none')
-    document.getElementById('part-args-name').innerText = event.target.innerText
-    partArgsEditor.innerHTML = document.getElementById(event.target.innerText + '-' + 'value').value
+    document.getElementById('part-args-name').innerText = target.innerText
+    if (target.getAttribute('env')) {
+        document.getElementById('env-name').innerText = languageMap['Environments'] + ' - ' + target.getAttribute('env')
+        partArgsEditorDiv.setAttribute('env', target.getAttribute('env'))
+    } else {
+        document.getElementById('env-name').innerText = ''
+    }
+    partArgsEditor.innerHTML = document.getElementById(target.innerText + '-' + 'value').value
+    partArgsEditorDiv.setAttribute('insert', false)
+    partArgsEditorDiv.setAttribute('partArg', true)
+    // disable image button
+    document.getElementById('open-image-selector').disabled = true
+    document.getElementById('jl').disabled = true
+    document.getElementById('jr').disabled = true
+    document.getElementById('jc').disabled = true
+    document.getElementById('jf').disabled = true
 }
 
 function confirmPartArg() {
-    let argName = document.getElementById('part-args-name').innerText
     let partArgsEditorDiv = document.getElementById('part-args-editor')
     let documentEditor = document.getElementById('editor')
-    let argValue = document.getElementById('part-editor').innerHTML
-    // store value
-    document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
-    savePart(true)
+    let isPartArg = partArgsEditorDiv.getAttribute('partArg')
+    let isInsert = partArgsEditorDiv.getAttribute('insert')
+    let env = partArgsEditorDiv.getAttribute('env')
+    if (isPartArg === 'true') {
+        let argName = document.getElementById('part-args-name').innerText
+        var argValue = document.getElementById('part-editor').innerHTML
+        // store value
+        document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
+        savePart(true)
+    }
     partArgsEditorDiv.classList.add('d-none')
     documentEditor.classList.remove('d-none')
+    if (isInsert === 'true') {
+        let texts = document.getElementById('part-editor').innerHTML
+
+        if (env) {
+            texts = '<div class="mt-1 mb-1 p-1 env" contenteditable=false>'
+                    + `<env-extra class="text-muted">${env}</env-extra><br>`
+                    + `<env type="${env}" style="color: black">${texts}</env></div><br>`
+        }
+        // insert into editor
+        insertElementAtCaret(texts)
+    }
+    // disable image button
+    document.getElementById('open-image-selector').disabled = false
+    document.getElementById('jl').disabled = false
+    document.getElementById('jr').disabled = false
+    document.getElementById('jc').disabled = false
+    document.getElementById('jf').disabled = false
 }
 
 
@@ -1458,12 +1566,13 @@ function compile() {
         let argNames = Object.keys(currentTemplateArgs)
         for (let i = 0; i < argNames.length; i++) {
             let argName = argNames[i]
-            let { help } = currentTemplateArgs[argName]
+            let { help, env } = currentTemplateArgs[argName]
             let argElement = document.getElementById(argName)
             var argValue = argElement.value
             if (!argValue) {
                 argValue = help
             }
+
             args[argName] = argValue
         }
     }
@@ -1478,13 +1587,18 @@ function compile() {
         let partArgNames = Object.keys(currentTemplatePartArgs)
         for (let i = 0; i < partArgNames.length; i++) {
             let argName = partArgNames[i]
-            let { help } = currentTemplatePartArgs[argName]
-            let argInput = document.getElementById(argName + '-' + 'value')
-            if (argInput) {
-                partArgs[argName] = converter.convert(argInput.value)
+            let { help, env } = currentTemplatePartArgs[argName]
+            let argValue = document.getElementById(argName + '-' + 'value').value
+            if (argValue) {
+                if (env) {
+                    argValue = `<env type="${env}">${argValue}</env>`
+                }
             } else {
-                partArgs[argName] = help
+                if (env) {
+                    argValue = `<env type="${env}">${help}</env>`
+                }
             }
+            partArgs[argName] = converter.convert(argValue)
         }
     }
 
@@ -1551,6 +1665,7 @@ function compile() {
             images: images,
             html: html
         }
+        console.log(compileTask)
         sendCompileTask(compileTask)
     })
 }

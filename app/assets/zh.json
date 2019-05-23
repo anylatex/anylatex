@@ -68,5 +68,6 @@
     "Save": "保存",
     "current server address": "当前服务器地址：",
     "open": "打开",
-    "User Data Path": "用户数据文件夹"
+    "User Data Path": "用户数据文件夹",
+    "Environments": "环境"
 }
