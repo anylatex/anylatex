@@ -24,46 +24,46 @@ $(function () {
     })
 })
 
-    /* Split panels, update tree's pinned status */
-    ; (function () {
-        const { stat } = store.getOneDocumentData(documentID)
-        var pinTree = stat['pinTree']
-        // tree is pinned by default in html.
-        // so, here will only need to detect if tree is unpinned
-        if (pinTree === false) {
-            var pinTreeButton = $('#pin-tree-panel')
-            var treePanel = $('#tree-panel')
-            pinTreeButton.removeClass('pinned')
-            // change the icon's style
-            $('#pin-icon').removeClass('pinned')
-            // unpin the panel
-            treePanel.removeClass('pinned')
-            // hide the tree
-            if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
+/* Split panels, update tree's pinned status */
+; (function () {
+    const { stat } = store.getOneDocumentData(documentID)
+    var pinTree = stat['pinTree']
+    // tree is pinned by default in html.
+    // so, here will only need to detect if tree is unpinned
+    if (pinTree === false) {
+        var pinTreeButton = $('#pin-tree-panel')
+        var treePanel = $('#tree-panel')
+        pinTreeButton.removeClass('pinned')
+        // change the icon's style
+        $('#pin-icon').removeClass('pinned')
+        // unpin the panel
+        treePanel.removeClass('pinned')
+        // hide the tree
+        if (!treePanel.hasClass('hide')) treePanel.addClass('hide')
+    }
+    var storedSizes = stat['splitSizes']
+    var sizes
+    if (storedSizes) {
+        sizes = JSON.parse(storedSizes)
+    } else {
+        // TODO: why total is not 100?
+        sizes = [40, 40]
+    }
+    Split(['#content-panel', '#pdf-panel'], {
+        elementStyle: function (dimension, size, gutterSize) {
+            return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }
+        },
+        sizes: sizes,
+        minSize: [650, 350],
+        gutterSize: 3,
+        onDrag: () => {
+            editorScrollBar.resize()
+        },
+        onDragEnd: endSizes => {
+            store.updateDocument({ id: documentID, splitSizes: endSizes })
         }
-        var storedSizes = stat['splitSizes']
-        var sizes
-        if (storedSizes) {
-            sizes = JSON.parse(storedSizes)
-        } else {
-            // TODO: why total is not 100?
-            sizes = [40, 40]
-        }
-        Split(['#content-panel', '#pdf-panel'], {
-            elementStyle: function (dimension, size, gutterSize) {
-                return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }
-            },
-            sizes: sizes,
-            minSize: [650, 350],
-            gutterSize: 3,
-            onDrag: () => {
-                editorScrollBar.resize()
-            },
-            onDragEnd: endSizes => {
-                store.updateDocument({ id: documentID, splitSizes: endSizes })
-            }
-        })
-    }())
+    })
+}())
 
 // setup HTML language
 function setupHTMLLanguage(languageMap) {
@@ -144,57 +144,57 @@ function setupTemplatesDropdown() {
 
 /* Load the document's content */
 var compiledHtml = ''
-    ; (function () {
-        let { documentContent, stat, pdfExists } = store.getOneDocumentData(documentID)
-        // recover document's content
-        if (documentContent) {
-            document.getElementById('editor').innerHTML = documentContent
-            // enable popovers
-            $(function () {
-                $('[data-toggle="popover"]').popover()
-            })
+; (function () {
+    let { documentContent, stat, pdfExists } = store.getOneDocumentData(documentID)
+    // recover document's content
+    if (documentContent) {
+        document.getElementById('editor').innerHTML = documentContent
+        // enable popovers
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    }
+    // recover template setting and arguments' content
+    let { template, args, partArguments } = stat
+    if (!template) {
+        template = defaultTemplateName
+    }
+    document.getElementById('current-template').value = template
+    document.getElementById('dropdown-button').innerText = `${languageMap['Templates']}(${template})`
+    setTemplateHeadings(template)
+    setTemplateArguments(template)
+    if (templateArgs[template]['partArgs'] && partArguments) {
+        const templatePartArgNames = Object.keys(templateArgs[template]['partArgs'])
+        for (const argName of Object.keys(partArguments)) {
+            if (templatePartArgNames.indexOf(argName) < 0) continue
+            const argValue = partArguments[argName]
+            document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
         }
-        // recover template setting and arguments' content
-        let { template, args, partArguments } = stat
-        if (!template) {
-            template = defaultTemplateName
+    }
+    if (templateArgs[template]['args'] && args) {
+        let argNames = Object.keys(args)
+        let templateArgNames = Object.keys(templateArgs[template]['args'])
+        for (const argName of argNames) {
+            if (templateArgNames.indexOf(argName) < 0) continue
+            const value = args[argName]
+            let argElement = document.getElementById(argName)
+            argElement.value = value
         }
-        document.getElementById('current-template').value = template
-        document.getElementById('dropdown-button').innerText = `${languageMap['Templates']}(${template})`
-        setTemplateHeadings(template)
-        setTemplateArguments(template)
-        if (templateArgs[template]['partArgs'] && partArguments) {
-            const templatePartArgNames = Object.keys(templateArgs[template]['partArgs'])
-            for (const argName of Object.keys(partArguments)) {
-                if (templatePartArgNames.indexOf(argName) < 0) continue
-                const argValue = partArguments[argName]
-                document.getElementById(argName + '-' + 'value').setAttribute('value', argValue)
-            }
-        }
-        if (templateArgs[template]['args'] && args) {
-            let argNames = Object.keys(args)
-            let templateArgNames = Object.keys(templateArgs[template]['args'])
-            for (const argName of argNames) {
-                if (templateArgNames.indexOf(argName) < 0) continue
-                const value = args[argName]
-                let argElement = document.getElementById(argName)
-                argElement.value = value
-            }
-        }
+    }
 
-        // generate outline tree
-        generateOutline()
+    // generate outline tree
+    generateOutline()
 
-        // Load compiled PDF
-        if (pdfExists != false) {
-            // TODO: check if content in editor corresponding to the existed pdf
-            compiledHtml = document.getElementById('editor').innerHTML
-            ipcRenderer.send('alert', 'load existed pdf: ' + pdfExists)
-            ipcRenderer.send('set-variable', { name: 'isCompileFinish', value: true })
-            ipcRenderer.send('set-variable', { name: 'pdfPath', value: pdfExists })
-        }
+    // Load compiled PDF
+    if (pdfExists != false) {
+        // TODO: check if content in editor corresponding to the existed pdf
+        compiledHtml = document.getElementById('editor').innerHTML
+        ipcRenderer.send('alert', 'load existed pdf: ' + pdfExists)
+        ipcRenderer.send('set-variable', { name: 'isCompileFinish', value: true })
+        ipcRenderer.send('set-variable', { name: 'pdfPath', value: pdfExists })
+    }
 
-    })()
+})()
 
 // cancel loading animation
 setTimeout(() => {
