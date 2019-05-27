@@ -9,7 +9,7 @@ let window = null
 const store = new Store({
     configName: 'anylatex-config',
     defaults: {
-        apiBase: 'http://latex.0x7cc.com/api',
+        apiBase: '',
         currentUserID: ''
     }
 })
