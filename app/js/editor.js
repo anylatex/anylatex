@@ -122,6 +122,11 @@ function insertElementAtCaret(html) {
     }
 }
 
+function getCaretElement() {
+    var node = document.getSelection().anchorNode
+    return (node.nodeType == 3 ? node.parentNode : node)
+}
+
 /* Get Available Templates */
 // Templates Arguments
 let templateArgs = store.getConfig('templateArgs')
@@ -1139,6 +1144,8 @@ function editorKeyHandler(event) {
             // cancel justify status
             justifyStatus = 'justifyLeft'
             document.execCommand('justifyLeft')
+            var curElement = getCaretElement()
+            curElement.removeAttribute("style")
             event.preventDefault()
             lastPressedKey = key
             return
