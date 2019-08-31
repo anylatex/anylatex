@@ -796,7 +796,7 @@ let commandEffectsCancelKeys = {
     italic: ['Enter'],
     underline: ['Enter'],
 }
-let justifies = ['justifyFull', 'justifyCenter', 'justifyLeft', 'justifyRight']
+let justifies = ['justifyCenter', 'justifyLeft', 'justifyRight']
 var justifyStatus = 'justifyLeft'
 var lastPressedKey = ''
 
