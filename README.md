@@ -12,6 +12,8 @@ Anylatex is designed to write small-to-medium documents like reports, articles o
 - inserting equations(using [asciimath][2] or buttons)
 - support cross reference of images, equations, tables and chapters
 
+![screenshot](./sample.jpg)
+
 # How to use
 
 ## Download the application
