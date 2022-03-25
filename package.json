@@ -21,7 +21,7 @@
     "webpack": "^4.30.0"
   },
   "devDependencies": {
-    "electron": "^4.0.5",
+    "electron": "^13.6.6",
     "electron-builder": "^20.39.0",
     "eslint": "^5.15.1"
   },
